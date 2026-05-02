@@ -7,8 +7,9 @@ const {
 const { protect, authorize } = require('../middleware/auth');
 
 router.use(protect);
-router.use(authorize('admin'));
 
-router.route('/').get(getStockAdjustments).post(createStockAdjustment);
+// Staff can view and create stock adjustments
+router.get('/', authorize('admin', 'staff'), getStockAdjustments);
+router.post('/', authorize('admin', 'staff'), createStockAdjustment);
 
 module.exports = router;

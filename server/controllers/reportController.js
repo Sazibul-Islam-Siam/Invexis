@@ -21,6 +21,11 @@ const getSalesReport = async (req, res, next) => {
       }
     }
 
+    // Staff can only see their own sales
+    if (req.user.role === 'staff') {
+      query.soldBy = req.user._id;
+    }
+
     const sales = await Sale.find(query)
       .populate('items.product', 'name sku category price')
       .populate('soldBy', 'name');

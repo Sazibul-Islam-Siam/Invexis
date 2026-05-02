@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import stockAdjustmentService from '../services/stockAdjustmentService';
 import productService from '../services/productService';
+import { useAuth } from '../context/AuthContext';
 import {
   HiOutlineAdjustments,
   HiOutlinePlus,
@@ -18,6 +19,7 @@ const typeConfig = {
 };
 
 const StockAdjustments = () => {
+  const { user } = useAuth();
   const [adjustments, setAdjustments] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -95,10 +97,12 @@ const StockAdjustments = () => {
           </h1>
           <p className="text-dark-400 mt-1">Track damaged, lost, expired, and corrected stock</p>
         </div>
-        <button onClick={openModal} className="btn-primary flex items-center gap-2">
-          <HiOutlinePlus className="text-lg" />
-          New Adjustment
-        </button>
+        {(user?.role === 'admin' || user?.role === 'staff') && (
+          <button onClick={openModal} className="btn-primary flex items-center gap-2">
+            <HiOutlinePlus className="text-lg" />
+            New Adjustment
+          </button>
+        )}
       </div>
 
       {/* Filter */}

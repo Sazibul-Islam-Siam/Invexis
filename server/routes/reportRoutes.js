@@ -8,10 +8,14 @@ const {
 const { protect, authorize } = require('../middleware/auth');
 
 router.use(protect);
-router.use(authorize('admin'));
 
-router.get('/sales', getSalesReport);
-router.get('/inventory', getInventoryReport);
-router.get('/stock-movements', getStockMovementReport);
+// Sales report: admin sees all, staff sees their own (scoped in controller)
+router.get('/sales', authorize('admin', 'staff'), getSalesReport);
+
+// Inventory report: admin and staff can view
+router.get('/inventory', authorize('admin', 'staff'), getInventoryReport);
+
+// Stock movements: admin only
+router.get('/stock-movements', authorize('admin'), getStockMovementReport);
 
 module.exports = router;
