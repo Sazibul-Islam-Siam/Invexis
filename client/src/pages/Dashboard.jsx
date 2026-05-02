@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import dashboardService from '../services/dashboardService';
 import {
@@ -34,6 +35,7 @@ ChartJS.register(
 
 // ==================== ADMIN / STAFF DASHBOARD ====================
 const AdminDashboard = ({ user }) => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [chartData, setChartData] = useState(null);
   const [activities, setActivities] = useState([]);
@@ -106,10 +108,10 @@ const AdminDashboard = ({ user }) => {
   };
 
   const statCards = stats ? [
-    { title: 'Total Products', value: stats.totalProducts, sub: `${stats.activeProducts} active`, icon: HiOutlineCube, color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-500/20' },
-    { title: 'Total Revenue', value: `৳${stats.totalRevenue.toLocaleString()}`, sub: `${stats.totalItemsSold} items sold`, icon: HiOutlineCash, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-500/20' },
-    { title: 'Total Sales', value: stats.totalSales, sub: `${stats.totalCategories} categories`, icon: HiOutlineShoppingCart, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-500/20' },
-    { title: 'Low Stock', value: stats.lowStockCount, sub: stats.lowStockCount > 0 ? 'Needs attention' : 'All stocked', icon: HiOutlineExclamation, color: stats.lowStockCount > 0 ? 'text-red-400' : 'text-amber-400', bg: stats.lowStockCount > 0 ? 'bg-red-400/10' : 'bg-amber-400/10', border: stats.lowStockCount > 0 ? 'border-red-500/20' : 'border-amber-500/20' },
+    { title: 'Total Products', value: stats.totalProducts, sub: `${stats.activeProducts} active`, icon: HiOutlineCube, color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-500/20', link: '/products' },
+    { title: 'Total Revenue', value: `৳${stats.totalRevenue.toLocaleString()}`, sub: `${stats.totalItemsSold} items sold`, icon: HiOutlineCash, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-500/20', link: '/reports' },
+    { title: 'Total Sales', value: stats.totalSales, sub: `${stats.totalCategories} categories`, icon: HiOutlineShoppingCart, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-500/20', link: '/sales' },
+    { title: 'Low Stock', value: stats.lowStockCount, sub: stats.lowStockCount > 0 ? 'Needs attention' : 'All stocked', icon: HiOutlineExclamation, color: stats.lowStockCount > 0 ? 'text-red-400' : 'text-amber-400', bg: stats.lowStockCount > 0 ? 'bg-red-400/10' : 'bg-amber-400/10', border: stats.lowStockCount > 0 ? 'border-red-500/20' : 'border-amber-500/20', link: '/products?lowStock=true' },
   ] : [];
 
   if (loading) {
@@ -120,7 +122,11 @@ const AdminDashboard = ({ user }) => {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {statCards.map((stat, i) => (
-          <div key={i} className={`card hover:border-dark-600 transition-all duration-200 group cursor-default border ${stat.border}`}>
+          <div
+            key={i}
+            onClick={() => navigate(stat.link)}
+            className={`card hover:border-dark-600 hover:scale-[1.02] transition-all duration-200 group cursor-pointer border ${stat.border}`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-dark-400 font-medium">{stat.title}</p>

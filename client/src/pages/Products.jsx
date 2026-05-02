@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import productService from '../services/productService';
 import categoryService from '../services/categoryService';
@@ -14,6 +15,7 @@ import {
 } from 'react-icons/hi';
 
 const Products = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +25,7 @@ const Products = () => {
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [filterLowStock, setFilterLowStock] = useState(searchParams.get('lowStock') === 'true');
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
 
   const emptyForm = {
@@ -45,7 +48,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [search, filterCategory, filterStatus, pagination.page]);
+  }, [search, filterCategory, filterStatus, filterLowStock, pagination.page]);
 
   const fetchCategories = async () => {
     try {
@@ -63,6 +66,7 @@ const Products = () => {
       if (search) params.search = search;
       if (filterCategory) params.category = filterCategory;
       if (filterStatus) params.status = filterStatus;
+      if (filterLowStock) params.lowStock = 'true';
 
       const res = await productService.getProducts(params);
       setProducts(res.data);
@@ -213,6 +217,26 @@ const Products = () => {
             <option value="active">Active</option>
             <option value="discontinued">Discontinued</option>
           </select>
+          <button
+            onClick={() => {
+              setFilterLowStock(!filterLowStock);
+              setPagination((prev) => ({ ...prev, page: 1 }));
+              // Update URL
+              if (!filterLowStock) {
+                setSearchParams({ lowStock: 'true' });
+              } else {
+                setSearchParams({});
+              }
+            }}
+            className={`px-3 py-2 rounded-xl text-sm font-medium border transition-all flex items-center gap-1.5 ${
+              filterLowStock
+                ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                : 'bg-dark-800 text-dark-400 border-dark-700 hover:border-dark-600'
+            }`}
+          >
+            <HiOutlineExclamation className="text-base" />
+            Low Stock
+          </button>
         </div>
       </div>
 
