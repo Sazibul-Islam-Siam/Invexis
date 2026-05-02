@@ -3,6 +3,7 @@ node_modules/
 
 # Environment variables
 .env
+firebaseServiceAccount.json
 
 # Build outputs
 dist/

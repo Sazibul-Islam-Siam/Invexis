@@ -1,5 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import authService from '../services/authService';
+import { auth } from '../config/firebase';
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from 'firebase/auth';
+import axios from 'axios';
 
 const AuthContext = createContext(null);
 
@@ -16,29 +22,86 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user data on mount
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    // Listen for Firebase auth state changes
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Check if email is verified
+        if (!firebaseUser.emailVerified) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        try {
+          // Get Firebase ID token
+          const token = await firebaseUser.getIdToken();
+
+          // Sync with backend to get MongoDB user data (role, profile, etc.)
+          const res = await axios.post('/api/auth/sync', {}, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const userData = {
+            ...res.data.data,
+            firebaseToken: token,
+          };
+
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+        } catch (error) {
+          console.error('Auth sync failed:', error);
+          setUser(null);
+          localStorage.removeItem('user');
+        }
+      } else {
+        setUser(null);
+        localStorage.removeItem('user');
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const login = async (email, password) => {
-    const userData = await authService.login({ email, password });
+    const result = await signInWithEmailAndPassword(auth, email, password);
+
+    if (!result.user.emailVerified) {
+      await signOut(auth);
+      throw new Error('Please verify your email before logging in. Check your inbox.');
+    }
+
+    // Get token and sync with backend
+    const token = await result.user.getIdToken();
+    const res = await axios.post('/api/auth/sync', {}, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const userData = {
+      ...res.data.data,
+      firebaseToken: token,
+    };
+
     setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
     return userData;
   };
 
-  const register = async (name, email, password, role) => {
-    const userData = await authService.register({ name, email, password, role });
-    setUser(userData);
-    return userData;
-  };
-
-  const logout = () => {
-    authService.logout();
+  const logout = async () => {
+    await signOut(auth);
     setUser(null);
+    localStorage.removeItem('user');
+  };
+
+  // Helper to get a fresh Firebase token for API calls
+  const getToken = async () => {
+    const fbUser = auth.currentUser;
+    if (fbUser) {
+      return await fbUser.getIdToken(true); // force refresh
+    }
+    // Fallback to stored token
+    const stored = JSON.parse(localStorage.getItem('user'));
+    return stored?.firebaseToken;
   };
 
   const value = {
@@ -46,8 +109,8 @@ export const AuthProvider = ({ children }) => {
     setUser,
     loading,
     login,
-    register,
     logout,
+    getToken,
     isAuthenticated: !!user,
   };
 

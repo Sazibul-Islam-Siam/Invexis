@@ -1,88 +1,32 @@
-const jwt = require('jsonwebtoken');
+const admin = require('../config/firebaseAdmin');
 const User = require('../models/User');
 const logAudit = require('../utils/logger');
 
-// Generate JWT token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
-  });
-};
-
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public (first admin) / Private (admin creates other users)
-const registerUser = async (req, res, next) => {
+// @desc    Sync Firebase user with MongoDB (called after frontend login)
+// @route   POST /api/auth/sync
+// @access  Public (but requires valid Firebase token)
+const syncUser = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
-
-    // Check if user already exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      res.status(400);
-      throw new Error('User already exists with this email');
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer')) {
+      res.status(401);
+      throw new Error('No token provided');
     }
 
-    // Create user
-    const user = await User.create({
-      name,
-      email,
-      password,
-      role: role || 'staff',
-    });
+    const token = authHeader.split(' ')[1];
+    const decoded = await admin.auth().verifyIdToken(token);
 
-    if (user) {
-      res.status(201).json({
-        success: true,
-        data: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          token: generateToken(user._id),
-        },
-      });
-    } else {
-      res.status(400);
-      throw new Error('Invalid user data');
-    }
-  } catch (error) {
-    next(error);
-  }
-};
-
-// @desc    Authenticate user & get token
-// @route   POST /api/auth/login
-// @access  Public
-const loginUser = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-
-    // Validate input
-    if (!email || !password) {
-      res.status(400);
-      throw new Error('Please provide email and password');
-    }
-
-    // Check for user (include password for comparison)
-    const user = await User.findOne({ email }).select('+password');
+    // Find or recognize the user in MongoDB
+    let user = await User.findOne({ firebaseUid: decoded.uid });
 
     if (!user) {
-      res.status(401);
-      throw new Error('Invalid credentials');
+      res.status(404);
+      throw new Error('Account not found. Please contact admin to create your account.');
     }
 
     if (!user.isActive) {
       res.status(401);
       throw new Error('Account has been deactivated. Contact an administrator.');
-    }
-
-    // Check password
-    const isMatch = await user.matchPassword(password);
-
-    if (!isMatch) {
-      res.status(401);
-      throw new Error('Invalid credentials');
     }
 
     logAudit(user._id, 'LOGIN', 'Auth', user._id, `${user.name} logged in (${user.role})`);
@@ -95,7 +39,6 @@ const loginUser = async (req, res, next) => {
         email: user.email,
         role: user.role,
         profilePicture: user.profilePicture || '',
-        token: generateToken(user._id),
       },
     });
   } catch (error) {
@@ -120,7 +63,6 @@ const getMe = async (req, res, next) => {
 };
 
 module.exports = {
-  registerUser,
-  loginUser,
+  syncUser,
   getMe,
 };

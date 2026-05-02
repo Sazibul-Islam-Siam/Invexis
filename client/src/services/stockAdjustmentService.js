@@ -4,7 +4,7 @@ const API_URL = '/api/stock-adjustments';
 
 const getAuthConfig = () => {
   const user = JSON.parse(localStorage.getItem('user'));
-  return { headers: { Authorization: `Bearer ${user?.token}` } };
+  return { headers: { Authorization: `Bearer ${user?.firebaseToken}` } };
 };
 
 const getStockAdjustments = async (params = {}) => {

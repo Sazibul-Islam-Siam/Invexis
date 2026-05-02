@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken');
+const admin = require('../config/firebaseAdmin');
 const User = require('../models/User');
 
-// Protect routes — verify JWT token
+// Protect routes — verify Firebase ID token
 const protect = async (req, res, next) => {
   let token;
 
@@ -13,15 +13,15 @@ const protect = async (req, res, next) => {
       // Get token from header
       token = req.headers.authorization.split(' ')[1];
 
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      // Verify Firebase ID token
+      const decoded = await admin.auth().verifyIdToken(token);
 
-      // Get user from the token (exclude password)
-      req.user = await User.findById(decoded.id).select('-password');
+      // Find user in MongoDB by Firebase UID
+      req.user = await User.findOne({ firebaseUid: decoded.uid });
 
       if (!req.user) {
         res.status(401);
-        throw new Error('User not found');
+        throw new Error('User not found in database');
       }
 
       if (!req.user.isActive) {

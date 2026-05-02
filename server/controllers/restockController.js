@@ -1,6 +1,9 @@
 const RestockRequest = require('../models/RestockRequest');
 const Product = require('../models/Product');
+const User = require('../models/User');
 const logAudit = require('../utils/logger');
+const sendEmail = require('../utils/sendEmail');
+const { restockNotifySupplier, shipmentNotifyAdmin, deliveryNotifySupplier } = require('../utils/emailTemplates');
 
 // @desc    Get all restock requests
 // @route   GET /api/restock-requests
@@ -65,6 +68,15 @@ const createRestockRequest = async (req, res, next) => {
 
     logAudit(req.user._id, 'CREATE', 'RestockRequest', request._id, `Created restock request for ${populated.product?.name} (qty: ${quantity})`);
 
+    // Email supplier about new request
+    if (populated.supplier?.email) {
+      sendEmail({
+        to: populated.supplier.email,
+        subject: `New Restock Request — ${populated.product?.name}`,
+        html: restockNotifySupplier(populated.supplier.name, populated.product?.name, quantity, populated.requestedBy?.name),
+      });
+    }
+
     res.status(201).json({ success: true, data: populated });
   } catch (error) {
     next(error);
@@ -116,6 +128,28 @@ const updateRestockRequest = async (req, res, next) => {
       .populate('requestedBy', 'name');
 
     logAudit(req.user._id, 'STATUS_CHANGE', 'RestockRequest', request._id, `Restock ${populated.product?.name} status changed to "${status}"`);
+
+    // Email notifications based on status
+    if (status === 'shipped' && populated.supplier?.name) {
+      // Notify all admins when supplier ships
+      const admins = await User.find({ role: 'admin', isActive: true });
+      for (const admin of admins) {
+        sendEmail({
+          to: admin.email,
+          subject: `Shipment Shipped — ${populated.product?.name}`,
+          html: shipmentNotifyAdmin(admin.name, populated.product?.name, request.quantity, populated.supplier.name),
+        });
+      }
+    }
+
+    if (status === 'delivered' && populated.supplier?.email) {
+      // Notify supplier when admin confirms delivery
+      sendEmail({
+        to: populated.supplier.email,
+        subject: `Delivery Confirmed — ${populated.product?.name}`,
+        html: deliveryNotifySupplier(populated.supplier.name, populated.product?.name, request.quantity),
+      });
+    }
 
     res.json({ success: true, data: populated });
   } catch (error) {

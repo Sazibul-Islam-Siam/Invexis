@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const admin = require('../config/firebaseAdmin');
 const fs = require('fs');
 const path = require('path');
 const cloudinary = require('../config/cloudinary');
@@ -9,20 +10,20 @@ const streamifier = require('streamifier');
 // @access  Private
 const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
+    const user = await User.findById(req.user._id);
     res.json({ success: true, data: user });
   } catch (error) {
     next(error);
   }
 };
 
-// @desc    Update my profile
+// @desc    Update my profile (name, email only — password changes handled by Firebase)
 // @route   PUT /api/profile
 // @access  Private
 const updateProfile = async (req, res, next) => {
   try {
-    const { name, email, currentPassword, newPassword } = req.body;
-    const user = await User.findById(req.user._id).select('+password');
+    const { name, email } = req.body;
+    const user = await User.findById(req.user._id);
 
     if (email && email !== user.email) {
       const exists = await User.findOne({ email });
@@ -30,23 +31,19 @@ const updateProfile = async (req, res, next) => {
         res.status(400);
         throw new Error('Email already in use');
       }
+      // Update email in Firebase too
+      if (user.firebaseUid) {
+        await admin.auth().updateUser(user.firebaseUid, { email });
+      }
     }
 
-    if (newPassword) {
-      if (!currentPassword) {
-        res.status(400);
-        throw new Error('Please provide current password');
+    if (name) {
+      user.name = name;
+      // Sync display name to Firebase
+      if (user.firebaseUid) {
+        await admin.auth().updateUser(user.firebaseUid, { displayName: name });
       }
-      const bcrypt = require('bcryptjs');
-      const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch) {
-        res.status(400);
-        throw new Error('Current password is incorrect');
-      }
-      user.password = newPassword;
     }
-
-    if (name) user.name = name;
     if (email) user.email = email;
 
     await user.save();

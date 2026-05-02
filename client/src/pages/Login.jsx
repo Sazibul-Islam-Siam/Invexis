@@ -34,9 +34,12 @@ const Login = () => {
       toast.success('Welcome back!');
       navigate('/dashboard');
     } catch (error) {
-      const message =
-        error.response?.data?.message || 'Login failed. Please try again.';
-      toast.error(message);
+      const message = error.response?.data?.message || error.message || 'Login failed. Please try again.';
+      // Make firebase errors prettier
+      const displayMessage = message.includes('auth/invalid-credential') 
+        ? 'Invalid email or password' 
+        : message.replace('Firebase: ', '');
+      toast.error(displayMessage);
     } finally {
       setIsLoading(false);
     }
