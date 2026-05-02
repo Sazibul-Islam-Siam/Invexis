@@ -84,15 +84,16 @@ const updateRestockRequest = async (req, res, next) => {
       throw new Error('Restock request not found');
     }
 
-    // Suppliers can only accept/reject/ship/deliver their own requests
+    // Suppliers can only accept/reject/ship their own requests
+    // Only admins can confirm receipt (mark as delivered)
     if (req.user.role === 'supplier') {
       if (request.supplier.toString() !== req.user._id.toString()) {
         res.status(403);
         throw new Error('Not authorized');
       }
-      if (!['accepted', 'rejected', 'shipped', 'delivered'].includes(status)) {
+      if (!['accepted', 'rejected', 'shipped'].includes(status)) {
         res.status(400);
-        throw new Error('Invalid status update');
+        throw new Error('Suppliers cannot mark shipments as delivered. Admin must confirm receipt.');
       }
     }
 

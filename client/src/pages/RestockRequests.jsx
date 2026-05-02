@@ -12,6 +12,7 @@ import {
   HiOutlineCheck,
   HiOutlineBan,
   HiOutlineCube,
+  HiOutlineInboxIn,
 } from 'react-icons/hi';
 
 const statusConfig = {
@@ -235,37 +236,26 @@ const RestockRequests = () => {
                             </>
                           )}
                           {user?.role === 'supplier' && r.status === 'accepted' && (
-                            <>
-                              <button
-                                onClick={() => handleStatusUpdate(r._id, 'shipped')}
-                                className="p-2 text-dark-400 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all"
-                                title="Mark Shipped"
-                              >
-                                <HiOutlineTruck className="text-lg" />
-                              </button>
-                              <button
-                                onClick={() => handleStatusUpdate(r._id, 'delivered')}
-                                className="px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25 transition-colors"
-                              >
-                                Delivered
-                              </button>
-                            </>
-                          )}
-                          {user?.role === 'supplier' && r.status === 'shipped' && (
                             <button
-                              onClick={() => handleStatusUpdate(r._id, 'delivered')}
-                              className="px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25 transition-colors"
+                              onClick={() => handleStatusUpdate(r._id, 'shipped')}
+                              className="px-3 py-1.5 text-xs font-medium bg-purple-500/15 text-purple-400 border border-purple-500/30 rounded-lg hover:bg-purple-500/25 transition-colors flex items-center gap-1.5"
                             >
-                              Delivered
+                              <HiOutlineTruck className="text-sm" /> Mark Shipped
                             </button>
                           )}
-                          {/* Admin actions */}
+                          {/* Admin: Confirm Receipt when supplier has shipped */}
                           {user?.role === 'admin' && r.status === 'shipped' && (
                             <button
-                              onClick={() => handleStatusUpdate(r._id, 'delivered')}
-                              className="px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25 transition-colors"
+                              onClick={() => {
+                                if (window.confirm(
+                                  `Confirm receipt of ${r.quantity} × ${r.product?.name}?\n\nThis will mark the shipment as Delivered and add ${r.quantity} units to inventory.`
+                                )) {
+                                  handleStatusUpdate(r._id, 'delivered');
+                                }
+                              }}
+                              className="px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25 transition-colors flex items-center gap-1.5"
                             >
-                              Mark Delivered
+                              <HiOutlineInboxIn className="text-sm" /> Confirm Receipt
                             </button>
                           )}
                           {user?.role === 'admin' && (

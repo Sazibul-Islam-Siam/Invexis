@@ -9,7 +9,8 @@ import {
   HiOutlineClock,
   HiOutlineCube,
   HiOutlineMenuAlt2,
-  HiOutlineX
+  HiOutlineX,
+  HiOutlineInboxIn,
 } from 'react-icons/hi';
 
 const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
@@ -76,6 +77,23 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
               icon: HiOutlineClock,
               color: 'text-blue-400',
               bg: 'bg-blue-500/15',
+              action: () => navigate('/restock-requests'),
+            });
+          }
+        } catch { /* silent */ }
+
+        // Check shipped restocks awaiting admin receipt confirmation
+        try {
+          const shippedRes = await axios.get('/api/restock-requests?status=shipped&limit=1', getAuthConfig());
+          if (shippedRes.data.total > 0) {
+            notifs.push({
+              id: 'shipped-restock',
+              type: 'warning',
+              title: 'Shipments Arrived',
+              message: `${shippedRes.data.total} shipment${shippedRes.data.total > 1 ? 's' : ''} awaiting your receipt confirmation`,
+              icon: HiOutlineInboxIn,
+              color: 'text-emerald-400',
+              bg: 'bg-emerald-500/15',
               action: () => navigate('/restock-requests'),
             });
           }
