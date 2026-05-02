@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -7,7 +7,10 @@ import {
   HiOutlineMail,
   HiOutlineLockClosed,
   HiOutlineShieldCheck,
+  HiOutlineCamera,
 } from 'react-icons/hi';
+
+const API_BASE = 'http://localhost:5000';
 
 const Profile = () => {
   const { user, setUser } = useAuth();
@@ -19,6 +22,8 @@ const Profile = () => {
   });
   const [saving, setSaving] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -35,7 +40,12 @@ const Profile = () => {
     setSaving(true);
     try {
       const res = await axios.put('/api/profile', form, getAuthConfig());
-      const updated = { ...user, name: res.data.data.name, email: res.data.data.email };
+      const updated = {
+        ...user,
+        name: res.data.data.name,
+        email: res.data.data.email,
+        profilePicture: res.data.data.profilePicture || user.profilePicture,
+      };
       setUser(updated);
       localStorage.setItem('user', JSON.stringify(updated));
       toast.success('Profile updated successfully');
@@ -43,6 +53,36 @@ const Profile = () => {
       toast.error(error.response?.data?.message || 'Failed to update profile');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      return toast.error('Image must be smaller than 2MB');
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    setUploadingAvatar(true);
+    try {
+      const res = await axios.post('/api/profile/avatar', formData, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const updated = { ...user, profilePicture: res.data.data.profilePicture };
+      setUser(updated);
+      localStorage.setItem('user', JSON.stringify(updated));
+      toast.success('Profile picture updated!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to upload picture');
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -79,6 +119,10 @@ const Profile = () => {
     supplier: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
   };
 
+  const avatarUrl = user?.profilePicture
+    ? `${API_BASE}${user.profilePicture}`
+    : null;
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
@@ -92,8 +136,37 @@ const Profile = () => {
       {/* Profile Card */}
       <div className="card mb-6">
         <div className="flex items-center gap-4 mb-6 pb-6 border-b border-dark-700">
-          <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">
-            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+          {/* Avatar with upload */}
+          <div className="relative group">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={user?.name}
+                className="w-20 h-20 rounded-2xl object-cover border-2 border-dark-600"
+              />
+            ) : (
+              <div className="w-20 h-20 bg-primary-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl">
+                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+            )}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              {uploadingAvatar ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+              ) : (
+                <HiOutlineCamera className="text-2xl text-white" />
+              )}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={handleAvatarUpload}
+              className="hidden"
+            />
           </div>
           <div>
             <h2 className="text-xl font-semibold text-white">{user?.name}</h2>
@@ -103,6 +176,7 @@ const Profile = () => {
                 {user?.role}
               </span>
             </div>
+            <p className="text-xs text-dark-500 mt-1">Click on avatar to change photo</p>
           </div>
         </div>
 

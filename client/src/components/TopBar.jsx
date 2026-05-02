@@ -229,17 +229,29 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
 
         <div className="h-8 w-px bg-dark-700"></div>
 
-        {/* User info */}
-        <div className="flex items-center gap-3">
+        {/* User info — clickable to profile */}
+        <div
+          onClick={() => navigate('/profile')}
+          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+          title="Go to Profile"
+        >
           <div className="text-right">
             <p className="text-sm font-medium text-white">{user?.name || 'User'}</p>
             <span className={`text-xs px-2 py-0.5 rounded-full border ${getRoleBadgeColor(user?.role)}`}>
               {getRoleLabel(user?.role)}
             </span>
           </div>
-          <div className="w-9 h-9 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-          </div>
+          {user?.profilePicture ? (
+            <img
+              src={`http://localhost:5000${user.profilePicture}`}
+              alt={user?.name}
+              className="w-9 h-9 rounded-full object-cover border-2 border-dark-600"
+            />
+          ) : (
+            <div className="w-9 h-9 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+          )}
         </div>
       </div>
     </header>

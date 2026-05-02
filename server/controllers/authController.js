@@ -94,6 +94,7 @@ const loginUser = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        profilePicture: user.profilePicture || '',
         token: generateToken(user._id),
       },
     });
