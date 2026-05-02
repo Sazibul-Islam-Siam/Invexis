@@ -120,7 +120,7 @@ const Profile = () => {
   };
 
   const avatarUrl = user?.profilePicture
-    ? `${API_BASE}${user.profilePicture}`
+    ? (user.profilePicture.startsWith('http') ? user.profilePicture : `${API_BASE}${user.profilePicture}`)
     : null;
 
   return (

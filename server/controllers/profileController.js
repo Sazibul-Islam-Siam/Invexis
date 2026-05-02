@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const fs = require('fs');
 const path = require('path');
+const cloudinary = require('../config/cloudinary');
+const streamifier = require('streamifier');
 
 // @desc    Get my profile
 // @route   GET /api/profile
@@ -76,15 +78,37 @@ const uploadAvatar = async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
-    // Delete old avatar if exists
-    if (user.profilePicture) {
+    // Delete old avatar if exists (only local ones)
+    if (user.profilePicture && !user.profilePicture.startsWith('http')) {
       const oldPath = path.join(__dirname, '..', user.profilePicture);
       if (fs.existsSync(oldPath)) {
         fs.unlinkSync(oldPath);
       }
     }
 
-    user.profilePicture = `/uploads/${req.file.filename}`;
+    // Upload to Cloudinary
+    const streamUpload = (req) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'invexis_avatars',
+            transformation: [{ width: 300, height: 300, crop: 'fill' }],
+          },
+          (error, result) => {
+            if (result) {
+              resolve(result);
+            } else {
+              reject(error);
+            }
+          }
+        );
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+    };
+
+    const result = await streamUpload(req);
+
+    user.profilePicture = result.secure_url;
     await user.save();
 
     res.json({

@@ -197,7 +197,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         >
           {user?.profilePicture ? (
             <img
-              src={`http://localhost:5000${user.profilePicture}`}
+              src={user.profilePicture.startsWith('http') ? user.profilePicture : `http://localhost:5000${user.profilePicture}`}
               alt={user?.name}
               className="w-9 h-9 rounded-full object-cover border-2 border-dark-600 shrink-0"
             />
