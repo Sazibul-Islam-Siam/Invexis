@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { auth } from '../config/firebase';
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import {
   HiOutlineUserCircle,
   HiOutlineMail,
@@ -32,7 +34,7 @@ const Profile = () => {
   }, [user]);
 
   const getAuthConfig = () => ({
-    headers: { Authorization: `Bearer ${user?.token}` },
+    headers: { Authorization: `Bearer ${user?.firebaseToken}` },
   });
 
   const handleUpdateProfile = async (e) => {
@@ -71,7 +73,7 @@ const Profile = () => {
     try {
       const res = await axios.post('/api/profile/avatar', formData, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${user?.firebaseToken}`,
           'Content-Type': 'multipart/form-data',
         },
       });
@@ -96,18 +98,29 @@ const Profile = () => {
     }
     setChangingPassword(true);
     try {
-      await axios.put(
-        '/api/profile',
-        {
-          currentPassword: passwordForm.currentPassword,
-          newPassword: passwordForm.newPassword,
-        },
-        getAuthConfig()
-      );
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      // Re-authenticate user first before changing password
+      const credential = EmailAuthProvider.credential(user.email, passwordForm.currentPassword);
+      await reauthenticateWithCredential(currentUser, credential);
+
+      // Update password
+      await updatePassword(currentUser, passwordForm.newPassword);
+      
       toast.success('Password changed successfully');
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to change password');
+      console.error('Password change error:', error);
+      let message = 'Failed to change password';
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        message = 'Incorrect current password';
+      } else if (error.message) {
+        message = error.message;
+      }
+      toast.error(message);
     } finally {
       setChangingPassword(false);
     }
