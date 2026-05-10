@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { HiOutlineMail, HiOutlineLockClosed, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
@@ -162,8 +162,16 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-dark-500 text-sm mt-6">
-          Invexis v1.0 — Inventory Management System
+        <p className="text-center text-dark-400 text-sm mt-6">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
+            Register Your Company
+          </Link>
+        </p>
+        <p className="text-center mt-3">
+          <Link to="/" className="text-dark-500 hover:text-dark-300 text-xs transition-colors">
+            ← Back to Home
+          </Link>
         </p>
       </div>
     </div>

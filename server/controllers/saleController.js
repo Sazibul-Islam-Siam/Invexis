@@ -16,9 +16,8 @@ const getSales = async (req, res, next) => {
       limit = 20,
     } = req.query;
 
-    const query = {};
+    const query = { company: req.user.company };
 
-    // Date range filter
     if (startDate || endDate) {
       query.saleDate = {};
       if (startDate) query.saleDate.$gte = new Date(startDate);
@@ -29,7 +28,6 @@ const getSales = async (req, res, next) => {
       }
     }
 
-    // Staff can only see their own sales
     if (req.user.role === 'staff') {
       query.soldBy = req.user._id;
     }
@@ -47,7 +45,6 @@ const getSales = async (req, res, next) => {
       Sale.countDocuments(query),
     ]);
 
-    // Calculate summary stats
     const allSales = await Sale.find(query);
     const totalRevenue = allSales.reduce((sum, s) => sum + (s.totalAmount || 0), 0);
     const totalItems = allSales.reduce(
@@ -78,7 +75,7 @@ const getSales = async (req, res, next) => {
 // @access  Private
 const getSale = async (req, res, next) => {
   try {
-    const sale = await Sale.findById(req.params.id)
+    const sale = await Sale.findOne({ _id: req.params.id, company: req.user.company })
       .populate('items.product', 'name sku price category')
       .populate('soldBy', 'name email');
 
@@ -87,10 +84,7 @@ const getSale = async (req, res, next) => {
       throw new Error('Sale not found');
     }
 
-    res.json({
-      success: true,
-      data: sale,
-    });
+    res.json({ success: true, data: sale });
   } catch (error) {
     next(error);
   }
@@ -108,10 +102,9 @@ const createSale = async (req, res, next) => {
       throw new Error('Please add at least one item to the sale');
     }
 
-    // Validate all products and stock
     const saleItems = [];
     for (const item of items) {
-      const product = await Product.findById(item.product);
+      const product = await Product.findOne({ _id: item.product, company: req.user.company });
 
       if (!product) {
         res.status(404);
@@ -140,31 +133,26 @@ const createSale = async (req, res, next) => {
 
     const totalAmount = saleItems.reduce((sum, item) => sum + item.totalPrice, 0);
 
-    // Create the sale
     const sale = await Sale.create({
       items: saleItems,
       totalAmount,
       soldBy: req.user._id,
+      company: req.user.company,
     });
 
-    // Deduct stock for all items
     for (const item of saleItems) {
       await Product.findByIdAndUpdate(item.product, {
         $inc: { quantity: -item.quantity },
       });
     }
 
-    // Populate and return
     const populated = await Sale.findById(sale._id)
       .populate('items.product', 'name sku price')
       .populate('soldBy', 'name email');
 
-    logAudit(req.user._id, 'CREATE', 'Sale', sale._id, `Recorded sale ${populated.invoiceNo} — ৳${totalAmount}`);
+    logAudit(req.user._id, 'CREATE', 'Sale', sale._id, `Recorded sale ${populated.invoiceNo} — ৳${totalAmount}`, req.user.company);
 
-    res.status(201).json({
-      success: true,
-      data: populated,
-    });
+    res.status(201).json({ success: true, data: populated });
   } catch (error) {
     next(error);
   }
@@ -175,14 +163,13 @@ const createSale = async (req, res, next) => {
 // @access  Private (Admin)
 const deleteSale = async (req, res, next) => {
   try {
-    const sale = await Sale.findById(req.params.id);
+    const sale = await Sale.findOne({ _id: req.params.id, company: req.user.company });
 
     if (!sale) {
       res.status(404);
       throw new Error('Sale not found');
     }
 
-    // Reverse stock for all items
     for (const item of sale.items) {
       await Product.findByIdAndUpdate(item.product, {
         $inc: { quantity: item.quantity },
@@ -192,12 +179,9 @@ const deleteSale = async (req, res, next) => {
     const invoiceNo = sale.invoiceNo;
     await sale.deleteOne();
 
-    logAudit(req.user._id, 'DELETE', 'Sale', req.params.id, `Deleted sale ${invoiceNo} (stock restored)`);
+    logAudit(req.user._id, 'DELETE', 'Sale', req.params.id, `Deleted sale ${invoiceNo} (stock restored)`, req.user.company);
 
-    res.json({
-      success: true,
-      data: {},
-    });
+    res.json({ success: true, data: {} });
   } catch (error) {
     next(error);
   }

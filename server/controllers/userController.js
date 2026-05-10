@@ -3,13 +3,13 @@ const User = require('../models/User');
 const logAudit = require('../utils/logger');
 const sendEmail = require('../utils/sendEmail');
 
-// @desc    Get all users
+// @desc    Get all users (within same company)
 // @route   GET /api/users
 // @access  Private (Admin)
 const getUsers = async (req, res, next) => {
   try {
     const { role, search, page = 1, limit = 20 } = req.query;
-    const query = {};
+    const query = { company: req.user.company };
 
     if (role) query.role = role;
     if (search) {
@@ -42,12 +42,10 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-// @desc    Get single user
-// @route   GET /api/users/:id
-// @access  Private (Admin)
+// @desc    Get single user (within same company)
 const getUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findOne({ _id: req.params.id, company: req.user.company });
     if (!user) {
       res.status(404);
       throw new Error('User not found');
@@ -58,21 +56,17 @@ const getUser = async (req, res, next) => {
   }
 };
 
-// @desc    Create a new user (creates in Firebase + MongoDB)
-// @route   POST /api/users
-// @access  Private (Admin)
+// @desc    Create a new user within the admin's company
 const createUser = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // Check if user already exists in MongoDB
     const exists = await User.findOne({ email });
     if (exists) {
       res.status(400);
       throw new Error('A user with this email already exists');
     }
 
-    // Create user in Firebase Auth
     const firebaseUser = await admin.auth().createUser({
       email,
       password,
@@ -80,10 +74,8 @@ const createUser = async (req, res, next) => {
       emailVerified: false,
     });
 
-    // Send email verification link via Firebase
     const verificationLink = await admin.auth().generateEmailVerificationLink(email);
-    
-    // Send custom styled verification email
+
     await sendEmail({
       to: email,
       subject: 'Verify Your Email — Invexis',
@@ -116,15 +108,16 @@ const createUser = async (req, res, next) => {
       `,
     });
 
-    // Create user in MongoDB
+    // Create user in MongoDB under the admin's company
     const user = await User.create({
       name,
       email,
       role,
       firebaseUid: firebaseUser.uid,
+      company: req.user.company,
     });
 
-    logAudit(req.user._id, 'CREATE', 'User', user._id, `Created ${role} account for "${name}"`);
+    logAudit(req.user._id, 'CREATE', 'User', user._id, `Created ${role} account for "${name}"`, req.user.company);
 
     res.status(201).json({
       success: true,
@@ -139,7 +132,6 @@ const createUser = async (req, res, next) => {
       message: `Verification email sent to ${email}`,
     });
   } catch (error) {
-    // If Firebase user was created but MongoDB failed, clean up
     if (error.message !== 'A user with this email already exists') {
       try {
         const fbUser = await admin.auth().getUserByEmail(req.body.email);
@@ -150,26 +142,22 @@ const createUser = async (req, res, next) => {
   }
 };
 
-// @desc    Update user
-// @route   PUT /api/users/:id
-// @access  Private (Admin)
+// @desc    Update user (within same company)
 const updateUser = async (req, res, next) => {
   try {
     const { name, email, role, isActive, password } = req.body;
-    const user = await User.findById(req.params.id);
+    const user = await User.findOne({ _id: req.params.id, company: req.user.company });
 
     if (!user) {
       res.status(404);
       throw new Error('User not found');
     }
 
-    // Prevent admin from deactivating themselves
     if (req.user._id.toString() === user._id.toString() && isActive === false) {
       res.status(400);
       throw new Error('You cannot deactivate your own account');
     }
 
-    // Check email uniqueness if changed
     if (email && email !== user.email) {
       const emailExists = await User.findOne({ email });
       if (emailExists) {
@@ -178,7 +166,6 @@ const updateUser = async (req, res, next) => {
       }
     }
 
-    // Update Firebase user too
     const fbUpdate = {};
     if (name) fbUpdate.displayName = name;
     if (email && email !== user.email) fbUpdate.email = email;
@@ -196,7 +183,7 @@ const updateUser = async (req, res, next) => {
 
     await user.save();
 
-    logAudit(req.user._id, 'UPDATE', 'User', user._id, `Updated user "${user.name}"`);
+    logAudit(req.user._id, 'UPDATE', 'User', user._id, `Updated user "${user.name}"`, req.user.company);
 
     res.json({
       success: true,
@@ -214,44 +201,34 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-// @desc    Delete user
-// @route   DELETE /api/users/:id
-// @access  Private (Admin)
+// @desc    Delete user (within same company)
 const deleteUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findOne({ _id: req.params.id, company: req.user.company });
 
     if (!user) {
       res.status(404);
       throw new Error('User not found');
     }
 
-    // Prevent admin from deleting themselves
     if (req.user._id.toString() === user._id.toString()) {
       res.status(400);
       throw new Error('You cannot delete your own account');
     }
 
-    // Delete from Firebase too
     if (user.firebaseUid) {
       try {
         await admin.auth().deleteUser(user.firebaseUid);
-      } catch { /* ignore if already deleted in Firebase */ }
+      } catch { /* ignore */ }
     }
 
     const userName = user.name;
     await user.deleteOne();
-    logAudit(req.user._id, 'DELETE', 'User', req.params.id, `Deleted user "${userName}"`);
+    logAudit(req.user._id, 'DELETE', 'User', req.params.id, `Deleted user "${userName}"`, req.user.company);
     res.json({ success: true, data: {} });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = {
-  getUsers,
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser,
-};
+module.exports = { getUsers, getUser, createUser, updateUser, deleteUser };

@@ -34,6 +34,11 @@ const restockRequestSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
+    },
   },
   {
     timestamps: true,

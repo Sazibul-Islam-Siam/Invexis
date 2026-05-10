@@ -11,11 +11,10 @@ const { restockNotifySupplier, shipmentNotifyAdmin, deliveryNotifySupplier } = r
 const getRestockRequests = async (req, res, next) => {
   try {
     const { status, page = 1, limit = 20 } = req.query;
-    const query = {};
+    const query = { company: req.user.company };
 
     if (status) query.status = status;
 
-    // Suppliers see only their own requests
     if (req.user.role === 'supplier') {
       query.supplier = req.user._id;
     }
@@ -59,6 +58,7 @@ const createRestockRequest = async (req, res, next) => {
       quantity,
       notes,
       requestedBy: req.user._id,
+      company: req.user.company,
     });
 
     const populated = await RestockRequest.findById(request._id)
@@ -66,9 +66,8 @@ const createRestockRequest = async (req, res, next) => {
       .populate('supplier', 'name email')
       .populate('requestedBy', 'name');
 
-    logAudit(req.user._id, 'CREATE', 'RestockRequest', request._id, `Created restock request for ${populated.product?.name} (qty: ${quantity})`);
+    logAudit(req.user._id, 'CREATE', 'RestockRequest', request._id, `Created restock request for ${populated.product?.name} (qty: ${quantity})`, req.user.company);
 
-    // Email supplier about new request
     if (populated.supplier?.email) {
       sendEmail({
         to: populated.supplier.email,
@@ -89,15 +88,13 @@ const createRestockRequest = async (req, res, next) => {
 const updateRestockRequest = async (req, res, next) => {
   try {
     const { status, estimatedDelivery, notes } = req.body;
-    const request = await RestockRequest.findById(req.params.id);
+    const request = await RestockRequest.findOne({ _id: req.params.id, company: req.user.company });
 
     if (!request) {
       res.status(404);
       throw new Error('Restock request not found');
     }
 
-    // Suppliers can only accept/reject/ship their own requests
-    // Only admins can confirm receipt (mark as delivered)
     if (req.user.role === 'supplier') {
       if (request.supplier.toString() !== req.user._id.toString()) {
         res.status(403);
@@ -109,7 +106,6 @@ const updateRestockRequest = async (req, res, next) => {
       }
     }
 
-    // If delivered, add stock to product
     if (status === 'delivered' && request.status !== 'delivered') {
       await Product.findByIdAndUpdate(request.product, {
         $inc: { quantity: request.quantity },
@@ -127,12 +123,10 @@ const updateRestockRequest = async (req, res, next) => {
       .populate('supplier', 'name email')
       .populate('requestedBy', 'name');
 
-    logAudit(req.user._id, 'STATUS_CHANGE', 'RestockRequest', request._id, `Restock ${populated.product?.name} status changed to "${status}"`);
+    logAudit(req.user._id, 'STATUS_CHANGE', 'RestockRequest', request._id, `Restock ${populated.product?.name} status changed to "${status}"`, req.user.company);
 
-    // Email notifications based on status
     if (status === 'shipped' && populated.supplier?.name) {
-      // Notify all admins when supplier ships
-      const admins = await User.find({ role: 'admin', isActive: true });
+      const admins = await User.find({ role: 'admin', isActive: true, company: req.user.company });
       for (const admin of admins) {
         sendEmail({
           to: admin.email,
@@ -143,7 +137,6 @@ const updateRestockRequest = async (req, res, next) => {
     }
 
     if (status === 'delivered' && populated.supplier?.email) {
-      // Notify supplier when admin confirms delivery
       sendEmail({
         to: populated.supplier.email,
         subject: `Delivery Confirmed — ${populated.product?.name}`,
@@ -162,13 +155,13 @@ const updateRestockRequest = async (req, res, next) => {
 // @access  Private (Admin)
 const deleteRestockRequest = async (req, res, next) => {
   try {
-    const request = await RestockRequest.findById(req.params.id);
+    const request = await RestockRequest.findOne({ _id: req.params.id, company: req.user.company });
     if (!request) {
       res.status(404);
       throw new Error('Restock request not found');
     }
     await request.deleteOne();
-    logAudit(req.user._id, 'DELETE', 'RestockRequest', req.params.id, `Deleted restock request`);
+    logAudit(req.user._id, 'DELETE', 'RestockRequest', req.params.id, `Deleted restock request`, req.user.company);
     res.json({ success: true, data: {} });
   } catch (error) {
     next(error);

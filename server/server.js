@@ -11,19 +11,8 @@ dotenv.config();
 // Connect to database
 connectDB();
 
-// Initialize Firebase Admin (imported early so it's ready)
-const admin = require('./config/firebaseAdmin');
-
-// Temporary: Auto-verify the admin's fake email in Firebase so they can log in
-admin.auth().getUserByEmail('siam@invexis.com')
-  .then(user => {
-    if (!user.emailVerified) {
-      return admin.auth().updateUser(user.uid, { emailVerified: true });
-    }
-  })
-  .then(() => console.log('✅ Auto-verified siam@invexis.com in Firebase!'))
-  .catch(err => console.log('Notice: Could not auto-verify admin email (might not exist yet).'));
-
+// Initialize Firebase Admin
+require('./config/firebaseAdmin');
 
 const app = express();
 

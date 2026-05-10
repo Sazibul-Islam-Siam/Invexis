@@ -24,6 +24,11 @@ const auditLogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -34,5 +39,6 @@ const auditLogSchema = new mongoose.Schema(
 auditLogSchema.index({ createdAt: -1 });
 auditLogSchema.index({ user: 1 });
 auditLogSchema.index({ entity: 1 });
+auditLogSchema.index({ company: 1 });
 
 module.exports = mongoose.model('AuditLog', auditLogSchema);

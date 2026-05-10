@@ -25,7 +25,6 @@ const saleSchema = new mongoose.Schema(
   {
     invoiceNo: {
       type: String,
-      unique: true,
     },
     items: {
       type: [saleItemSchema],
@@ -50,16 +49,24 @@ const saleSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Auto-generate invoice number before saving
+// Invoice number unique per company
+saleSchema.index({ invoiceNo: 1, company: 1 }, { unique: true });
+
+// Auto-generate invoice number scoped to company
 saleSchema.pre('save', async function () {
   if (!this.invoiceNo) {
-    const count = await mongoose.model('Sale').countDocuments();
+    const count = await mongoose.model('Sale').countDocuments({ company: this.company });
     const padded = String(count + 1).padStart(5, '0');
     this.invoiceNo = `INV-${padded}`;
   }

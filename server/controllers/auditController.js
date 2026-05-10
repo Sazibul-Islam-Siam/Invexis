@@ -1,8 +1,5 @@
 const AuditLog = require('../models/AuditLog');
 
-// @desc    Get audit logs
-// @route   GET /api/audit-logs
-// @access  Private (Admin)
 const getAuditLogs = async (req, res, next) => {
   try {
     const {
@@ -16,7 +13,7 @@ const getAuditLogs = async (req, res, next) => {
       limit = 20,
     } = req.query;
 
-    const query = {};
+    const query = { company: req.user.company };
 
     if (action) query.action = action;
     if (entity) query.entity = entity;

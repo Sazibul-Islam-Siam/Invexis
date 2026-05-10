@@ -7,9 +7,10 @@ const AuditLog = require('../models/AuditLog');
  * @param {string} entity - Product | Sale | RestockRequest | StockAdjustment | User | Category | Auth
  * @param {string|null} entityId - The ID of the affected document
  * @param {string} details - Human-readable description
+ * @param {string} companyId - The company this audit belongs to
  */
-const logAudit = (userId, action, entity, entityId, details) => {
-  AuditLog.create({ user: userId, action, entity, entityId, details }).catch((err) => {
+const logAudit = (userId, action, entity, entityId, details, companyId) => {
+  AuditLog.create({ user: userId, action, entity, entityId, details, company: companyId }).catch((err) => {
     console.error('Audit log error:', err.message);
   });
 };

@@ -26,6 +26,11 @@ const stockAdjustmentSchema = new mongoose.Schema(
       required: [true, 'Please add a reason for adjustment'],
       trim: true,
     },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
+    },
   },
   {
     timestamps: true,

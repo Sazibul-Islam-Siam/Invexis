@@ -22,10 +22,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Listen for Firebase auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Check if email is verified
         if (!firebaseUser.emailVerified) {
           setUser(null);
           setLoading(false);
@@ -33,10 +31,8 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-          // Get Firebase ID token
           const token = await firebaseUser.getIdToken();
 
-          // Sync with backend to get MongoDB user data (role, profile, etc.)
           const res = await axios.post('/api/auth/sync', {}, {
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -71,7 +67,6 @@ export const AuthProvider = ({ children }) => {
       throw new Error('Please verify your email before logging in. Check your inbox.');
     }
 
-    // Get token and sync with backend
     const token = await result.user.getIdToken();
     const res = await axios.post('/api/auth/sync', {}, {
       headers: { Authorization: `Bearer ${token}` },
@@ -93,13 +88,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
   };
 
-  // Helper to get a fresh Firebase token for API calls
   const getToken = async () => {
     const fbUser = auth.currentUser;
     if (fbUser) {
-      return await fbUser.getIdToken(true); // force refresh
+      return await fbUser.getIdToken(true);
     }
-    // Fallback to stored token
     const stored = JSON.parse(localStorage.getItem('user'));
     return stored?.firebaseToken;
   };

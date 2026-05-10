@@ -17,8 +17,7 @@ const getProducts = async (req, res, next) => {
       limit = 20,
     } = req.query;
 
-    // Build query
-    const query = {};
+    const query = { company: req.user.company };
 
     if (search) {
       query.$or = [
@@ -26,15 +25,8 @@ const getProducts = async (req, res, next) => {
         { sku: { $regex: search, $options: 'i' } },
       ];
     }
-
-    if (category) {
-      query.category = category;
-    }
-
-    if (status) {
-      query.status = status;
-    }
-
+    if (category) query.category = category;
+    if (status) query.status = status;
     if (lowStock === 'true') {
       query.$expr = { $lte: ['$quantity', '$minStockThreshold'] };
     }
@@ -70,7 +62,7 @@ const getProducts = async (req, res, next) => {
 // @access  Private
 const getProduct = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id)
+    const product = await Product.findOne({ _id: req.params.id, company: req.user.company })
       .populate('category', 'name')
       .populate('supplier', 'name email');
 
@@ -79,10 +71,7 @@ const getProduct = async (req, res, next) => {
       throw new Error('Product not found');
     }
 
-    res.json({
-      success: true,
-      data: product,
-    });
+    res.json({ success: true, data: product });
   } catch (error) {
     next(error);
   }
@@ -93,19 +82,16 @@ const getProduct = async (req, res, next) => {
 // @access  Private (Admin)
 const createProduct = async (req, res, next) => {
   try {
-    const product = await Product.create(req.body);
+    const product = await Product.create({ ...req.body, company: req.user.company });
 
     const populated = await product.populate([
       { path: 'category', select: 'name' },
       { path: 'supplier', select: 'name email' },
     ]);
 
-    logAudit(req.user._id, 'CREATE', 'Product', product._id, `Created product "${product.name}"`);
+    logAudit(req.user._id, 'CREATE', 'Product', product._id, `Created product "${product.name}"`, req.user.company);
 
-    res.status(201).json({
-      success: true,
-      data: populated,
-    });
+    res.status(201).json({ success: true, data: populated });
   } catch (error) {
     next(error);
   }
@@ -116,10 +102,11 @@ const createProduct = async (req, res, next) => {
 // @access  Private (Admin)
 const updateProduct = async (req, res, next) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    })
+    const product = await Product.findOneAndUpdate(
+      { _id: req.params.id, company: req.user.company },
+      req.body,
+      { new: true, runValidators: true }
+    )
       .populate('category', 'name')
       .populate('supplier', 'name email');
 
@@ -128,12 +115,9 @@ const updateProduct = async (req, res, next) => {
       throw new Error('Product not found');
     }
 
-    logAudit(req.user._id, 'UPDATE', 'Product', product._id, `Updated product "${product.name}"`);
+    logAudit(req.user._id, 'UPDATE', 'Product', product._id, `Updated product "${product.name}"`, req.user.company);
 
-    res.json({
-      success: true,
-      data: product,
-    });
+    res.json({ success: true, data: product });
   } catch (error) {
     next(error);
   }
@@ -144,7 +128,7 @@ const updateProduct = async (req, res, next) => {
 // @access  Private (Admin)
 const deleteProduct = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findOne({ _id: req.params.id, company: req.user.company });
 
     if (!product) {
       res.status(404);
@@ -154,12 +138,9 @@ const deleteProduct = async (req, res, next) => {
     const productName = product.name;
     await product.deleteOne();
 
-    logAudit(req.user._id, 'DELETE', 'Product', req.params.id, `Deleted product "${productName}"`);
+    logAudit(req.user._id, 'DELETE', 'Product', req.params.id, `Deleted product "${productName}"`, req.user.company);
 
-    res.json({
-      success: true,
-      data: {},
-    });
+    res.json({ success: true, data: {} });
   } catch (error) {
     next(error);
   }

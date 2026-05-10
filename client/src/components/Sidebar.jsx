@@ -152,9 +152,12 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
             </svg>
           </div>
           {!isCollapsed && (
-            <span className="text-lg font-bold text-white whitespace-nowrap">
-              Invexis
-            </span>
+            <div className="whitespace-nowrap overflow-hidden">
+              <span className="text-lg font-bold text-white block leading-tight">Invexis</span>
+              {user?.company?.name && (
+                <span className="text-[11px] text-dark-400 block truncate">{user.company.name}</span>
+              )}
+            </div>
           )}
         </div>
       </div>

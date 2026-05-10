@@ -5,7 +5,7 @@ const Category = require('../models/Category');
 // @access  Private
 const getCategories = async (req, res, next) => {
   try {
-    const categories = await Category.find().sort({ name: 1 });
+    const categories = await Category.find({ company: req.user.company }).sort({ name: 1 });
 
     res.json({
       success: true,
@@ -22,7 +22,7 @@ const getCategories = async (req, res, next) => {
 // @access  Private
 const getCategory = async (req, res, next) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findOne({ _id: req.params.id, company: req.user.company });
 
     if (!category) {
       res.status(404);
@@ -45,7 +45,7 @@ const createCategory = async (req, res, next) => {
   try {
     const { name, description } = req.body;
 
-    const category = await Category.create({ name, description });
+    const category = await Category.create({ name, description, company: req.user.company });
 
     res.status(201).json({
       success: true,
@@ -61,8 +61,8 @@ const createCategory = async (req, res, next) => {
 // @access  Private (Admin)
 const updateCategory = async (req, res, next) => {
   try {
-    const category = await Category.findByIdAndUpdate(
-      req.params.id,
+    const category = await Category.findOneAndUpdate(
+      { _id: req.params.id, company: req.user.company },
       req.body,
       { new: true, runValidators: true }
     );
@@ -86,7 +86,7 @@ const updateCategory = async (req, res, next) => {
 // @access  Private (Admin)
 const deleteCategory = async (req, res, next) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findOne({ _id: req.params.id, company: req.user.company });
 
     if (!category) {
       res.status(404);

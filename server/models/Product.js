@@ -10,7 +10,6 @@ const productSchema = new mongoose.Schema(
     sku: {
       type: String,
       required: [true, 'Please add a SKU'],
-      unique: true,
       uppercase: true,
       trim: true,
     },
@@ -53,11 +52,19 @@ const productSchema = new mongoose.Schema(
       enum: ['active', 'discontinued'],
       default: 'active',
     },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// SKU unique per company, not globally
+productSchema.index({ sku: 1, company: 1 }, { unique: true });
 
 // Virtual: Check if stock is low
 productSchema.virtual('isLowStock').get(function () {
