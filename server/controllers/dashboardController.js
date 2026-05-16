@@ -13,15 +13,15 @@ const getStats = async (req, res, next) => {
     const activeProducts = await Product.countDocuments({ company: co, status: 'active' });
 
     const lowStockProducts = await Product.find({
-      $and: [
-        { company: co },
-        { status: 'active' },
-        { $expr: { $lte: ['$quantity', '$minStockThreshold'] } },
-      ],
+      company: co,
+      status: 'active',
     })
       .populate('category', 'name')
-      .select('name sku quantity minStockThreshold category')
-      .limit(10);
+      .select('name sku quantity minStockThreshold category');
+
+    const filteredLowStock = lowStockProducts
+      .filter(p => p.quantity <= p.minStockThreshold)
+      .slice(0, 10);
 
     const allSales = await Sale.find({ company: co });
     const totalSales = allSales.length;
@@ -36,7 +36,7 @@ const getStats = async (req, res, next) => {
       success: true,
       data: {
         totalProducts, activeProducts, totalSales, totalRevenue, totalItemsSold,
-        totalCategories, lowStockCount: lowStockProducts.length, lowStockProducts,
+        totalCategories, lowStockCount: filteredLowStock.length, lowStockProducts: filteredLowStock,
       },
     });
   } catch (error) {
@@ -198,13 +198,8 @@ const getStaffStats = async (req, res, next) => {
     const todayRevenue = todaySales.reduce((sum, s) => sum + (s.totalAmount || 0), 0);
 
     const totalProducts = await Product.countDocuments({ company: co, status: 'active' });
-    const lowStockCount = await Product.countDocuments({
-      $and: [
-        { company: co },
-        { status: 'active' },
-        { $expr: { $lte: ['$quantity', '$minStockThreshold'] } },
-      ],
-    });
+    const activeForLowStock = await Product.find({ company: co, status: 'active' }).select('quantity minStockThreshold');
+    const lowStockCount = activeForLowStock.filter(p => p.quantity <= p.minStockThreshold).length;
 
     res.json({
       success: true,

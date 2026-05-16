@@ -27,15 +27,32 @@ const getProducts = async (req, res, next) => {
     }
     if (category) query.category = category;
     if (status) query.status = status;
+
+    const sortOrder = order === 'asc' ? 1 : -1;
+
+    // Low stock filter: compare two fields in JS since $expr is unreliable
     if (lowStock === 'true') {
-      query.$and = [
-        ...(query.$and || []),
-        { $expr: { $lte: ['$quantity', '$minStockThreshold'] } },
-      ];
+      const allProducts = await Product.find(query)
+        .populate('category', 'name')
+        .populate('supplier', 'name email')
+        .sort({ [sortBy]: sortOrder });
+
+      const filtered = allProducts.filter(p => p.quantity <= p.minStockThreshold);
+      const total = filtered.length;
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+      const paginated = filtered.slice(skip, skip + parseInt(limit));
+
+      return res.json({
+        success: true,
+        count: paginated.length,
+        total,
+        pages: Math.ceil(total / parseInt(limit)),
+        currentPage: parseInt(page),
+        data: paginated,
+      });
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sortOrder = order === 'asc' ? 1 : -1;
 
     const [products, total] = await Promise.all([
       Product.find(query)
