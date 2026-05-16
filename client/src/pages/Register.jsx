@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { auth } from '../config/firebase';
+import { signInWithEmailAndPassword, signOut, sendEmailVerification } from 'firebase/auth';
 import {
   HiOutlineMail,
   HiOutlineLockClosed,
@@ -44,14 +46,21 @@ const Register = () => {
     }
 
     try {
-      const res = await axios.post('/api/auth/register-company', {
+      // 1. Register company + user on the backend
+      await axios.post('/api/auth/register-company', {
         companyName: formData.companyName,
         name: formData.name,
         email: formData.email,
         password: formData.password,
       });
 
-      toast.success(res.data.message || 'Company registered! Check your email to verify.');
+      // 2. Sign in temporarily to send Firebase's built-in verification email
+      //    (this uses Google's servers — no SMTP needed on our backend)
+      const credential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      await sendEmailVerification(credential.user);
+      await signOut(auth); // sign out immediately — they can't use the app until verified
+
+      toast.success('Company registered! Check your email for the verification link.');
       navigate('/login');
     } catch (error) {
       const message = error.response?.data?.message || error.message || 'Registration failed';
