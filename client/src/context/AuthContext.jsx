@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendEmailVerification,
 } from 'firebase/auth';
 import axios from 'axios';
 
@@ -63,8 +64,10 @@ export const AuthProvider = ({ children }) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
 
     if (!result.user.emailVerified) {
+      // Automatically send verification email using Google's servers
+      await sendEmailVerification(result.user);
       await signOut(auth);
-      throw new Error('Please verify your email before logging in. Check your inbox.');
+      throw new Error('Please verify your email before logging in. A new verification link has been sent to your inbox.');
     }
 
     const token = await result.user.getIdToken();

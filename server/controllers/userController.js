@@ -67,6 +67,7 @@ const createUser = async (req, res, next) => {
       throw new Error('A user with this email already exists');
     }
 
+    // 1. Create user in Firebase (Unverified)
     const firebaseUser = await admin.auth().createUser({
       email,
       password,
@@ -74,41 +75,7 @@ const createUser = async (req, res, next) => {
       emailVerified: false,
     });
 
-    const verificationLink = await admin.auth().generateEmailVerificationLink(email);
-
-    await sendEmail({
-      to: email,
-      subject: 'Verify Your Email — Invexis',
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <body style="margin:0;padding:0;background:#0f172a;font-family:Arial,sans-serif;">
-          <div style="max-width:500px;margin:40px auto;background:#1e293b;border-radius:16px;overflow:hidden;border:1px solid #334155;">
-            <div style="padding:32px 24px;text-align:center;background:linear-gradient(135deg,#4f46e5,#7c3aed);">
-              <h1 style="color:#fff;margin:0;font-size:24px;">Welcome to Invexis</h1>
-              <p style="color:#c7d2fe;margin:8px 0 0;font-size:14px;">Smart Inventory Management System</p>
-            </div>
-            <div style="padding:32px 24px;">
-              <p style="color:#e2e8f0;font-size:16px;margin:0 0 16px;">Hi <strong>${name}</strong>,</p>
-              <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin:0 0 24px;">
-                Your account has been created as <strong>${role}</strong>. Please verify your email to activate your account:
-              </p>
-              <div style="text-align:center;margin:24px 0;">
-                <a href="${verificationLink}" style="display:inline-block;background:#4f46e5;color:#fff;text-decoration:none;padding:12px 32px;border-radius:8px;font-weight:600;font-size:14px;">
-                  Verify Email
-                </a>
-              </div>
-              <p style="color:#64748b;font-size:12px;text-align:center;margin:24px 0 0;">
-                After verification, log in with your email and the password provided by your admin.
-              </p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `,
-    });
-
-    // Create user in MongoDB under the admin's company
+    // 2. Create user in MongoDB under the admin's company
     const user = await User.create({
       name,
       email,
@@ -129,7 +96,7 @@ const createUser = async (req, res, next) => {
         isActive: user.isActive,
         createdAt: user.createdAt,
       },
-      message: `Verification email sent to ${email}`,
+      message: `User created! Tell them to log in at invexis.com to receive their verification email.`,
     });
   } catch (error) {
     if (error.message !== 'A user with this email already exists') {
