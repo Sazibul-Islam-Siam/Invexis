@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer');
+// Force IPv4 because Render containers sometimes fail to route IPv6 traffic to Google
+require('dns').setDefaultResultOrder('ipv4first');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
