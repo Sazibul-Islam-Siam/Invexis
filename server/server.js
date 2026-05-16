@@ -1,3 +1,6 @@
+// Force IPv4 for all network requests (fixes Render Node.js IPv6 SMTP routing issues)
+require('dns').setDefaultResultOrder('ipv4first');
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
