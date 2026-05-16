@@ -243,7 +243,7 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
           </div>
           {user?.profilePicture ? (
             <img
-              src={user.profilePicture.startsWith('http') ? user.profilePicture : `http://localhost:5000${user.profilePicture}`}
+              src={user.profilePicture.startsWith('http') ? user.profilePicture : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${user.profilePicture}`}
               alt={user?.name}
               className="w-9 h-9 rounded-full object-cover border-2 border-dark-600"
             />
