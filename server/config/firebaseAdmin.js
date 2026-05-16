@@ -1,8 +1,15 @@
 const admin = require('firebase-admin');
 const path = require('path');
 
+const fs = require('fs');
+
 // Initialize Firebase Admin with service account
-const serviceAccountPath = path.join(__dirname, 'firebaseServiceAccount.json');
+let serviceAccountPath = path.join(__dirname, 'firebaseServiceAccount.json');
+
+// Render places secret files in the root folder, so we add a fallback check
+if (!fs.existsSync(serviceAccountPath)) {
+  serviceAccountPath = path.join(__dirname, '..', 'firebaseServiceAccount.json');
+}
 
 try {
   const serviceAccount = require(serviceAccountPath);
