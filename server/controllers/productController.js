@@ -28,7 +28,10 @@ const getProducts = async (req, res, next) => {
     if (category) query.category = category;
     if (status) query.status = status;
     if (lowStock === 'true') {
-      query.$expr = { $lte: ['$quantity', '$minStockThreshold'] };
+      query.$and = [
+        ...(query.$and || []),
+        { $expr: { $lte: ['$quantity', '$minStockThreshold'] } },
+      ];
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);

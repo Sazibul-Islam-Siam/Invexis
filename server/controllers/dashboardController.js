@@ -13,9 +13,11 @@ const getStats = async (req, res, next) => {
     const activeProducts = await Product.countDocuments({ company: co, status: 'active' });
 
     const lowStockProducts = await Product.find({
-      company: co,
-      $expr: { $lte: ['$quantity', '$minStockThreshold'] },
-      status: 'active',
+      $and: [
+        { company: co },
+        { status: 'active' },
+        { $expr: { $lte: ['$quantity', '$minStockThreshold'] } },
+      ],
     })
       .populate('category', 'name')
       .select('name sku quantity minStockThreshold category')
@@ -197,7 +199,11 @@ const getStaffStats = async (req, res, next) => {
 
     const totalProducts = await Product.countDocuments({ company: co, status: 'active' });
     const lowStockCount = await Product.countDocuments({
-      company: co, $expr: { $lte: ['$quantity', '$minStockThreshold'] }, status: 'active',
+      $and: [
+        { company: co },
+        { status: 'active' },
+        { $expr: { $lte: ['$quantity', '$minStockThreshold'] } },
+      ],
     });
 
     res.json({
