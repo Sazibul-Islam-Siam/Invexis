@@ -19,6 +19,14 @@ const saleItemSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  unitCost: {
+    type: Number,
+    default: 0,
+  },
+  totalCost: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const saleSchema = new mongoose.Schema(
@@ -39,6 +47,14 @@ const saleSchema = new mongoose.Schema(
     totalAmount: {
       type: Number,
       required: true,
+    },
+    totalCost: {
+      type: Number,
+      default: 0,
+    },
+    totalProfit: {
+      type: Number,
+      default: 0,
     },
     soldBy: {
       type: mongoose.Schema.Types.ObjectId,

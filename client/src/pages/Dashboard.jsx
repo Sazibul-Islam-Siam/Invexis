@@ -82,6 +82,16 @@ const AdminDashboard = ({ user }) => {
           pointBackgroundColor: '#818cf8',
           pointBorderColor: '#1e1b4b',
           pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7,
+        },
+        {
+          label: 'Profit (৳)',
+          data: chartData.map((d) => d.profit),
+          borderColor: '#34d399',
+          backgroundColor: 'transparent',
+          tension: 0.4, fill: false,
+          pointBackgroundColor: '#34d399',
+          pointBorderColor: '#064e3b',
+          pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
         }],
       }
     : null;
@@ -94,7 +104,9 @@ const AdminDashboard = ({ user }) => {
         backgroundColor: '#1e293b', borderColor: '#334155', borderWidth: 1,
         titleColor: '#f8fafc', bodyColor: '#cbd5e1', padding: 12, cornerRadius: 8,
         displayColors: false,
-        callbacks: { label: (ctx) => `Revenue: ৳${ctx.parsed.y.toLocaleString()}` },
+        callbacks: { 
+          label: (ctx) => `${ctx.dataset.label}: ৳${ctx.parsed.y.toLocaleString()}` 
+        },
       },
     },
     scales: {
@@ -109,8 +121,8 @@ const AdminDashboard = ({ user }) => {
 
   const statCards = stats ? [
     { title: 'Total Products', value: stats.totalProducts, sub: `${stats.activeProducts} active`, icon: HiOutlineCube, color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-500/20', link: '/products' },
-    { title: 'Total Revenue', value: `৳${stats.totalRevenue.toLocaleString()}`, sub: `${stats.totalItemsSold} items sold`, icon: HiOutlineCash, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-500/20', link: '/reports' },
-    { title: 'Total Sales', value: stats.totalSales, sub: `${stats.totalCategories} categories`, icon: HiOutlineShoppingCart, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-500/20', link: '/sales' },
+    { title: 'Total Revenue', value: `৳${stats.totalRevenue.toLocaleString()}`, sub: `${stats.totalItemsSold} items sold`, icon: HiOutlineCash, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-500/20', link: '/reports' },
+    { title: 'Total Profit', value: `৳${stats.totalProfit.toLocaleString()}`, sub: `${stats.totalSales} transactions`, icon: HiOutlineChartBar, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-500/20', link: '/reports' },
     { title: 'Low Stock', value: stats.lowStockCount, sub: stats.lowStockCount > 0 ? 'Needs attention' : 'All stocked', icon: HiOutlineExclamation, color: stats.lowStockCount > 0 ? 'text-red-400' : 'text-amber-400', bg: stats.lowStockCount > 0 ? 'bg-red-400/10' : 'bg-amber-400/10', border: stats.lowStockCount > 0 ? 'border-red-500/20' : 'border-amber-500/20', link: '/products?lowStock=true' },
   ] : [];
 

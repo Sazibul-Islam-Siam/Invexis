@@ -26,6 +26,7 @@ const getStats = async (req, res, next) => {
     const allSales = await Sale.find({ company: co });
     const totalSales = allSales.length;
     const totalRevenue = allSales.reduce((sum, s) => sum + (s.totalAmount || 0), 0);
+    const totalProfit = allSales.reduce((sum, s) => sum + (s.totalProfit || 0), 0);
     const totalItemsSold = allSales.reduce(
       (sum, s) => sum + (s.items || []).reduce((iSum, item) => iSum + item.quantity, 0), 0
     );
@@ -35,7 +36,7 @@ const getStats = async (req, res, next) => {
     res.json({
       success: true,
       data: {
-        totalProducts, activeProducts, totalSales, totalRevenue, totalItemsSold,
+        totalProducts, activeProducts, totalSales, totalRevenue, totalProfit, totalItemsSold,
         totalCategories, lowStockCount: filteredLowStock.length, lowStockProducts: filteredLowStock,
       },
     });
@@ -70,6 +71,7 @@ const getSalesChart = async (req, res, next) => {
         date: dayStart.toISOString().split('T')[0],
         label: dayStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         revenue: daySales.reduce((sum, s) => sum + (s.totalAmount || 0), 0),
+        profit: daySales.reduce((sum, s) => sum + (s.totalProfit || 0), 0),
         transactions: daySales.length,
       });
     }

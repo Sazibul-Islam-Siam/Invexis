@@ -33,8 +33,9 @@ const getSalesReport = async (req, res, next) => {
         key = ws.toISOString().split('T')[0];
       } else key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 
-      if (!revenueByPeriod[key]) revenueByPeriod[key] = { revenue: 0, transactions: 0, items: 0 };
+      if (!revenueByPeriod[key]) revenueByPeriod[key] = { revenue: 0, profit: 0, transactions: 0, items: 0 };
       revenueByPeriod[key].revenue += sale.totalAmount || 0;
+      revenueByPeriod[key].profit += sale.totalProfit || 0;
       revenueByPeriod[key].transactions += 1;
       revenueByPeriod[key].items += (sale.items || []).reduce((s, i) => s + i.quantity, 0);
     });
@@ -48,9 +49,10 @@ const getSalesReport = async (req, res, next) => {
       (sale.items || []).forEach((item) => {
         const pid = item.product?._id?.toString();
         if (!pid) return;
-        if (!productSales[pid]) productSales[pid] = { name: item.product.name, sku: item.product.sku, totalQty: 0, totalRevenue: 0 };
+        if (!productSales[pid]) productSales[pid] = { name: item.product.name, sku: item.product.sku, totalQty: 0, totalRevenue: 0, totalProfit: 0 };
         productSales[pid].totalQty += item.quantity;
         productSales[pid].totalRevenue += item.totalPrice || 0;
+        productSales[pid].totalProfit += (item.totalPrice || 0) - (item.totalCost || 0);
       });
     });
 
@@ -59,9 +61,10 @@ const getSalesReport = async (req, res, next) => {
     const staffSales = {};
     sales.forEach((sale) => {
       const name = sale.soldBy?.name || 'Unknown';
-      if (!staffSales[name]) staffSales[name] = { transactions: 0, revenue: 0 };
+      if (!staffSales[name]) staffSales[name] = { transactions: 0, revenue: 0, profit: 0 };
       staffSales[name].transactions += 1;
       staffSales[name].revenue += sale.totalAmount || 0;
+      staffSales[name].profit += sale.totalProfit || 0;
     });
 
     const salesByStaff = Object.entries(staffSales)
@@ -69,6 +72,7 @@ const getSalesReport = async (req, res, next) => {
       .sort((a, b) => b.revenue - a.revenue);
 
     const totalRevenue = sales.reduce((s, sale) => s + (sale.totalAmount || 0), 0);
+    const totalProfit = sales.reduce((s, sale) => s + (sale.totalProfit || 0), 0);
     const totalTransactions = sales.length;
     const totalItemsSold = sales.reduce((s, sale) => s + (sale.items || []).reduce((is, i) => is + i.quantity, 0), 0);
     const avgOrderValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
@@ -76,7 +80,7 @@ const getSalesReport = async (req, res, next) => {
     res.json({
       success: true,
       data: {
-        summary: { totalRevenue, totalTransactions, totalItemsSold, avgOrderValue },
+        summary: { totalRevenue, totalProfit, totalTransactions, totalItemsSold, avgOrderValue },
         revenueTimeline, topProducts, salesByStaff,
       },
     });

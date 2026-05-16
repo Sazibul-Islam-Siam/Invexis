@@ -60,6 +60,7 @@ const getSales = async (req, res, next) => {
       currentPage: parseInt(page),
       summary: {
         totalRevenue,
+        totalProfit: allSales.reduce((sum, s) => sum + (s.totalProfit || 0), 0),
         totalItems,
         totalTransactions: total,
       },
@@ -128,14 +129,20 @@ const createSale = async (req, res, next) => {
         quantity: item.quantity,
         unitPrice: product.price,
         totalPrice: product.price * item.quantity,
+        unitCost: product.costPrice || 0,
+        totalCost: (product.costPrice || 0) * item.quantity,
       });
     }
 
     const totalAmount = saleItems.reduce((sum, item) => sum + item.totalPrice, 0);
+    const totalCost = saleItems.reduce((sum, item) => sum + (item.totalCost || 0), 0);
+    const totalProfit = totalAmount - totalCost;
 
     const sale = await Sale.create({
       items: saleItems,
       totalAmount,
+      totalCost,
+      totalProfit,
       soldBy: req.user._id,
       company: req.user.company,
     });

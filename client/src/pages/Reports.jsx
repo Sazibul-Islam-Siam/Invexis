@@ -128,6 +128,16 @@ const Reports = () => {
           pointBackgroundColor: colors.purple.border,
           pointBorderColor: '#1e1b4b',
           pointBorderWidth: 2, pointRadius: 4,
+        },
+        {
+          label: 'Profit',
+          data: salesData.revenueTimeline.map((d) => d.profit),
+          borderColor: colors.emerald.border,
+          backgroundColor: 'transparent',
+          tension: 0.4, fill: false,
+          pointBackgroundColor: colors.emerald.border,
+          pointBorderColor: '#064e3b',
+          pointBorderWidth: 2, pointRadius: 3,
         }],
       }
     : null;
@@ -276,10 +286,14 @@ const Reports = () => {
 
           {/* Summary Cards */}
           {salesData?.summary && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-6">
               <div className="card border border-emerald-500/20">
                 <p className="text-sm text-dark-400">Total Revenue</p>
                 <p className="text-2xl font-bold text-white mt-1">৳{salesData.summary.totalRevenue.toLocaleString()}</p>
+              </div>
+              <div className="card border border-emerald-500/20">
+                <p className="text-sm text-dark-400">Total Profit</p>
+                <p className="text-2xl font-bold text-white mt-1">৳{salesData.summary.totalProfit.toLocaleString()}</p>
               </div>
               <div className="card border border-purple-500/20">
                 <p className="text-sm text-dark-400">Transactions</p>
@@ -309,7 +323,9 @@ const Reports = () => {
                       ...chartBaseOptions.plugins,
                       tooltip: {
                         ...chartBaseOptions.plugins.tooltip,
-                        callbacks: { label: (ctx) => `৳${ctx.parsed.y.toLocaleString()}` },
+                        callbacks: { 
+                          label: (ctx) => `${ctx.dataset.label}: ৳${ctx.parsed.y.toLocaleString()}` 
+                        },
                       },
                     },
                   }} />
