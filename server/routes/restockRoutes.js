@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getRestockRequests,
   createRestockRequest,
+  approveStaffRequest,
   updateRestockRequest,
   deleteRestockRequest,
 } = require('../controllers/restockController');
@@ -13,7 +14,11 @@ router.use(protect);
 router
   .route('/')
   .get(getRestockRequests)
-  .post(authorize('admin'), createRestockRequest);
+  .post(authorize('admin', 'staff'), createRestockRequest);
+
+router
+  .route('/:id/approve')
+  .put(authorize('admin'), approveStaffRequest);
 
 router
   .route('/:id')

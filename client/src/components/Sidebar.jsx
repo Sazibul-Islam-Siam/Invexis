@@ -102,6 +102,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         path: '/sales',
       },
       {
+        label: 'Restock Requests',
+        icon: HiOutlineTruck,
+        path: '/restock-requests',
+      },
+      {
         label: 'Stock Updates',
         icon: HiOutlineClipboardList,
         path: '/stock-adjustments',

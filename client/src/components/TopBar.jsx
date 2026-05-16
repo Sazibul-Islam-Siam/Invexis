@@ -68,8 +68,25 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
         } catch { /* silent */ }
       }
 
-      // Check pending restocks (admin only)
+      // Check staff restock requests awaiting admin approval
       if (user?.role === 'admin') {
+        try {
+          const staffReqRes = await axios.get('/api/restock-requests?status=pending_admin&limit=1', getAuthConfig());
+          if (staffReqRes.data.total > 0) {
+            notifs.push({
+              id: 'staff-restock',
+              type: 'info',
+              title: 'Staff Restock Requests',
+              message: `${staffReqRes.data.total} request${staffReqRes.data.total > 1 ? 's' : ''} from staff awaiting your approval`,
+              icon: HiOutlineClock,
+              color: 'text-orange-400',
+              bg: 'bg-orange-500/15',
+              action: () => navigate('/restock-requests'),
+            });
+          }
+        } catch { /* silent */ }
+
+        // Check pending restocks (sent to supplier)
         try {
           const restockRes = await axios.get('/api/restock-requests?status=pending&limit=1', getAuthConfig());
           if (restockRes.data.total > 0) {

@@ -10,7 +10,6 @@ const restockRequestSchema = new mongoose.Schema(
     supplier: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: [true, 'Please select a supplier'],
     },
     requestedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,12 +18,11 @@ const restockRequestSchema = new mongoose.Schema(
     },
     quantity: {
       type: Number,
-      required: [true, 'Please add quantity to restock'],
       min: [1, 'Quantity must be at least 1'],
     },
     status: {
       type: String,
-      enum: ['pending', 'accepted', 'rejected', 'shipped', 'delivered'],
+      enum: ['pending_admin', 'pending', 'accepted', 'rejected', 'shipped', 'delivered'],
       default: 'pending',
     },
     estimatedDelivery: {

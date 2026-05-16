@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import saleService from '../services/saleService';
 import productService from '../services/productService';
@@ -34,6 +34,9 @@ const Sales = () => {
   const [cart, setCart] = useState([]);
   const [selectedProductId, setSelectedProductId] = useState('');
   const [selectedQty, setSelectedQty] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const printInvoice = (sale) => {
     const itemsHtml = (sale.items || []).map((i) =>
@@ -54,6 +57,16 @@ const Sales = () => {
   useEffect(() => {
     fetchSales();
   }, [pagination.page, dateFilter.startDate, dateFilter.endDate]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const fetchProducts = async () => {
     try {
@@ -125,6 +138,7 @@ const Sales = () => {
     }
 
     setSelectedProductId('');
+    setSearchQuery('');
     setSelectedQty(1);
   };
 
@@ -153,6 +167,8 @@ const Sales = () => {
   const closeModal = () => {
     setShowModal(false);
     setCart([]);
+    setSearchQuery('');
+    setSelectedProductId('');
   };
 
   const handleSubmit = async () => {
@@ -429,18 +445,49 @@ const Sales = () => {
             <div className="bg-dark-900/50 border border-dark-600 rounded-xl p-4 mb-4">
               <p className="text-sm font-medium text-dark-300 mb-3">Add Products</p>
               <div className="flex gap-3">
-                <select
-                  value={selectedProductId}
-                  onChange={(e) => setSelectedProductId(e.target.value)}
-                  className="input-field flex-1"
-                >
-                  <option value="">Select a product</option>
-                  {availableProducts.map((p) => (
-                    <option key={p._id} value={p._id}>
-                      {p.name} — Stock: {p.quantity} — ৳{p.price.toLocaleString()}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative flex-1" ref={dropdownRef}>
+                  <input
+                    type="text"
+                    placeholder="Search and select a product..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setIsDropdownOpen(true);
+                      if (!e.target.value) setSelectedProductId('');
+                    }}
+                    onFocus={() => setIsDropdownOpen(true)}
+                    className="input-field w-full"
+                  />
+                  {isDropdownOpen && (
+                    <div className="absolute z-10 w-full mt-1 bg-dark-800 border border-dark-600 rounded-lg shadow-2xl max-h-56 overflow-y-auto">
+                      {availableProducts
+                        .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.sku.toLowerCase().includes(searchQuery.toLowerCase()))
+                        .map(p => (
+                          <div
+                            key={p._id}
+                            onClick={() => {
+                              setSelectedProductId(p._id);
+                              setSearchQuery(p.name);
+                              setIsDropdownOpen(false);
+                            }}
+                            className={`px-3 py-2 cursor-pointer transition-colors text-sm ${
+                              selectedProductId === p._id
+                                ? 'bg-primary-600/20 text-primary-400'
+                                : 'text-dark-100 hover:bg-dark-700'
+                            }`}
+                          >
+                            <p className="font-medium">{p.name}</p>
+                            <p className="text-xs text-dark-400 mt-0.5">
+                              {p.sku} • Stock: {p.quantity} • ৳{p.price.toLocaleString()}
+                            </p>
+                          </div>
+                      ))}
+                      {availableProducts.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.sku.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                        <div className="px-3 py-4 text-dark-400 text-sm text-center">No products found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
                 <input
                   type="number"
                   min="1"

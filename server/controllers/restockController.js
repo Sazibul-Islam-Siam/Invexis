@@ -17,6 +17,10 @@ const getRestockRequests = async (req, res, next) => {
 
     if (req.user.role === 'supplier') {
       query.supplier = req.user._id;
+      // Suppliers should never see pending_admin requests
+      if (!status) {
+        query.status = { $ne: 'pending_admin' };
+      }
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -47,28 +51,47 @@ const getRestockRequests = async (req, res, next) => {
 
 // @desc    Create restock request
 // @route   POST /api/restock-requests
-// @access  Private (Admin)
+// @access  Private (Admin, Staff)
 const createRestockRequest = async (req, res, next) => {
   try {
     const { product, supplier, quantity, notes } = req.body;
 
-    const request = await RestockRequest.create({
+    const requestData = {
       product,
-      supplier,
-      quantity,
       notes,
       requestedBy: req.user._id,
       company: req.user.company,
-    });
+    };
+
+    if (req.user.role === 'staff') {
+      // Staff creates a request that needs admin approval first
+      requestData.status = 'pending_admin';
+    } else {
+      // Admin creates a request that goes directly to the supplier
+      if (!supplier) {
+        res.status(400);
+        throw new Error('Please select a supplier');
+      }
+      if (!quantity || quantity < 1) {
+        res.status(400);
+        throw new Error('Please add a valid quantity');
+      }
+      requestData.supplier = supplier;
+      requestData.quantity = quantity;
+      requestData.status = 'pending';
+    }
+
+    const request = await RestockRequest.create(requestData);
 
     const populated = await RestockRequest.findById(request._id)
       .populate('product', 'name sku')
       .populate('supplier', 'name email')
       .populate('requestedBy', 'name');
 
-    logAudit(req.user._id, 'CREATE', 'RestockRequest', request._id, `Created restock request for ${populated.product?.name} (qty: ${quantity})`, req.user.company);
+    logAudit(req.user._id, 'CREATE', 'RestockRequest', request._id, `Created restock request for ${populated.product?.name}${quantity ? ` (qty: ${quantity})` : ' (awaiting admin approval)'}`, req.user.company);
 
-    if (populated.supplier?.email) {
+    // Only email supplier if admin created (direct to supplier)
+    if (req.user.role === 'admin' && populated.supplier?.email) {
       sendEmail({
         to: populated.supplier.email,
         subject: `New Restock Request — ${populated.product?.name}`,
@@ -77,6 +100,60 @@ const createRestockRequest = async (req, res, next) => {
     }
 
     res.status(201).json({ success: true, data: populated });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Admin approves a staff restock request (assigns supplier + quantity)
+// @route   PUT /api/restock-requests/:id/approve
+// @access  Private (Admin)
+const approveStaffRequest = async (req, res, next) => {
+  try {
+    const { supplier, quantity } = req.body;
+
+    if (!supplier) {
+      res.status(400);
+      throw new Error('Please select a supplier');
+    }
+    if (!quantity || quantity < 1) {
+      res.status(400);
+      throw new Error('Please add a valid quantity');
+    }
+
+    const request = await RestockRequest.findOne({
+      _id: req.params.id,
+      company: req.user.company,
+      status: 'pending_admin',
+    });
+
+    if (!request) {
+      res.status(404);
+      throw new Error('Request not found or already processed');
+    }
+
+    request.supplier = supplier;
+    request.quantity = quantity;
+    request.status = 'pending';
+    await request.save();
+
+    const populated = await RestockRequest.findById(request._id)
+      .populate('product', 'name sku quantity')
+      .populate('supplier', 'name email')
+      .populate('requestedBy', 'name');
+
+    logAudit(req.user._id, 'APPROVE', 'RestockRequest', request._id, `Approved staff restock request for ${populated.product?.name} (qty: ${quantity})`, req.user.company);
+
+    // Notify supplier
+    if (populated.supplier?.email) {
+      sendEmail({
+        to: populated.supplier.email,
+        subject: `New Restock Request — ${populated.product?.name}`,
+        html: restockNotifySupplier(populated.supplier.name, populated.product?.name, quantity, populated.requestedBy?.name),
+      });
+    }
+
+    res.json({ success: true, data: populated });
   } catch (error) {
     next(error);
   }
@@ -93,6 +170,18 @@ const updateRestockRequest = async (req, res, next) => {
     if (!request) {
       res.status(404);
       throw new Error('Restock request not found');
+    }
+
+    // Admin can reject a pending_admin request
+    if (status === 'rejected' && request.status === 'pending_admin' && req.user.role === 'admin') {
+      request.status = 'rejected';
+      await request.save();
+      const populated = await RestockRequest.findById(request._id)
+        .populate('product', 'name sku quantity')
+        .populate('supplier', 'name email')
+        .populate('requestedBy', 'name');
+      logAudit(req.user._id, 'STATUS_CHANGE', 'RestockRequest', request._id, `Rejected staff restock request for ${populated.product?.name}`, req.user.company);
+      return res.json({ success: true, data: populated });
     }
 
     if (req.user.role === 'supplier') {
@@ -171,6 +260,7 @@ const deleteRestockRequest = async (req, res, next) => {
 module.exports = {
   getRestockRequests,
   createRestockRequest,
+  approveStaffRequest,
   updateRestockRequest,
   deleteRestockRequest,
 };

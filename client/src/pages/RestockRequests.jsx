@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import restockService from '../services/restockService';
 import productService from '../services/productService';
@@ -13,9 +13,11 @@ import {
   HiOutlineBan,
   HiOutlineCube,
   HiOutlineInboxIn,
+  HiOutlineClipboardCheck,
 } from 'react-icons/hi';
 
 const statusConfig = {
+  pending_admin: { label: 'Awaiting Approval', className: 'bg-orange-500/15 text-orange-400 border-orange-500/30' },
   pending: { label: 'Pending', className: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
   accepted: { label: 'Accepted', className: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
   rejected: { label: 'Rejected', className: 'bg-red-500/15 text-red-400 border-red-500/30' },
@@ -30,7 +32,12 @@ const RestockRequests = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [approvingRequest, setApprovingRequest] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const [statusFilter, setStatusFilter] = useState('');
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
 
@@ -41,13 +48,31 @@ const RestockRequests = () => {
     notes: '',
   });
 
+  const [approveData, setApproveData] = useState({
+    supplier: '',
+    quantity: 1,
+  });
+
   useEffect(() => {
     fetchRequests();
     if (user?.role === 'admin') {
       fetchProducts();
       fetchSuppliers();
     }
+    if (user?.role === 'staff') {
+      fetchProducts();
+    }
   }, [pagination.page, statusFilter]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const fetchRequests = async () => {
     try {
@@ -87,19 +112,58 @@ const RestockRequests = () => {
 
   const openModal = () => {
     setFormData({ product: '', supplier: '', quantity: 1, notes: '' });
+    setSearchQuery('');
     setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSearchQuery('');
   };
 
   const handleCreate = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await restockService.createRestockRequest(formData);
-      toast.success('Restock request created');
-      setShowModal(false);
+      if (user?.role === 'staff') {
+        // Staff only sends product + notes
+        await restockService.createRestockRequest({
+          product: formData.product,
+          notes: formData.notes,
+        });
+        toast.success('Restock request submitted for admin approval');
+      } else {
+        await restockService.createRestockRequest(formData);
+        toast.success('Restock request created');
+      }
+      closeModal();
       fetchRequests();
+      window.dispatchEvent(new Event('refresh-notifications'));
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to create request');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const openApproveModal = (request) => {
+    setApprovingRequest(request);
+    setApproveData({ supplier: '', quantity: 1 });
+    setShowApproveModal(true);
+  };
+
+  const handleApprove = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await restockService.approveRestockRequest(approvingRequest._id, approveData);
+      toast.success('Request approved and sent to supplier');
+      setShowApproveModal(false);
+      setApprovingRequest(null);
+      fetchRequests();
+      window.dispatchEvent(new Event('refresh-notifications'));
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to approve');
     } finally {
       setSubmitting(false);
     }
@@ -138,10 +202,10 @@ const RestockRequests = () => {
           </h1>
           <p className="text-dark-400 mt-1">Manage supplier restock orders</p>
         </div>
-        {user?.role === 'admin' && (
+        {(user?.role === 'admin' || user?.role === 'staff') && (
           <button onClick={openModal} className="btn-primary flex items-center gap-2">
             <HiOutlinePlus className="text-lg" />
-            New Request
+            {user?.role === 'staff' ? 'Request Restock' : 'New Request'}
           </button>
         )}
       </div>
@@ -157,6 +221,7 @@ const RestockRequests = () => {
           className="input-field w-auto"
         >
           <option value="">All Statuses</option>
+          {user?.role === 'admin' && <option value="pending_admin">Awaiting Approval</option>}
           <option value="pending">Pending</option>
           <option value="accepted">Accepted</option>
           <option value="shipped">Shipped</option>
@@ -185,6 +250,7 @@ const RestockRequests = () => {
                   <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Product</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Supplier</th>
                   <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Qty</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Requested By</th>
                   <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Status</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Date</th>
                   <th className="text-right py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Actions</th>
@@ -206,12 +272,19 @@ const RestockRequests = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-dark-400 text-sm">{r.supplier?.name}</td>
-                      <td className="py-3.5 px-4 text-center">
-                        <span className="bg-dark-700 px-2.5 py-1 rounded-lg text-sm font-medium text-white">
-                          {r.quantity}
-                        </span>
+                      <td className="py-3.5 px-4 text-dark-400 text-sm">
+                        {r.supplier?.name || <span className="text-dark-500 italic">Not assigned</span>}
                       </td>
+                      <td className="py-3.5 px-4 text-center">
+                        {r.quantity ? (
+                          <span className="bg-dark-700 px-2.5 py-1 rounded-lg text-sm font-medium text-white">
+                            {r.quantity}
+                          </span>
+                        ) : (
+                          <span className="text-dark-500 italic text-sm">—</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-dark-400 text-sm">{r.requestedBy?.name}</td>
                       <td className="py-3.5 px-4 text-center">
                         <span className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${badge.className}`}>
                           {badge.label}
@@ -224,6 +297,25 @@ const RestockRequests = () => {
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center justify-end gap-1">
+                          {/* Admin: Approve/Reject staff requests */}
+                          {user?.role === 'admin' && r.status === 'pending_admin' && (
+                            <>
+                              <button
+                                onClick={() => openApproveModal(r)}
+                                className="px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25 transition-colors flex items-center gap-1.5"
+                                title="Approve & Assign Supplier"
+                              >
+                                <HiOutlineClipboardCheck className="text-sm" /> Approve
+                              </button>
+                              <button
+                                onClick={() => handleStatusUpdate(r._id, 'rejected')}
+                                className="p-2 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                                title="Reject"
+                              >
+                                <HiOutlineBan className="text-lg" />
+                              </button>
+                            </>
+                          )}
                           {/* Supplier actions */}
                           {user?.role === 'supplier' && r.status === 'pending' && (
                             <>
@@ -307,30 +399,140 @@ const RestockRequests = () => {
         )}
       </div>
 
-      {/* Create Modal */}
+      {/* ==================== CREATE MODAL ==================== */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)}></div>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal}></div>
           <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">New Restock Request</h2>
-              <button onClick={() => setShowModal(false)} className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all">
+              <h2 className="text-xl font-semibold text-white">
+                {user?.role === 'staff' ? 'Request Restock' : 'New Restock Request'}
+              </h2>
+              <button onClick={closeModal} className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all">
                 <HiOutlineX className="text-xl" />
               </button>
             </div>
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Product <span className="text-red-400">*</span></label>
-                <select required value={formData.product} onChange={(e) => setFormData({ ...formData, product: e.target.value })} className="input-field">
-                  <option value="">Select product</option>
-                  {products.map((p) => (
-                    <option key={p._id} value={p._id}>{p.name} (Stock: {p.quantity})</option>
-                  ))}
-                </select>
+
+            {user?.role === 'staff' && (
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 mb-4">
+                <p className="text-xs text-blue-400">
+                  Your request will be reviewed by an Admin who will assign a supplier and quantity before forwarding it.
+                </p>
               </div>
+            )}
+
+            <form onSubmit={handleCreate} className="space-y-4">
+              {/* Product selector (searchable) */}
+              <div className="relative" ref={dropdownRef}>
+                <label className="block text-sm font-medium text-dark-300 mb-1.5">Product <span className="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  required={!formData.product}
+                  placeholder="Search and select a product..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsDropdownOpen(true);
+                    if (!e.target.value) setFormData({ ...formData, product: '' });
+                  }}
+                  onFocus={() => setIsDropdownOpen(true)}
+                  className="input-field w-full"
+                />
+                {isDropdownOpen && (
+                  <div className="absolute z-10 w-full mt-1 bg-dark-800 border border-dark-600 rounded-lg shadow-2xl max-h-56 overflow-y-auto">
+                    {products
+                      .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase())))
+                      .map(p => (
+                        <div
+                          key={p._id}
+                          onClick={() => {
+                            setFormData({ ...formData, product: p._id });
+                            setSearchQuery(p.name);
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`px-3 py-2 cursor-pointer transition-colors text-sm ${
+                            formData.product === p._id
+                              ? 'bg-primary-600/20 text-primary-400'
+                              : 'text-dark-100 hover:bg-dark-700'
+                          }`}
+                        >
+                          {p.name} <span className="text-dark-400">— Stock: {p.quantity}</span>
+                        </div>
+                    ))}
+                    {products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase()))).length === 0 && (
+                      <div className="px-3 py-4 text-dark-400 text-sm text-center">No products found</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Supplier + Quantity only for Admin */}
+              {user?.role === 'admin' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1.5">Supplier <span className="text-red-400">*</span></label>
+                    <select required value={formData.supplier} onChange={(e) => setFormData({ ...formData, supplier: e.target.value })} className="input-field">
+                      <option value="">Select supplier</option>
+                      {suppliers.map((s) => (
+                        <option key={s._id} value={s._id}>{s.name} ({s.email})</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1.5">Quantity <span className="text-red-400">*</span></label>
+                    <input type="number" required min="1" value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: e.target.value })} className="input-field" />
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-dark-300 mb-1.5">Notes</label>
+                <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className="input-field" rows="2" placeholder="Optional notes..." />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={closeModal} className="btn-secondary flex-1">Cancel</button>
+                <button type="submit" disabled={submitting} className="btn-primary flex-1 flex items-center justify-center gap-2">
+                  {submitting ? <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div> : (user?.role === 'staff' ? 'Submit Request' : 'Create Request')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== APPROVE MODAL (Admin assigns supplier + qty) ==================== */}
+      {showApproveModal && approvingRequest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowApproveModal(false)}></div>
+          <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-white">Approve Restock Request</h2>
+              <button onClick={() => setShowApproveModal(false)} className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all">
+                <HiOutlineX className="text-xl" />
+              </button>
+            </div>
+
+            {/* Request Info */}
+            <div className="bg-dark-900/50 border border-dark-600 rounded-xl p-4 mb-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-9 h-9 bg-primary-600/15 rounded-lg flex items-center justify-center shrink-0">
+                  <HiOutlineCube className="text-primary-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-white">{approvingRequest.product?.name}</p>
+                  <p className="text-xs text-dark-500">Current Stock: {approvingRequest.product?.quantity} | Min: {approvingRequest.product?.minStockThreshold}</p>
+                </div>
+              </div>
+              <p className="text-xs text-dark-400">
+                Requested by <span className="text-dark-200">{approvingRequest.requestedBy?.name}</span>
+                {approvingRequest.notes && <> — "{approvingRequest.notes}"</>}
+              </p>
+            </div>
+
+            <form onSubmit={handleApprove} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-1.5">Supplier <span className="text-red-400">*</span></label>
-                <select required value={formData.supplier} onChange={(e) => setFormData({ ...formData, supplier: e.target.value })} className="input-field">
+                <select required value={approveData.supplier} onChange={(e) => setApproveData({ ...approveData, supplier: e.target.value })} className="input-field">
                   <option value="">Select supplier</option>
                   {suppliers.map((s) => (
                     <option key={s._id} value={s._id}>{s.name} ({s.email})</option>
@@ -339,16 +541,12 @@ const RestockRequests = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-1.5">Quantity <span className="text-red-400">*</span></label>
-                <input type="number" required min="1" value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: e.target.value })} className="input-field" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Notes</label>
-                <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className="input-field" rows="2" placeholder="Optional notes..." />
+                <input type="number" required min="1" value={approveData.quantity} onChange={(e) => setApproveData({ ...approveData, quantity: e.target.value })} className="input-field" />
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">Cancel</button>
+                <button type="button" onClick={() => setShowApproveModal(false)} className="btn-secondary flex-1">Cancel</button>
                 <button type="submit" disabled={submitting} className="btn-primary flex-1 flex items-center justify-center gap-2">
-                  {submitting ? <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div> : 'Create Request'}
+                  {submitting ? <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div> : 'Approve & Send to Supplier'}
                 </button>
               </div>
             </form>

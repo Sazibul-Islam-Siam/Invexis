@@ -19,6 +19,11 @@ const createRestockRequest = async (data) => {
   return res.data;
 };
 
+const approveRestockRequest = async (id, data) => {
+  const res = await axios.put(`${API_URL}/${id}/approve`, data, getAuthConfig());
+  return res.data;
+};
+
 const updateRestockRequest = async (id, data) => {
   const res = await axios.put(`${API_URL}/${id}`, data, getAuthConfig());
   return res.data;
@@ -29,4 +34,4 @@ const deleteRestockRequest = async (id) => {
   return res.data;
 };
 
-export default { getRestockRequests, createRestockRequest, updateRestockRequest, deleteRestockRequest };
+export default { getRestockRequests, createRestockRequest, approveRestockRequest, updateRestockRequest, deleteRestockRequest };
