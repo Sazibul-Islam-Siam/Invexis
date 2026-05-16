@@ -100,9 +100,9 @@ const registerCompany = async (req, res, next) => {
     company.owner = user._id;
     await company.save();
 
-    // 5. Send verification email
+    // 5. Send verification email in the background (no await)
     const verificationLink = await admin.auth().generateEmailVerificationLink(email);
-    await sendEmail({
+    sendEmail({
       to: email,
       subject: 'Verify Your Email — Invexis',
       html: `
@@ -129,7 +129,7 @@ const registerCompany = async (req, res, next) => {
         </body>
         </html>
       `,
-    });
+    }).catch(console.error);
 
     res.status(201).json({
       success: true,
