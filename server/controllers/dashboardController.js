@@ -51,6 +51,41 @@ const getSalesChart = async (req, res, next) => {
     const { days = 7 } = req.query;
     const numDays = parseInt(days);
     const startDate = new Date();
+    if (numDays === 90) {
+      // Group by Month for 90 days
+      startDate.setMonth(startDate.getMonth() - 2);
+      startDate.setDate(1);
+      startDate.setHours(0, 0, 0, 0);
+
+      const sales = await Sale.find({ company: co, saleDate: { $gte: startDate } });
+
+      const monthlyData = [];
+      const current = new Date(startDate);
+      const now = new Date();
+      
+      while (current.getFullYear() < now.getFullYear() || (current.getFullYear() === now.getFullYear() && current.getMonth() <= now.getMonth())) {
+        const monthStart = new Date(current.getFullYear(), current.getMonth(), 1);
+        const monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0, 23, 59, 59, 999);
+
+        const monthSales = sales.filter(
+          (s) => new Date(s.saleDate) >= monthStart && new Date(s.saleDate) <= monthEnd
+        );
+
+        monthlyData.push({
+          date: monthStart.toISOString().split('T')[0],
+          label: monthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+          revenue: monthSales.reduce((sum, s) => sum + (s.totalAmount || 0), 0),
+          profit: monthSales.reduce((sum, s) => sum + (s.totalProfit || 0), 0),
+          transactions: monthSales.length,
+        });
+
+        current.setMonth(current.getMonth() + 1);
+      }
+
+      return res.json({ success: true, data: monthlyData });
+    }
+
+    // Default daily grouping
     startDate.setDate(startDate.getDate() - numDays + 1);
     startDate.setHours(0, 0, 0, 0);
 

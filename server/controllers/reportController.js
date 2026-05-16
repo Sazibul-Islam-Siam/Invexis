@@ -56,7 +56,7 @@ const getSalesReport = async (req, res, next) => {
       });
     });
 
-    const topProducts = Object.values(productSales).sort((a, b) => b.totalRevenue - a.totalRevenue).slice(0, 10);
+    const topProducts = Object.values(productSales).sort((a, b) => b.totalRevenue - a.totalRevenue).slice(0, 3);
 
     const staffSales = {};
     sales.forEach((sale) => {

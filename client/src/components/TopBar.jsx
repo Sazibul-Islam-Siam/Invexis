@@ -11,6 +11,7 @@ import {
   HiOutlineMenuAlt2,
   HiOutlineX,
   HiOutlineInboxIn,
+  HiOutlineTruck,
 } from 'react-icons/hi';
 
 const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
@@ -18,27 +19,26 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [showNotif, setShowNotif] = useState(false);
-  const [search, setSearch] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [showSearch, setShowSearch] = useState(false);
   const notifRef = useRef(null);
-  const searchRef = useRef(null);
 
   const getAuthConfig = () => ({
-    headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}` },
+    headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.firebaseToken}` },
   });
 
   useEffect(() => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60000); // refresh every minute
-    return () => clearInterval(interval);
+    window.addEventListener('refresh-notifications', fetchNotifications);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('refresh-notifications', fetchNotifications);
+    };
   }, []);
 
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClick = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotif(false);
-      if (searchRef.current && !searchRef.current.contains(e.target)) setShowSearch(false);
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -46,22 +46,26 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
 
   const fetchNotifications = async () => {
     try {
-      if (user?.role !== 'admin' && user?.role !== 'staff') return;
-      const res = await axios.get('/api/dashboard/stats', getAuthConfig());
-      const data = res.data.data;
+      if (!user) return;
       const notifs = [];
 
-      if (data.lowStockCount > 0) {
-        notifs.push({
-          id: 'low-stock',
-          type: 'warning',
-          title: 'Low Stock Alert',
-          message: `${data.lowStockCount} product${data.lowStockCount > 1 ? 's' : ''} below threshold`,
-          icon: HiOutlineExclamation,
-          color: 'text-amber-400',
-          bg: 'bg-amber-500/15',
-          action: () => navigate('/reports'),
-        });
+      if (user?.role === 'admin' || user?.role === 'staff') {
+        try {
+          const res = await axios.get('/api/dashboard/stats', getAuthConfig());
+          const data = res.data.data;
+          if (data.lowStockCount > 0) {
+            notifs.push({
+              id: 'low-stock',
+              type: 'warning',
+              title: 'Low Stock Alert',
+              message: `${data.lowStockCount} product${data.lowStockCount > 1 ? 's' : ''} below threshold`,
+              icon: HiOutlineExclamation,
+              color: 'text-amber-400',
+              bg: 'bg-amber-500/15',
+              action: () => navigate('/products?lowStock=true'),
+            });
+          }
+        } catch { /* silent */ }
       }
 
       // Check pending restocks (admin only)
@@ -100,25 +104,29 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
         } catch { /* silent */ }
       }
 
+      // Check pending restocks (supplier only)
+      if (user?.role === 'supplier') {
+        try {
+          const supplierRes = await axios.get('/api/restock-requests?status=pending&limit=1', getAuthConfig());
+          if (supplierRes.data.total > 0) {
+            notifs.push({
+              id: 'pending-restock-supplier',
+              type: 'info',
+              title: 'New Restock Requests',
+              message: `${supplierRes.data.total} new request${supplierRes.data.total > 1 ? 's' : ''} awaiting your review`,
+              icon: HiOutlineTruck,
+              color: 'text-blue-400',
+              bg: 'bg-blue-500/15',
+              action: () => navigate('/restock-requests'),
+            });
+          }
+        } catch { /* silent */ }
+      }
+
       setNotifications(notifs);
     } catch { /* silent */ }
   };
 
-  const handleSearch = async (query) => {
-    setSearch(query);
-    if (query.length < 2) {
-      setSearchResults([]);
-      setShowSearch(false);
-      return;
-    }
-    try {
-      const res = await axios.get(`/api/products?search=${query}&limit=5`, getAuthConfig());
-      setSearchResults(res.data.data || []);
-      setShowSearch(true);
-    } catch {
-      setSearchResults([]);
-    }
-  };
 
   const getRoleLabel = (role) => ({ admin: 'Admin', supplier: 'Supplier', staff: 'Staff' }[role] || role);
   const getRoleBadgeColor = (role) => ({
@@ -139,41 +147,6 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
         </button>
       )}
 
-      {/* Search Bar */}
-      <div className="relative max-w-md w-full" ref={searchRef}>
-        <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400 text-lg" />
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          onFocus={() => search.length >= 2 && setShowSearch(true)}
-          className="w-full bg-dark-800 border border-dark-700 rounded-lg pl-10 pr-4 py-2 text-sm text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all duration-200"
-        />
-        {showSearch && searchResults.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-dark-800 border border-dark-600 rounded-xl shadow-2xl overflow-hidden z-50">
-            {searchResults.map((p) => (
-              <button
-                key={p._id}
-                onClick={() => {
-                  navigate('/products');
-                  setShowSearch(false);
-                  setSearch('');
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-dark-700/50 transition-colors text-left"
-              >
-                <div className="w-8 h-8 bg-primary-600/15 rounded-lg flex items-center justify-center shrink-0">
-                  <HiOutlineCube className="text-primary-400 text-sm" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white truncate">{p.name}</p>
-                  <p className="text-xs text-dark-500">{p.sku} • Stock: {p.quantity}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
 
       {/* Right side */}
       <div className="flex items-center gap-2 md:gap-4 ml-auto">

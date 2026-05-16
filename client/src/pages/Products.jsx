@@ -151,6 +151,17 @@ const Products = () => {
     }
   };
 
+  const handleToggleStatus = async (product) => {
+    try {
+      const newStatus = product.status === 'active' ? 'discontinued' : 'active';
+      await productService.updateProduct(product._id, { status: newStatus });
+      toast.success(`Product marked as ${newStatus}`);
+      fetchProducts();
+    } catch {
+      toast.error('Failed to update status');
+    }
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -347,15 +358,17 @@ const Products = () => {
                         </p>
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        <span
-                          className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                        <button
+                          onClick={() => handleToggleStatus(product)}
+                          className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors cursor-pointer ${
                             product.status === 'active'
-                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
-                              : 'bg-dark-600/50 text-dark-400 border border-dark-500/20'
+                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25'
+                              : 'bg-dark-600/50 text-dark-400 border border-dark-500/20 hover:bg-dark-600'
                           }`}
+                          title="Click to toggle status"
                         >
                           {product.status}
-                        </span>
+                        </button>
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center justify-end gap-2">

@@ -67,7 +67,14 @@ const RestockRequests = () => {
   const fetchProducts = async () => {
     try {
       const res = await productService.getProducts({ limit: 200 });
-      setProducts(res.data);
+      const sortedProducts = res.data.sort((a, b) => {
+        const aIsLow = a.quantity <= (a.minStockThreshold || 10);
+        const bIsLow = b.quantity <= (b.minStockThreshold || 10);
+        if (aIsLow && !bIsLow) return -1;
+        if (!aIsLow && bIsLow) return 1;
+        return a.name.localeCompare(b.name);
+      });
+      setProducts(sortedProducts);
     } catch { /* silent */ }
   };
 
@@ -103,6 +110,7 @@ const RestockRequests = () => {
       await restockService.updateRestockRequest(id, { status });
       toast.success(`Request ${status}`);
       fetchRequests();
+      window.dispatchEvent(new Event('refresh-notifications'));
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update');
     }
