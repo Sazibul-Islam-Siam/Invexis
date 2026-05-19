@@ -1,25 +1,49 @@
 const admin = require('../config/firebaseAdmin');
 const User = require('../models/User');
+const CompanySupplier = require('../models/CompanySupplier');
 const logAudit = require('../utils/logger');
-const sendEmail = require('../utils/sendEmail');
 
-// @desc    Get all users (within same company)
+// @desc    Get all users (within same company, including linked suppliers)
 // @route   GET /api/users
 // @access  Private (Admin)
 const getUsers = async (req, res, next) => {
   try {
     const { role, search, page = 1, limit = 20 } = req.query;
-    const query = { company: req.user.company };
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    if (role) query.role = role;
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-      ];
+    // Build query conditions
+    const conditions = [];
+
+    if (role === 'supplier') {
+      // Find suppliers linked to this company via CompanySupplier
+      const links = await CompanySupplier.find({ company: req.user.company, status: 'active' });
+      const supplierIds = links.map((l) => l.supplier);
+      conditions.push({ _id: { $in: supplierIds }, role: 'supplier' });
+    } else if (role) {
+      // Specific non-supplier role
+      conditions.push({ company: req.user.company, role });
+    } else {
+      // No role filter — show all: regular users + linked suppliers
+      const links = await CompanySupplier.find({ company: req.user.company, status: 'active' });
+      const supplierIds = links.map((l) => l.supplier);
+      conditions.push({
+        $or: [
+          { company: req.user.company },
+          { _id: { $in: supplierIds }, role: 'supplier' },
+        ],
+      });
     }
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    if (search) {
+      conditions.push({
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+        ],
+      });
+    }
+
+    const query = conditions.length > 0 ? { $and: conditions } : {};
 
     const [users, total] = await Promise.all([
       User.find(query)
@@ -42,10 +66,23 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-// @desc    Get single user (within same company)
+// @desc    Get single user (within same company or linked supplier)
 const getUser = async (req, res, next) => {
   try {
-    const user = await User.findOne({ _id: req.params.id, company: req.user.company });
+    let user = await User.findOne({ _id: req.params.id, company: req.user.company });
+
+    // If not found, check if it's a linked supplier
+    if (!user) {
+      const link = await CompanySupplier.findOne({
+        company: req.user.company,
+        supplier: req.params.id,
+        status: 'active',
+      });
+      if (link) {
+        user = await User.findOne({ _id: req.params.id, role: 'supplier' });
+      }
+    }
+
     if (!user) {
       res.status(404);
       throw new Error('User not found');
@@ -57,12 +94,98 @@ const getUser = async (req, res, next) => {
 };
 
 // @desc    Create a new user within the admin's company
+//          For suppliers: links existing account or creates new one
 const createUser = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
 
-    const exists = await User.findOne({ email });
-    if (exists) {
+    const existing = await User.findOne({ email });
+
+    // ─── Supplier: link-or-create flow ───
+    if (role === 'supplier') {
+      if (existing) {
+        // If already a supplier, just link to this company
+        if (existing.role === 'supplier') {
+          const existingLink = await CompanySupplier.findOne({
+            company: req.user.company,
+            supplier: existing._id,
+          });
+
+          if (existingLink) {
+            if (existingLink.status === 'active') {
+              res.status(400);
+              throw new Error('This supplier is already linked to your company');
+            }
+            // Reactivate inactive link
+            existingLink.status = 'active';
+            await existingLink.save();
+          } else {
+            await CompanySupplier.create({
+              company: req.user.company,
+              supplier: existing._id,
+            });
+          }
+
+          logAudit(req.user._id, 'CREATE', 'User', existing._id, `Linked existing supplier "${existing.name}" to company`, req.user.company);
+
+          return res.status(201).json({
+            success: true,
+            data: {
+              _id: existing._id,
+              name: existing.name,
+              email: existing.email,
+              role: existing.role,
+              isActive: existing.isActive,
+              createdAt: existing.createdAt,
+            },
+            message: `Supplier "${existing.name}" has been linked to your company.`,
+          });
+        }
+
+        // Email exists but not as a supplier
+        res.status(400);
+        throw new Error('A user with this email already exists with a different role');
+      }
+
+      // Create brand new supplier (no company on User, linked via CompanySupplier)
+      const firebaseUser = await admin.auth().createUser({
+        email,
+        password,
+        displayName: name,
+        emailVerified: false,
+      });
+
+      const user = await User.create({
+        name,
+        email,
+        role: 'supplier',
+        firebaseUid: firebaseUser.uid,
+        // company intentionally omitted — suppliers use CompanySupplier
+      });
+
+      await CompanySupplier.create({
+        company: req.user.company,
+        supplier: user._id,
+      });
+
+      logAudit(req.user._id, 'CREATE', 'User', user._id, `Created supplier account for "${name}" and linked to company`, req.user.company);
+
+      return res.status(201).json({
+        success: true,
+        data: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          isActive: user.isActive,
+          createdAt: user.createdAt,
+        },
+        message: `Supplier created! Tell them to log in at invexis.com to receive their verification email.`,
+      });
+    }
+
+    // ─── Non-supplier: original flow ───
+    if (existing) {
       res.status(400);
       throw new Error('A user with this email already exists');
     }
@@ -99,7 +222,9 @@ const createUser = async (req, res, next) => {
       message: `User created! Tell them to log in at invexis.com to receive their verification email.`,
     });
   } catch (error) {
-    if (error.message !== 'A user with this email already exists') {
+    if (error.message !== 'A user with this email already exists' &&
+        error.message !== 'This supplier is already linked to your company' &&
+        error.message !== 'A user with this email already exists with a different role') {
       try {
         const fbUser = await admin.auth().getUserByEmail(req.body.email);
         if (fbUser) await admin.auth().deleteUser(fbUser.uid);
@@ -109,11 +234,24 @@ const createUser = async (req, res, next) => {
   }
 };
 
-// @desc    Update user (within same company)
+// @desc    Update user (within same company or linked supplier)
 const updateUser = async (req, res, next) => {
   try {
     const { name, email, role, isActive, password } = req.body;
-    const user = await User.findOne({ _id: req.params.id, company: req.user.company });
+
+    let user = await User.findOne({ _id: req.params.id, company: req.user.company });
+
+    // Check linked suppliers
+    if (!user) {
+      const link = await CompanySupplier.findOne({
+        company: req.user.company,
+        supplier: req.params.id,
+        status: 'active',
+      });
+      if (link) {
+        user = await User.findOne({ _id: req.params.id, role: 'supplier' });
+      }
+    }
 
     if (!user) {
       res.status(404);
@@ -145,7 +283,7 @@ const updateUser = async (req, res, next) => {
 
     if (name) user.name = name;
     if (email) user.email = email;
-    if (role) user.role = role;
+    if (role && user.role !== 'supplier') user.role = role; // Don't change supplier role
     if (typeof isActive === 'boolean') user.isActive = isActive;
 
     await user.save();
@@ -168,9 +306,51 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-// @desc    Delete user (within same company)
+// @desc    Delete user (within same company) or unlink supplier
 const deleteUser = async (req, res, next) => {
   try {
+    // Check if it's a linked supplier first
+    const supplierLink = await CompanySupplier.findOne({
+      company: req.user.company,
+      supplier: req.params.id,
+    });
+
+    if (supplierLink) {
+      // It's a supplier — unlink from this company instead of deleting
+      const supplier = await User.findById(req.params.id);
+      if (!supplier) {
+        res.status(404);
+        throw new Error('Supplier not found');
+      }
+
+      await supplierLink.deleteOne();
+
+      // Check if supplier has any remaining company links
+      const remainingLinks = await CompanySupplier.countDocuments({ supplier: req.params.id });
+
+      logAudit(req.user._id, 'DELETE', 'User', req.params.id, `Unlinked supplier "${supplier.name}" from company`, req.user.company);
+
+      // If no more links, optionally delete the supplier entirely
+      if (remainingLinks === 0) {
+        if (supplier.firebaseUid) {
+          try { await admin.auth().deleteUser(supplier.firebaseUid); } catch { /* ignore */ }
+        }
+        await supplier.deleteOne();
+        return res.json({
+          success: true,
+          data: {},
+          message: `Supplier "${supplier.name}" has been fully deleted (no other companies linked).`,
+        });
+      }
+
+      return res.json({
+        success: true,
+        data: {},
+        message: `Supplier "${supplier.name}" has been unlinked from your company.`,
+      });
+    }
+
+    // Non-supplier: original delete flow
     const user = await User.findOne({ _id: req.params.id, company: req.user.company });
 
     if (!user) {

@@ -1,6 +1,7 @@
 const RestockRequest = require('../models/RestockRequest');
 const Product = require('../models/Product');
 const User = require('../models/User');
+const CompanySupplier = require('../models/CompanySupplier');
 const logAudit = require('../utils/logger');
 const sendEmail = require('../utils/sendEmail');
 const { restockNotifySupplier, shipmentNotifyAdmin, deliveryNotifySupplier } = require('../utils/emailTemplates');
@@ -257,10 +258,73 @@ const deleteRestockRequest = async (req, res, next) => {
   }
 };
 
+// @desc    Get pending restock counts across ALL linked companies (for supplier notifications)
+// @route   GET /api/restock-requests/cross-company-alerts
+// @access  Private (Supplier only)
+const getSupplierCrossCompanyAlerts = async (req, res, next) => {
+  try {
+    if (req.user.role !== 'supplier') {
+      res.status(403);
+      throw new Error('Only suppliers can access cross-company alerts');
+    }
+
+    // Get all companies this supplier is linked to
+    const links = await CompanySupplier.find({ supplier: req.user._id, status: 'active' })
+      .populate('company', 'name slug');
+
+    const companyIds = links.map((l) => l.company._id);
+
+    // Count pending requests per company for this supplier
+    const alerts = await RestockRequest.aggregate([
+      {
+        $match: {
+          supplier: req.user._id,
+          company: { $in: companyIds },
+          status: { $in: ['pending', 'accepted'] },
+        },
+      },
+      {
+        $group: {
+          _id: '$company',
+          pendingCount: {
+            $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] },
+          },
+          acceptedCount: {
+            $sum: { $cond: [{ $eq: ['$status', 'accepted'] }, 1, 0] },
+          },
+        },
+      },
+    ]);
+
+    // Build a map with company info
+    const companyMap = {};
+    links.forEach((l) => {
+      companyMap[l.company._id.toString()] = {
+        _id: l.company._id,
+        name: l.company.name,
+        slug: l.company.slug,
+      };
+    });
+
+    const data = alerts
+      .filter((a) => a.pendingCount > 0 || a.acceptedCount > 0)
+      .map((a) => ({
+        company: companyMap[a._id.toString()] || { _id: a._id },
+        pendingCount: a.pendingCount,
+        acceptedCount: a.acceptedCount,
+      }));
+
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getRestockRequests,
   createRestockRequest,
   approveStaffRequest,
   updateRestockRequest,
   deleteRestockRequest,
+  getSupplierCrossCompanyAlerts,
 };

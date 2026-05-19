@@ -12,7 +12,9 @@ import {
   HiOutlineX,
   HiOutlineInboxIn,
   HiOutlineTruck,
+  HiOutlineOfficeBuilding,
 } from 'react-icons/hi';
+import CompanySwitcher from './CompanySwitcher';
 
 const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
   const { user } = useAuth();
@@ -123,22 +125,45 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
         } catch { /* silent */ }
       }
 
-      // Check pending restocks (supplier only)
+      // Cross-company alerts for suppliers (checks ALL linked companies)
       if (user?.role === 'supplier') {
         try {
-          const supplierRes = await axios.get('/api/restock-requests?status=pending&limit=1', getAuthConfig());
-          if (supplierRes.data.total > 0) {
-            notifs.push({
-              id: 'pending-restock-supplier',
-              type: 'info',
-              title: 'New Restock Requests',
-              message: `${supplierRes.data.total} new request${supplierRes.data.total > 1 ? 's' : ''} awaiting your review`,
-              icon: HiOutlineTruck,
-              color: 'text-blue-400',
-              bg: 'bg-blue-500/15',
-              action: () => navigate('/restock-requests'),
-            });
-          }
+          const alertsRes = await axios.get('/api/restock-requests/cross-company-alerts', getAuthConfig());
+          const alerts = alertsRes.data.data || [];
+          alerts.forEach((alert) => {
+            if (alert.pendingCount > 0) {
+              notifs.push({
+                id: `pending-${alert.company._id}`,
+                type: 'info',
+                title: alert.company.name,
+                message: `${alert.pendingCount} new request${alert.pendingCount > 1 ? 's' : ''} awaiting your review`,
+                icon: HiOutlineOfficeBuilding,
+                color: 'text-blue-400',
+                bg: 'bg-blue-500/15',
+                action: () => {
+                  localStorage.setItem('activeCompany', alert.company._id);
+                  navigate('/restock-requests');
+                  window.location.reload();
+                },
+              });
+            }
+            if (alert.acceptedCount > 0) {
+              notifs.push({
+                id: `accepted-${alert.company._id}`,
+                type: 'warning',
+                title: alert.company.name,
+                message: `${alert.acceptedCount} accepted request${alert.acceptedCount > 1 ? 's' : ''} ready to ship`,
+                icon: HiOutlineTruck,
+                color: 'text-amber-400',
+                bg: 'bg-amber-500/15',
+                action: () => {
+                  localStorage.setItem('activeCompany', alert.company._id);
+                  navigate('/restock-requests');
+                  window.location.reload();
+                },
+              });
+            }
+          });
         } catch { /* silent */ }
       }
 
@@ -170,6 +195,8 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
 
       {/* Right side */}
       <div className="flex items-center gap-2 md:gap-4 ml-auto">
+        {/* Company Switcher (suppliers with multiple companies) */}
+        <CompanySwitcher />
         {/* Notifications */}
         <div className="relative" ref={notifRef}>
           <button

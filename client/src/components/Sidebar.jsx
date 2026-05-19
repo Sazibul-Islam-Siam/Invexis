@@ -19,7 +19,7 @@ import {
 } from 'react-icons/hi';
 
 const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, getActiveCompanyInfo } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -170,8 +170,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           {!isCollapsed && (
             <div className="whitespace-nowrap overflow-hidden">
               <span className="text-lg font-bold text-white block leading-tight">Invexis</span>
-              {user?.company?.name && (
-                <span className="text-[11px] text-dark-400 block truncate">{user.company.name}</span>
+              {(user?.company?.name || getActiveCompanyInfo()?.name) && (
+                <span className="text-[11px] text-dark-400 block truncate">{user?.company?.name || getActiveCompanyInfo()?.name}</span>
               )}
             </div>
           )}

@@ -66,4 +66,37 @@ const blockSuperAdmin = (req, res, next) => {
   next();
 };
 
-module.exports = { protect, authorize, blockSuperAdmin };
+// Resolve active company for suppliers (they can be linked to multiple companies)
+const resolveSupplierCompany = async (req, res, next) => {
+  if (req.user.role !== 'supplier') {
+    return next(); // Non-suppliers already have req.user.company set
+  }
+
+  const companyId = req.headers['x-active-company'];
+  if (!companyId) {
+    res.status(400);
+    return next(new Error('Please select a company to continue'));
+  }
+
+  try {
+    const CompanySupplier = require('../models/CompanySupplier');
+    const link = await CompanySupplier.findOne({
+      company: companyId,
+      supplier: req.user._id,
+      status: 'active',
+    });
+
+    if (!link) {
+      res.status(403);
+      return next(new Error('You are not linked to this company'));
+    }
+
+    // Set company on the user object for downstream controllers
+    req.user.company = link.company;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { protect, authorize, blockSuperAdmin, resolveSupplierCompany };

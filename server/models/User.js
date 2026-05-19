@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Company',
       required: function () {
-        return this.role !== 'super_admin';
+        return this.role !== 'super_admin' && this.role !== 'supplier';
       },
     },
     isActive: {

@@ -97,8 +97,8 @@ const Users = () => {
         await userService.updateUser(editing._id, updateData);
         toast.success('User updated successfully');
       } else {
-        await userService.createUser(formData);
-        toast.success('User created successfully');
+        const res = await userService.createUser(formData);
+        toast.success(res.message || 'User created successfully');
       }
       closeModal();
       fetchUsers();
@@ -113,8 +113,8 @@ const Users = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      await userService.deleteUser(id);
-      toast.success('User deleted');
+      const res = await userService.deleteUser(id);
+      toast.success(res.message || 'User deleted');
       fetchUsers();
     } catch (error) {
       const msg = error.response?.data?.message || 'Failed to delete user';
@@ -319,6 +319,14 @@ const Users = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Supplier link hint */}
+              {!editing && formData.role === 'supplier' && (
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
+                  <p className="text-xs text-amber-400">
+                    If a supplier with this email already exists on the platform, they will be <strong>linked</strong> to your company instead of creating a duplicate account.
+                  </p>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-1.5">
                   Full Name <span className="text-red-400">*</span>

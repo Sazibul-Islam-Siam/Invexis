@@ -21,6 +21,19 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeCompany, setActiveCompanyState] = useState(
+    localStorage.getItem('activeCompany') || null
+  );
+
+  // Helper to set active company in both state and localStorage
+  const setActiveCompany = (companyId) => {
+    if (companyId) {
+      localStorage.setItem('activeCompany', companyId);
+    } else {
+      localStorage.removeItem('activeCompany');
+    }
+    setActiveCompanyState(companyId);
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -45,6 +58,15 @@ export const AuthProvider = ({ children }) => {
 
           setUser(userData);
           localStorage.setItem('user', JSON.stringify(userData));
+
+          // Auto-select first company for suppliers if none selected
+          if (userData.role === 'supplier' && userData.companies?.length > 0) {
+            const stored = localStorage.getItem('activeCompany');
+            const isValid = userData.companies.some((c) => c._id === stored);
+            if (!stored || !isValid) {
+              setActiveCompany(userData.companies[0]._id);
+            }
+          }
         } catch (error) {
           console.error('Auth sync failed:', error);
           setUser(null);
@@ -53,6 +75,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
         localStorage.removeItem('user');
+        setActiveCompany(null);
       }
       setLoading(false);
     });
@@ -82,6 +105,12 @@ export const AuthProvider = ({ children }) => {
 
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
+
+    // Auto-select first company for suppliers
+    if (userData.role === 'supplier' && userData.companies?.length > 0) {
+      setActiveCompany(userData.companies[0]._id);
+    }
+
     return userData;
   };
 
@@ -89,6 +118,7 @@ export const AuthProvider = ({ children }) => {
     await signOut(auth);
     setUser(null);
     localStorage.removeItem('user');
+    setActiveCompany(null);
   };
 
   const getToken = async () => {
@@ -100,6 +130,12 @@ export const AuthProvider = ({ children }) => {
     return stored?.firebaseToken;
   };
 
+  // Get the active company object (for display purposes)
+  const getActiveCompanyInfo = () => {
+    if (user?.role !== 'supplier' || !user?.companies) return null;
+    return user.companies.find((c) => c._id === activeCompany) || null;
+  };
+
   const value = {
     user,
     setUser,
@@ -108,6 +144,10 @@ export const AuthProvider = ({ children }) => {
     logout,
     getToken,
     isAuthenticated: !!user,
+    // Supplier multi-company
+    activeCompany,
+    setActiveCompany,
+    getActiveCompanyInfo,
   };
 
   return (

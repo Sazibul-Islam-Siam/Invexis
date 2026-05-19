@@ -1,5 +1,6 @@
 const Company = require('../models/Company');
 const User = require('../models/User');
+const CompanySupplier = require('../models/CompanySupplier');
 const admin = require('../config/firebaseAdmin');
 const logAudit = require('../utils/logger');
 
@@ -67,16 +68,25 @@ const getCompanies = async (req, res, next) => {
       Company.countDocuments(query),
     ]);
 
-    // Get user counts for each company
+    // Get user counts for each company (non-supplier users)
     const companyIds = companies.map((c) => c._id);
     const userCounts = await User.aggregate([
       { $match: { company: { $in: companyIds }, role: { $ne: 'super_admin' } } },
       { $group: { _id: '$company', count: { $sum: 1 } } },
     ]);
 
+    // Get linked supplier counts per company
+    const supplierCounts = await CompanySupplier.aggregate([
+      { $match: { company: { $in: companyIds } } },
+      { $group: { _id: '$company', count: { $sum: 1 } } },
+    ]);
+
     const countMap = {};
     userCounts.forEach((uc) => {
-      countMap[uc._id.toString()] = uc.count;
+      countMap[uc._id.toString()] = (countMap[uc._id.toString()] || 0) + uc.count;
+    });
+    supplierCounts.forEach((sc) => {
+      countMap[sc._id.toString()] = (countMap[sc._id.toString()] || 0) + sc.count;
     });
 
     const data = companies.map((c) => ({
@@ -118,13 +128,13 @@ const toggleCompanyStatus = async (req, res, next) => {
     company.isActive = !company.isActive;
     await company.save();
 
-    // Also toggle all users in this company
+    // Also toggle all non-supplier users in this company
     await User.updateMany(
       { company: company._id },
       { isActive: company.isActive }
     );
 
-    // Disable/enable Firebase accounts for all users in this company
+    // Toggle Firebase accounts for non-supplier users
     const companyUsers = await User.find({ company: company._id });
     for (const u of companyUsers) {
       if (u.firebaseUid) {
@@ -132,6 +142,13 @@ const toggleCompanyStatus = async (req, res, next) => {
           await admin.auth().updateUser(u.firebaseUid, { disabled: !company.isActive });
         } catch { /* ignore individual failures */ }
       }
+    }
+
+    // Also toggle linked suppliers via CompanySupplier
+    const supplierLinks = await CompanySupplier.find({ company: company._id });
+    for (const link of supplierLinks) {
+      link.status = company.isActive ? 'active' : 'inactive';
+      await link.save();
     }
 
     logAudit(
@@ -168,7 +185,7 @@ const deleteCompany = async (req, res, next) => {
       throw new Error('Company not found');
     }
 
-    // Delete all Firebase accounts for users in this company
+    // Delete all Firebase accounts for non-supplier users in this company
     const companyUsers = await User.find({ company: company._id });
     for (const u of companyUsers) {
       if (u.firebaseUid) {
@@ -178,8 +195,24 @@ const deleteCompany = async (req, res, next) => {
       }
     }
 
-    // Delete all users in this company from MongoDB
+    // Delete all non-supplier users in this company from MongoDB
     await User.deleteMany({ company: company._id });
+
+    // Remove all CompanySupplier links for this company
+    const supplierLinks = await CompanySupplier.find({ company: company._id });
+    await CompanySupplier.deleteMany({ company: company._id });
+
+    // Clean up orphaned suppliers (no remaining company links)
+    for (const link of supplierLinks) {
+      const remaining = await CompanySupplier.countDocuments({ supplier: link.supplier });
+      if (remaining === 0) {
+        const supplier = await User.findById(link.supplier);
+        if (supplier?.firebaseUid) {
+          try { await admin.auth().deleteUser(supplier.firebaseUid); } catch { /* ignore */ }
+        }
+        if (supplier) await supplier.deleteOne();
+      }
+    }
 
     const companyName = company.name;
     await company.deleteOne();

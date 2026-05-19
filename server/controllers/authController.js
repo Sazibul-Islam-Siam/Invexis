@@ -1,6 +1,7 @@
 const admin = require('../config/firebaseAdmin');
 const User = require('../models/User');
 const Company = require('../models/Company');
+const CompanySupplier = require('../models/CompanySupplier');
 const logAudit = require('../utils/logger');
 
 // @desc    Sync Firebase user with MongoDB (called after frontend login)
@@ -37,16 +38,35 @@ const syncUser = async (req, res, next) => {
     const companyId = user.company?._id || user.company || null;
     logAudit(user._id, 'LOGIN', 'Auth', user._id, `${user.name} logged in (${user.role})`, companyId);
 
+    // For suppliers, fetch all linked companies
+    let companies = null;
+    if (user.role === 'supplier') {
+      const links = await CompanySupplier.find({ supplier: user._id, status: 'active' })
+        .populate('company', 'name slug');
+      companies = links.map((l) => ({
+        _id: l.company._id,
+        name: l.company.name,
+        slug: l.company.slug,
+      }));
+    }
+
+    const responseData = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      profilePicture: user.profilePicture || '',
+      company: user.company || null,
+    };
+
+    // Attach linked companies for suppliers
+    if (companies) {
+      responseData.companies = companies;
+    }
+
     res.json({
       success: true,
-      data: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        profilePicture: user.profilePicture || '',
-        company: user.company || null,
-      },
+      data: responseData,
     });
   } catch (error) {
     next(error);
