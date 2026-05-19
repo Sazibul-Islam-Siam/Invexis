@@ -7,10 +7,11 @@ const {
   getSupplierStats,
   getStaffStats,
 } = require('../controllers/dashboardController');
-const { protect } = require('../middleware/auth');
+const { protect, blockSuperAdmin } = require('../middleware/auth');
 
-// All routes require authentication
+// All routes require authentication and block super_admin
 router.use(protect);
+router.use(blockSuperAdmin);
 
 router.get('/stats', getStats);
 router.get('/sales-chart', getSalesChart);

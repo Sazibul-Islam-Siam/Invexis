@@ -55,4 +55,15 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { protect, authorize };
+// Block super_admin from accessing company-internal routes
+const blockSuperAdmin = (req, res, next) => {
+  if (req.user.role === 'super_admin') {
+    res.status(403);
+    return next(
+      new Error('Super Admin cannot access company-internal data')
+    );
+  }
+  next();
+};
+
+module.exports = { protect, authorize, blockSuperAdmin };

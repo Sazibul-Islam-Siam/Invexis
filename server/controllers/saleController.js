@@ -95,6 +95,7 @@ const getSale = async (req, res, next) => {
 // @route   POST /api/sales
 // @access  Private (Admin, Staff)
 const createSale = async (req, res, next) => {
+
   try {
     const { items } = req.body;
 

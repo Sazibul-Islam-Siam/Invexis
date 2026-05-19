@@ -130,6 +130,11 @@ const Profile = () => {
     admin: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
     staff: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
     supplier: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+    super_admin: 'bg-violet-500/15 text-violet-400 border-violet-500/30',
+  };
+
+  const roleLabel = {
+    admin: 'Admin', staff: 'Staff', supplier: 'Supplier', super_admin: 'Super Admin',
   };
 
   const avatarUrl = user?.profilePicture
@@ -185,8 +190,8 @@ const Profile = () => {
             <h2 className="text-xl font-semibold text-white">{user?.name}</h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-sm text-dark-400">{user?.email}</span>
-              <span className={`px-2 py-0.5 rounded-lg text-xs font-medium border capitalize ${roleBadge[user?.role] || ''}`}>
-                {user?.role}
+              <span className={`px-2 py-0.5 rounded-lg text-xs font-medium border ${roleBadge[user?.role] || ''}`}>
+                {roleLabel[user?.role] || user?.role}
               </span>
             </div>
             <p className="text-xs text-dark-500 mt-1">Click on avatar to change photo</p>
@@ -225,7 +230,7 @@ const Profile = () => {
             <input
               type="text"
               disabled
-              value={user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
+              value={roleLabel[user?.role] || user?.role}
               className="input-field opacity-50 cursor-not-allowed capitalize"
             />
           </div>

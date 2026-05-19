@@ -16,6 +16,7 @@ import StockAdjustments from './pages/StockAdjustments';
 import Reports from './pages/Reports';
 import Profile from './pages/Profile';
 import AuditLogs from './pages/AuditLogs';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import Layout from './components/Layout';
 import PrivateRoute from './components/PrivateRoute';
 
@@ -49,6 +50,7 @@ function App() {
               <Route path="/users" element={<Users />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/audit-logs" element={<AuditLogs />} />
+              <Route path="/super-admin" element={<SuperAdminDashboard />} />
             </Route>
 
             {/* Catch-all */}

@@ -5,9 +5,10 @@ const {
   getInventoryReport,
   getStockMovementReport,
 } = require('../controllers/reportController');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize, blockSuperAdmin } = require('../middleware/auth');
 
 router.use(protect);
+router.use(blockSuperAdmin);
 
 // Sales report: admin sees all, staff sees their own (scoped in controller)
 router.get('/sales', authorize('admin', 'staff'), getSalesReport);

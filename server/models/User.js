@@ -25,13 +25,15 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'supplier', 'staff'],
+      enum: ['admin', 'supplier', 'staff', 'super_admin'],
       default: 'staff',
     },
     company: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Company',
-      required: true,
+      required: function () {
+        return this.role !== 'super_admin';
+      },
     },
     isActive: {
       type: Boolean,

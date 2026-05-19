@@ -4,9 +4,10 @@ const {
   getStockAdjustments,
   createStockAdjustment,
 } = require('../controllers/stockAdjustmentController');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize, blockSuperAdmin } = require('../middleware/auth');
 
 router.use(protect);
+router.use(blockSuperAdmin);
 
 // Staff can view and create stock adjustments
 router.get('/', authorize('admin', 'staff'), getStockAdjustments);

@@ -6,10 +6,11 @@ const {
   createSale,
   deleteSale,
 } = require('../controllers/saleController');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize, blockSuperAdmin } = require('../middleware/auth');
 
-// All routes require authentication
+// All routes require authentication and block super_admin
 router.use(protect);
+router.use(blockSuperAdmin);
 
 router
   .route('/')

@@ -7,10 +7,11 @@ const {
   updateUser,
   deleteUser,
 } = require('../controllers/userController');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize, blockSuperAdmin } = require('../middleware/auth');
 
-// All routes require admin
+// All routes require admin and block super_admin
 router.use(protect);
+router.use(blockSuperAdmin);
 router.use(authorize('admin'));
 
 router.route('/').get(getUsers).post(createUser);

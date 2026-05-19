@@ -15,7 +15,7 @@ const auditLogSchema = new mongoose.Schema(
     entity: {
       type: String,
       required: true,
-      enum: ['Product', 'Sale', 'RestockRequest', 'StockAdjustment', 'User', 'Category', 'Auth'],
+      enum: ['Product', 'Sale', 'RestockRequest', 'StockAdjustment', 'User', 'Category', 'Auth', 'Company'],
     },
     entityId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -27,7 +27,6 @@ const auditLogSchema = new mongoose.Schema(
     company: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Company',
-      required: true,
     },
   },
   {

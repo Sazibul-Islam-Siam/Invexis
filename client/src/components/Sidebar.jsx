@@ -15,6 +15,7 @@ import {
   HiOutlineChevronRight,
   HiOutlineInboxIn,
   HiOutlineDocumentReport,
+  HiOutlineShieldCheck,
 } from 'react-icons/hi';
 
 const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
@@ -118,6 +119,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       },
     ];
 
+    const superAdminItems = [
+      {
+        label: 'Platform Manager',
+        icon: HiOutlineShieldCheck,
+        path: '/super-admin',
+      },
+    ];
+
     switch (user?.role) {
       case 'admin':
         return adminItems;
@@ -125,6 +134,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         return supplierItems;
       case 'staff':
         return staffItems;
+      case 'super_admin':
+        return superAdminItems;
       default:
         return commonItems;
     }
@@ -219,7 +230,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
               <p className="text-sm font-medium text-white truncate">
                 {user?.name || 'User'}
               </p>
-              <p className="text-xs text-dark-400 capitalize">{user?.role}</p>
+              <p className="text-xs text-dark-400">{{ admin: 'Admin', supplier: 'Supplier', staff: 'Staff', super_admin: 'Super Admin' }[user?.role] || user?.role}</p>
             </div>
           )}
         </NavLink>

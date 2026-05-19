@@ -7,9 +7,10 @@ const {
   updateRestockRequest,
   deleteRestockRequest,
 } = require('../controllers/restockController');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize, blockSuperAdmin } = require('../middleware/auth');
 
 router.use(protect);
+router.use(blockSuperAdmin);
 
 router
   .route('/')

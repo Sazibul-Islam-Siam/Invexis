@@ -36,6 +36,7 @@ app.use('/api/stock-adjustments', require('./routes/stockAdjustmentRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/profile', require('./routes/profileRoutes'));
 app.use('/api/audit-logs', require('./routes/auditRoutes'));
+app.use('/api/super-admin', require('./routes/superAdminRoutes'));
 
 // Health check route
 app.get('/api/health', (req, res) => {

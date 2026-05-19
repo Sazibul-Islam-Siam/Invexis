@@ -47,6 +47,8 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
   const fetchNotifications = async () => {
     try {
       if (!user) return;
+      // Super admin has no company — skip all company-scoped notifications
+      if (user?.role === 'super_admin') { setNotifications([]); return; }
       const notifs = [];
 
       if (user?.role === 'admin' || user?.role === 'staff') {
@@ -145,11 +147,12 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
   };
 
 
-  const getRoleLabel = (role) => ({ admin: 'Admin', supplier: 'Supplier', staff: 'Staff' }[role] || role);
+  const getRoleLabel = (role) => ({ admin: 'Admin', supplier: 'Supplier', staff: 'Staff', super_admin: 'Super Admin' }[role] || role);
   const getRoleBadgeColor = (role) => ({
     admin: 'bg-primary-600/20 text-primary-300 border-primary-500/30',
     supplier: 'bg-amber-600/20 text-amber-300 border-amber-500/30',
     staff: 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30',
+    super_admin: 'bg-violet-600/20 text-violet-300 border-violet-500/30',
   }[role] || '');
 
   return (

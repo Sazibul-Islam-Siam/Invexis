@@ -12,12 +12,13 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already logged in
   if (isAuthenticated) {
-    navigate('/dashboard', { replace: true });
+    const dest = user?.role === 'super_admin' ? '/super-admin' : '/dashboard';
+    navigate(dest, { replace: true });
     return null;
   }
 
@@ -30,9 +31,9 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      const userData = await login(formData.email, formData.password);
       toast.success('Welcome back!');
-      navigate('/dashboard');
+      navigate(userData?.role === 'super_admin' ? '/super-admin' : '/dashboard');
     } catch (error) {
       const message = error.response?.data?.message || error.message || 'Login failed. Please try again.';
       // Make firebase errors prettier

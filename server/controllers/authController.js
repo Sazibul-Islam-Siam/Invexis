@@ -17,7 +17,12 @@ const syncUser = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const decoded = await admin.auth().verifyIdToken(token);
 
-    let user = await User.findOne({ firebaseUid: decoded.uid }).populate('company', 'name slug');
+    let userQuery = User.findOne({ firebaseUid: decoded.uid });
+    // Only populate company for non-super_admin users
+    // We need to check after fetching, so always try populate (it will be null for super_admin)
+    userQuery = userQuery.populate('company', 'name slug');
+
+    let user = await userQuery;
 
     if (!user) {
       res.status(404);
@@ -29,7 +34,8 @@ const syncUser = async (req, res, next) => {
       throw new Error('Account has been deactivated. Contact an administrator.');
     }
 
-    logAudit(user._id, 'LOGIN', 'Auth', user._id, `${user.name} logged in (${user.role})`, user.company._id || user.company);
+    const companyId = user.company?._id || user.company || null;
+    logAudit(user._id, 'LOGIN', 'Auth', user._id, `${user.name} logged in (${user.role})`, companyId);
 
     res.json({
       success: true,
@@ -39,7 +45,7 @@ const syncUser = async (req, res, next) => {
         email: user.email,
         role: user.role,
         profilePicture: user.profilePicture || '',
-        company: user.company,
+        company: user.company || null,
       },
     });
   } catch (error) {

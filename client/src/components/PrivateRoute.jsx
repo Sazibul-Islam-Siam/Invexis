@@ -1,8 +1,9 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const PrivateRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -12,7 +13,25 @@ const PrivateRoute = ({ children }) => {
     );
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Redirect super_admin away from company-internal routes
+  if (user?.role === 'super_admin') {
+    const allowedPaths = ['/super-admin', '/profile'];
+    const isAllowed = allowedPaths.some((p) => location.pathname.startsWith(p));
+    if (!isAllowed) {
+      return <Navigate to="/super-admin" replace />;
+    }
+  }
+
+  // Redirect super_admin if they try to access /dashboard
+  if (user?.role === 'super_admin' && location.pathname === '/dashboard') {
+    return <Navigate to="/super-admin" replace />;
+  }
+
+  return children;
 };
 
 export default PrivateRoute;
