@@ -37,9 +37,14 @@ const Login = () => {
     } catch (error) {
       const message = error.response?.data?.message || error.message || 'Login failed. Please try again.';
       // Make firebase errors prettier
-      const displayMessage = message.includes('auth/invalid-credential') 
-        ? 'Invalid email or password' 
-        : message.replace('Firebase: ', '');
+      let displayMessage = message;
+      if (message.includes('auth/invalid-credential')) {
+        displayMessage = 'Invalid email or password';
+      } else if (message.includes('auth/user-disabled')) {
+        displayMessage = 'Your account or company has been deactivated. Please contact support.';
+      } else {
+        displayMessage = message.replace('Firebase: ', '');
+      }
       toast.error(displayMessage);
     } finally {
       setIsLoading(false);
