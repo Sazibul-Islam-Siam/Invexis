@@ -30,6 +30,13 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const userData = await login(formData.email, formData.password);
       toast.success('Welcome back!');

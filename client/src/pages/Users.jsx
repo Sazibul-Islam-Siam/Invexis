@@ -93,6 +93,13 @@ const Users = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Standard email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
     if (!editing && formData.role === 'supplier' && supplierCreationStep === 1) {
       setSubmitting(true);
       try {
