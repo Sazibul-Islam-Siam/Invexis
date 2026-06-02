@@ -172,6 +172,7 @@ const AuditLogs = () => {
             <input
               type="date"
               value={filters.startDate}
+              max={filters.endDate || undefined}
               onChange={(e) => {
                 setFilters({ ...filters, startDate: e.target.value });
                 setPagination((p) => ({ ...p, page: 1 }));
@@ -182,6 +183,7 @@ const AuditLogs = () => {
             <input
               type="date"
               value={filters.endDate}
+              min={filters.startDate || undefined}
               onChange={(e) => {
                 setFilters({ ...filters, endDate: e.target.value });
                 setPagination((p) => ({ ...p, page: 1 }));

@@ -110,40 +110,40 @@ const SuperAdminDashboard = () => {
 
   const statCards = stats
     ? [
-        {
-          title: 'Total Companies',
-          value: stats.totalCompanies,
-          icon: HiOutlineOfficeBuilding,
-          color: 'text-indigo-400',
-          bg: 'bg-indigo-400/10',
-          border: 'border-indigo-500/20',
-        },
-        {
-          title: 'Active Companies',
-          value: stats.activeCompanies,
-          icon: HiOutlineCheckCircle,
-          color: 'text-emerald-400',
-          bg: 'bg-emerald-400/10',
-          border: 'border-emerald-500/20',
-        },
-        {
-          title: 'Inactive Companies',
-          value: stats.inactiveCompanies,
-          icon: HiOutlineBan,
-          color: 'text-red-400',
-          bg: 'bg-red-400/10',
-          border: 'border-red-500/20',
-        },
-        {
-          title: 'Total Users',
-          value: stats.totalUsers,
-          sub: `${stats.activeUsers} active`,
-          icon: HiOutlineUsers,
-          color: 'text-blue-400',
-          bg: 'bg-blue-400/10',
-          border: 'border-blue-500/20',
-        },
-      ]
+      {
+        title: 'Total Companies',
+        value: stats.totalCompanies,
+        icon: HiOutlineOfficeBuilding,
+        color: 'text-indigo-400',
+        bg: 'bg-indigo-400/10',
+        border: 'border-indigo-500/20',
+      },
+      {
+        title: 'Active Companies',
+        value: stats.activeCompanies,
+        icon: HiOutlineCheckCircle,
+        color: 'text-emerald-400',
+        bg: 'bg-emerald-400/10',
+        border: 'border-emerald-500/20',
+      },
+      {
+        title: 'Inactive Companies',
+        value: stats.inactiveCompanies,
+        icon: HiOutlineBan,
+        color: 'text-red-400',
+        bg: 'bg-red-400/10',
+        border: 'border-red-500/20',
+      },
+      {
+        title: 'Total Users',
+        value: stats.totalUsers,
+        sub: `${stats.activeUsers} active`,
+        icon: HiOutlineUsers,
+        color: 'text-blue-400',
+        bg: 'bg-blue-400/10',
+        border: 'border-blue-500/20',
+      },
+    ]
     : [];
 
   if (loading) {
@@ -338,11 +338,10 @@ const SuperAdminDashboard = () => {
                       </td>
                       <td className="py-3.5 px-4 text-center">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${
-                            company.isActive
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${company.isActive
                               ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
                               : 'bg-red-500/15 text-red-400 border-red-500/30'
-                          }`}
+                            }`}
                         >
                           {company.isActive ? (
                             <HiOutlineCheckCircle className="text-sm" />
@@ -374,11 +373,10 @@ const SuperAdminDashboard = () => {
                               )
                             }
                             disabled={actionLoading === company._id}
-                            className={`p-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                              company.isActive
+                            className={`p-2 rounded-lg text-sm font-medium transition-all duration-200 ${company.isActive
                                 ? 'text-amber-400 hover:bg-amber-500/10 hover:text-amber-300'
                                 : 'text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300'
-                            } disabled:opacity-50`}
+                              } disabled:opacity-50`}
                             title={
                               company.isActive ? 'Deactivate' : 'Activate'
                             }

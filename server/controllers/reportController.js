@@ -41,6 +41,7 @@ const getSalesReport = async (req, res, next) => {
       revenueByPeriod[key].items += (sale.items || []).reduce((s, i) => s + i.quantity, 0);
     });
 
+
     const revenueTimeline = Object.entries(revenueByPeriod)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, data]) => ({ date, ...data }));

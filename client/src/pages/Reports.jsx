@@ -285,6 +285,7 @@ const Reports = () => {
                 <input
                   type="date"
                   value={dateRange.startDate}
+                  max={dateRange.endDate || undefined}
                   onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
                   className="input-field w-auto text-sm"
                 />
@@ -294,6 +295,7 @@ const Reports = () => {
                 <input
                   type="date"
                   value={dateRange.endDate}
+                  min={dateRange.startDate || undefined}
                   onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
                   className="input-field w-auto text-sm"
                 />
@@ -585,6 +587,7 @@ const Reports = () => {
                 <input
                   type="date"
                   value={dateRange.startDate}
+                  max={dateRange.endDate || undefined}
                   onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
                   className="input-field w-auto text-sm"
                 />
@@ -594,6 +597,7 @@ const Reports = () => {
                 <input
                   type="date"
                   value={dateRange.endDate}
+                  min={dateRange.startDate || undefined}
                   onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
                   className="input-field w-auto text-sm"
                 />

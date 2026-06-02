@@ -276,6 +276,7 @@ const Sales = () => {
             <input
               type="date"
               value={dateFilter.startDate}
+              max={dateFilter.endDate || undefined}
               onChange={(e) => {
                 setDateFilter({ ...dateFilter, startDate: e.target.value });
                 setPagination((prev) => ({ ...prev, page: 1 }));
@@ -288,6 +289,7 @@ const Sales = () => {
             <input
               type="date"
               value={dateFilter.endDate}
+              min={dateFilter.startDate || undefined}
               onChange={(e) => {
                 setDateFilter({ ...dateFilter, endDate: e.target.value });
                 setPagination((prev) => ({ ...prev, page: 1 }));
