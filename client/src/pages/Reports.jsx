@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import reportService from '../services/reportService';
+import { useAuth } from '../context/AuthContext';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,6 +23,8 @@ import {
   HiOutlineExclamation,
   HiOutlineCalendar,
   HiOutlineDownload,
+  HiOutlineTruck,
+  HiOutlineClipboardCheck,
 } from 'react-icons/hi';
 
 ChartJS.register(
@@ -45,17 +48,31 @@ const TABS = [
   { key: 'inventory', label: 'Inventory Report', icon: HiOutlineCube },
 ];
 
+const SUPPLIER_TABS = [
+  { key: 'deliveries', label: 'Delivery History', icon: HiOutlineTruck },
+  { key: 'requests', label: 'Restock Summary', icon: HiOutlineClipboardCheck },
+];
+
 const Reports = () => {
-  const [activeTab, setActiveTab] = useState('sales');
+  const { user } = useAuth();
+  const isSupplier = user?.role === 'supplier';
+  const tabs = isSupplier ? SUPPLIER_TABS : TABS;
+  const [activeTab, setActiveTab] = useState(isSupplier ? 'deliveries' : 'sales');
   const [salesData, setSalesData] = useState(null);
   const [inventoryData, setInventoryData] = useState(null);
+  const [supplierData, setSupplierData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('daily');
   const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
 
   useEffect(() => {
-    if (activeTab === 'sales') fetchSalesReport();
-    else fetchInventoryReport();
+    if (isSupplier) {
+      fetchSupplierReport();
+    } else if (activeTab === 'sales') {
+      fetchSalesReport();
+    } else {
+      fetchInventoryReport();
+    }
   }, [activeTab, period, dateRange.startDate, dateRange.endDate]);
 
   const fetchSalesReport = async () => {
@@ -80,6 +97,21 @@ const Reports = () => {
       setInventoryData(res.data);
     } catch {
       toast.error('Failed to fetch inventory report');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSupplierReport = async () => {
+    try {
+      setLoading(true);
+      const params = {};
+      if (dateRange.startDate) params.startDate = dateRange.startDate;
+      if (dateRange.endDate) params.endDate = dateRange.endDate;
+      const res = await reportService.getSupplierReport(params);
+      setSupplierData(res.data);
+    } catch {
+      toast.error('Failed to fetch supplier report');
     } finally {
       setLoading(false);
     }
@@ -197,8 +229,8 @@ const Reports = () => {
 
       {/* Tabs + Export */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex gap-2">
-        {TABS.map((tab) => (
+      <div className="flex gap-2">
+        {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
@@ -232,7 +264,7 @@ const Reports = () => {
             className="btn-secondary flex items-center gap-2 text-sm"
           >
             <HiOutlineDownload className="text-lg" />
-            Export CSV
+          Export CSV
           </button>
         )}
       </div>
@@ -418,7 +450,7 @@ const Reports = () => {
             </div>
           </div>
         </div>
-      ) : (
+      ) : !isSupplier ? (
         /* ==================== INVENTORY REPORT ==================== */
         <div>
           {/* Summary Cards */}
@@ -538,6 +570,289 @@ const Reports = () => {
                 </table>
               </div>
             </div>
+          )}
+        </div>
+      ) : null}
+      {/* ==================== SUPPLIER REPORT ==================== */}
+      {!loading && isSupplier && supplierData && (
+        <div>
+          {/* Date filters */}
+          <div className="card mb-6">
+            <div className="flex flex-wrap items-center gap-4">
+              <HiOutlineCalendar className="text-dark-400 text-lg" />
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-dark-400">From:</label>
+                <input
+                  type="date"
+                  value={dateRange.startDate}
+                  onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
+                  className="input-field w-auto text-sm"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-dark-400">To:</label>
+                <input
+                  type="date"
+                  value={dateRange.endDate}
+                  onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
+                  className="input-field w-auto text-sm"
+                />
+              </div>
+              {(dateRange.startDate || dateRange.endDate) && (
+                <button
+                  onClick={() => setDateRange({ startDate: '', endDate: '' })}
+                  className="text-sm text-primary-400 hover:text-primary-300"
+                >Clear</button>
+              )}
+            </div>
+          </div>
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+            <div className="card border border-blue-500/20">
+              <p className="text-sm text-dark-400">Total Requests</p>
+              <p className="text-2xl font-bold text-white mt-1">{supplierData.summary.totalRequests}</p>
+            </div>
+            <div className="card border border-emerald-500/20">
+              <p className="text-sm text-dark-400">Delivered</p>
+              <p className="text-2xl font-bold text-emerald-400 mt-1">{supplierData.summary.totalDelivered}</p>
+              <p className="text-xs text-dark-500 mt-0.5">{supplierData.summary.totalUnitsDelivered} units total</p>
+            </div>
+            <div className="card border border-purple-500/20">
+              <p className="text-sm text-dark-400">Total Delivery Value</p>
+              <p className="text-2xl font-bold text-white mt-1">৳{supplierData.summary.totalDeliveryValue.toLocaleString()}</p>
+            </div>
+            <div className="card border border-amber-500/20">
+              <p className="text-sm text-dark-400">Pending</p>
+              <p className="text-2xl font-bold text-amber-400 mt-1">{supplierData.summary.pending + supplierData.summary.accepted + supplierData.summary.shipped}</p>
+              <p className="text-xs text-dark-500 mt-0.5">{supplierData.summary.rejected} rejected</p>
+            </div>
+          </div>
+
+          {activeTab === 'deliveries' ? (
+            <>
+              {/* Delivery Timeline Chart */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div className="card">
+                  <h3 className="text-base font-semibold text-white mb-4">Deliveries Over Time</h3>
+                  {supplierData.deliveryTimeline?.length ? (
+                    <div className="h-64">
+                      <Bar
+                        data={{
+                          labels: supplierData.deliveryTimeline.map((d) => d.month),
+                          datasets: [{
+                            label: 'Units Delivered',
+                            data: supplierData.deliveryTimeline.map((d) => d.units),
+                            backgroundColor: colors.purple.bg,
+                            borderColor: colors.purple.border,
+                            borderWidth: 1,
+                            borderRadius: 6,
+                          }],
+                        }}
+                        options={chartBaseOptions}
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-64 flex items-center justify-center text-dark-500 border border-dashed border-dark-700 rounded-xl">
+                      <p className="text-sm">No delivery data for this period</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Delivery Value Chart */}
+                <div className="card">
+                  <h3 className="text-base font-semibold text-white mb-4">Delivery Value Over Time</h3>
+                  {supplierData.deliveryTimeline?.length ? (
+                    <div className="h-64">
+                      <Bar
+                        data={{
+                          labels: supplierData.deliveryTimeline.map((d) => d.month),
+                          datasets: [{
+                            label: 'Value (৳)',
+                            data: supplierData.deliveryTimeline.map((d) => d.value),
+                            backgroundColor: colors.emerald.bg,
+                            borderColor: colors.emerald.border,
+                            borderWidth: 1,
+                            borderRadius: 6,
+                          }],
+                        }}
+                        options={{
+                          ...chartBaseOptions,
+                          plugins: {
+                            ...chartBaseOptions.plugins,
+                            tooltip: {
+                              ...chartBaseOptions.plugins.tooltip,
+                              callbacks: { label: (ctx) => `৳${ctx.parsed.y.toLocaleString()}` },
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-64 flex items-center justify-center text-dark-500 border border-dashed border-dark-700 rounded-xl">
+                      <p className="text-sm">No delivery data for this period</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Top Products Supplied */}
+              <div className="card">
+                <h3 className="text-base font-semibold text-white mb-4">Top Products Supplied</h3>
+                {supplierData.topProducts?.length ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-dark-700">
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Product</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">SKU</th>
+                          <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Deliveries</th>
+                          <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Units</th>
+                          <th className="text-right py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-dark-700/50">
+                        {supplierData.topProducts.map((p, i) => (
+                          <tr key={i} className="hover:bg-dark-800/50">
+                            <td className="py-2.5 px-3 text-sm text-white font-medium">{p.name}</td>
+                            <td className="py-2.5 px-3"><code className="text-xs text-dark-400">{p.sku}</code></td>
+                            <td className="py-2.5 px-3 text-center text-sm text-dark-400">{p.deliveries}</td>
+                            <td className="py-2.5 px-3 text-center text-sm text-dark-400">{p.units}</td>
+                            <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-400">৳{p.value.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-sm text-dark-500 text-center py-8">No delivery data</p>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Status Breakdown */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div className="card">
+                  <h3 className="text-base font-semibold text-white mb-4">Request Status Breakdown</h3>
+                  <div className="space-y-3">
+                    {[
+                      { label: 'Pending', count: supplierData.summary.pending, color: 'bg-amber-400', textColor: 'text-amber-400' },
+                      { label: 'Accepted', count: supplierData.summary.accepted, color: 'bg-blue-400', textColor: 'text-blue-400' },
+                      { label: 'Shipped', count: supplierData.summary.shipped, color: 'bg-purple-400', textColor: 'text-purple-400' },
+                      { label: 'Delivered', count: supplierData.summary.delivered, color: 'bg-emerald-400', textColor: 'text-emerald-400' },
+                      { label: 'Rejected', count: supplierData.summary.rejected, color: 'bg-red-400', textColor: 'text-red-400' },
+                    ].map((s) => {
+                      const pct = supplierData.summary.totalRequests > 0 ? (s.count / supplierData.summary.totalRequests) * 100 : 0;
+                      return (
+                        <div key={s.label}>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-dark-300">{s.label}</span>
+                            <span className={`font-medium ${s.textColor}`}>{s.count}</span>
+                          </div>
+                          <div className="w-full bg-dark-700 rounded-full h-2">
+                            <div className={`${s.color} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }}></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Status Doughnut */}
+                <div className="card">
+                  <h3 className="text-base font-semibold text-white mb-4">Status Distribution</h3>
+                  <div className="h-64 flex items-center justify-center">
+                    <Doughnut
+                      data={{
+                        labels: ['Pending', 'Accepted', 'Shipped', 'Delivered', 'Rejected'],
+                        datasets: [{
+                          data: [
+                            supplierData.summary.pending,
+                            supplierData.summary.accepted,
+                            supplierData.summary.shipped,
+                            supplierData.summary.delivered,
+                            supplierData.summary.rejected,
+                          ],
+                          backgroundColor: [
+                            colors.amber.bg, colors.blue.bg, colors.purple.bg,
+                            colors.emerald.bg, colors.red.bg,
+                          ],
+                          borderColor: [
+                            colors.amber.border, colors.blue.border, colors.purple.border,
+                            colors.emerald.border, colors.red.border,
+                          ],
+                          borderWidth: 2,
+                        }],
+                      }}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: {
+                            position: 'right',
+                            labels: { color: '#94a3b8', padding: 16, font: { size: 12 } },
+                          },
+                        },
+                        cutout: '65%',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Requests */}
+              <div className="card">
+                <h3 className="text-base font-semibold text-white mb-4">Recent Requests</h3>
+                {supplierData.recentRequests?.length ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-dark-700">
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Product</th>
+                          <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Qty</th>
+                          <th className="text-right py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Unit Cost</th>
+                          <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Status</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Requested By</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-dark-700/50">
+                        {supplierData.recentRequests.map((r) => {
+                          const statusColors = {
+                            pending: 'bg-amber-400/10 text-amber-400 border-amber-400/30',
+                            accepted: 'bg-blue-400/10 text-blue-400 border-blue-400/30',
+                            shipped: 'bg-purple-400/10 text-purple-400 border-purple-400/30',
+                            delivered: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/30',
+                            rejected: 'bg-red-400/10 text-red-400 border-red-400/30',
+                          };
+                          return (
+                            <tr key={r._id} className="hover:bg-dark-800/50">
+                              <td className="py-2.5 px-3 text-sm text-white font-medium">{r.product?.name || 'Unknown'}</td>
+                              <td className="py-2.5 px-3 text-center text-sm text-dark-400">{r.quantity}</td>
+                              <td className="py-2.5 px-3 text-right text-sm text-dark-300">
+                                {r.unitCost != null ? `৳${r.unitCost.toLocaleString()}` : '—'}
+                              </td>
+                              <td className="py-2.5 px-3 text-center">
+                                <span className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${statusColors[r.status] || 'text-dark-400'}`}>
+                                  {r.status}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3 text-sm text-dark-400">{r.requestedBy?.name || '—'}</td>
+                              <td className="py-2.5 px-3 text-sm text-dark-400">
+                                {new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-sm text-dark-500 text-center py-8">No requests found</p>
+                )}
+              </div>
+            </>
           )}
         </div>
       )}

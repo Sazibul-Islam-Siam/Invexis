@@ -4,8 +4,9 @@ const {
   getSalesReport,
   getInventoryReport,
   getStockMovementReport,
+  getSupplierReport,
 } = require('../controllers/reportController');
-const { protect, authorize, blockSuperAdmin } = require('../middleware/auth');
+const { protect, authorize, blockSuperAdmin, resolveSupplierCompany } = require('../middleware/auth');
 
 router.use(protect);
 router.use(blockSuperAdmin);
@@ -18,5 +19,8 @@ router.get('/inventory', authorize('admin', 'staff'), getInventoryReport);
 
 // Stock movements: admin only
 router.get('/stock-movements', authorize('admin'), getStockMovementReport);
+
+// Supplier report: supplier only
+router.get('/supplier', authorize('supplier'), resolveSupplierCompany, getSupplierReport);
 
 module.exports = router;

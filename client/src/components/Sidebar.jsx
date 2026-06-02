@@ -88,6 +88,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         icon: HiOutlineInboxIn,
         path: '/restock-requests',
       },
+      {
+        label: 'My Reports',
+        icon: HiOutlineDocumentReport,
+        path: '/reports',
+      },
     ];
 
     const staffItems = [

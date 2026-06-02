@@ -1,6 +1,7 @@
 const Sale = require('../models/Sale');
 const Product = require('../models/Product');
 const StockAdjustment = require('../models/StockAdjustment');
+const RestockRequest = require('../models/RestockRequest');
 
 const getSalesReport = async (req, res, next) => {
   try {
@@ -166,4 +167,101 @@ const getStockMovementReport = async (req, res, next) => {
   }
 };
 
-module.exports = { getSalesReport, getInventoryReport, getStockMovementReport };
+const getSupplierReport = async (req, res, next) => {
+  try {
+    const supplierId = req.user._id;
+    const co = req.user.company;
+    const { startDate, endDate } = req.query;
+
+    const query = { supplier: supplierId, company: co };
+
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate); end.setHours(23, 59, 59, 999);
+        query.createdAt.$lte = end;
+      }
+    }
+
+    const requests = await RestockRequest.find(query)
+      .populate('product', 'name sku')
+      .populate('requestedBy', 'name')
+      .sort({ createdAt: -1 });
+
+    // Status breakdown
+    const statusBreakdown = {
+      pending: 0, accepted: 0, shipped: 0, delivered: 0, rejected: 0,
+    };
+    requests.forEach((r) => {
+      if (statusBreakdown[r.status] !== undefined) statusBreakdown[r.status]++;
+    });
+
+    // Delivery history — only delivered requests
+    const deliveries = requests.filter((r) => r.status === 'delivered');
+    const totalDelivered = deliveries.length;
+    const totalUnitsDelivered = deliveries.reduce((sum, r) => sum + (r.quantity || 0), 0);
+    const totalDeliveryValue = deliveries.reduce((sum, r) => sum + ((r.unitCost || r.product?.costPrice || 0) * (r.quantity || 0)), 0);
+
+    // Delivery timeline — group by month
+    const monthlyMap = {};
+    deliveries.forEach((r) => {
+      const d = new Date(r.updatedAt || r.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (!monthlyMap[key]) monthlyMap[key] = { deliveries: 0, units: 0, value: 0 };
+      monthlyMap[key].deliveries += 1;
+      monthlyMap[key].units += r.quantity || 0;
+      monthlyMap[key].value += (r.unitCost || r.product?.costPrice || 0) * (r.quantity || 0);
+    });
+
+    const deliveryTimeline = Object.entries(monthlyMap)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([month, data]) => ({ month, ...data }));
+
+    // Top products supplied
+    const productMap = {};
+    deliveries.forEach((r) => {
+      const pid = r.product?._id?.toString();
+      if (!pid) return;
+      if (!productMap[pid]) productMap[pid] = { name: r.product.name, sku: r.product.sku, deliveries: 0, units: 0, value: 0 };
+      productMap[pid].deliveries += 1;
+      productMap[pid].units += r.quantity || 0;
+      productMap[pid].value += (r.unitCost || r.product?.costPrice || 0) * (r.quantity || 0);
+    });
+
+    const topProducts = Object.values(productMap)
+      .sort((a, b) => b.units - a.units)
+      .slice(0, 10);
+
+    // Recent requests (all statuses)
+    const recentRequests = requests.slice(0, 15).map((r) => ({
+      _id: r._id,
+      product: r.product,
+      quantity: r.quantity,
+      unitCost: r.unitCost,
+      status: r.status,
+      requestedBy: r.requestedBy,
+      date: r.createdAt,
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        summary: {
+          totalRequests: requests.length,
+          totalDelivered,
+          totalUnitsDelivered,
+          totalDeliveryValue,
+          ...statusBreakdown,
+        },
+        deliveryTimeline,
+        topProducts,
+        recentRequests,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getSalesReport, getInventoryReport, getStockMovementReport, getSupplierReport };
