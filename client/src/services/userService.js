@@ -38,6 +38,11 @@ const deleteUser = async (id) => {
   return response.data;
 };
 
-const userService = { getUsers, getUser, createUser, updateUser, deleteUser };
+const checkEmail = async (email) => {
+  const response = await axios.post(`${API_URL}/check-email`, { email }, getAuthConfig());
+  return response.data;
+};
+
+const userService = { getUsers, getUser, createUser, updateUser, deleteUser, checkEmail };
 
 export default userService;

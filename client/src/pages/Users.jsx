@@ -34,6 +34,7 @@ const Users = () => {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [supplierCreationStep, setSupplierCreationStep] = useState(1);
 
   const emptyForm = { name: '', email: '', password: '', role: 'staff', isActive: true };
   const [formData, setFormData] = useState(emptyForm);
@@ -66,6 +67,7 @@ const Users = () => {
   const openCreate = () => {
     setEditing(null);
     setFormData(emptyForm);
+    setSupplierCreationStep(1);
     setShowModal(true);
   };
 
@@ -78,16 +80,44 @@ const Users = () => {
       role: user.role,
       isActive: user.isActive,
     });
+    setSupplierCreationStep(1);
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setEditing(null);
+    setSupplierCreationStep(1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!editing && formData.role === 'supplier' && supplierCreationStep === 1) {
+      setSubmitting(true);
+      try {
+        const res = await userService.checkEmail(formData.email);
+        if (res.data.exists) {
+          if (res.data.role === 'supplier') {
+            const linkRes = await userService.createUser({ email: formData.email, role: 'supplier' });
+            toast.success(linkRes.message || 'Supplier linked successfully');
+            closeModal();
+            fetchUsers();
+          } else {
+            toast.error('A user with this email already exists with a different role');
+          }
+        } else {
+          setSupplierCreationStep(2);
+        }
+      } catch (error) {
+        console.error('Check email error:', error);
+        toast.error(error.response?.data?.message || error.message || 'Failed to check email');
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -320,25 +350,29 @@ const Users = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Supplier link hint */}
-              {!editing && formData.role === 'supplier' && (
+              {!editing && formData.role === 'supplier' && supplierCreationStep === 1 && (
                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
                   <p className="text-xs text-amber-400">
-                    If a supplier with this email already exists on the platform, they will be <strong>linked</strong> to your company instead of creating a duplicate account.
+                    Enter the supplier's email first. If they exist on the platform, we'll link their account. Otherwise, we'll ask for their name and password to create a new one.
                   </p>
                 </div>
               )}
+
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">
-                  Full Name <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                <label className="block text-sm font-medium text-dark-300 mb-1.5">Role</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => {
+                    setFormData({ ...formData, role: e.target.value });
+                    setSupplierCreationStep(1);
+                  }}
                   className="input-field"
-                  placeholder="e.g. John Doe"
-                />
+                  disabled={editing || (formData.role === 'supplier' && supplierCreationStep === 2)}
+                >
+                  <option value="staff">Staff</option>
+                  <option value="supplier">Supplier</option>
+                  <option value="admin">Admin</option>
+                </select>
               </div>
 
               <div>
@@ -352,37 +386,43 @@ const Users = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="input-field"
                   placeholder="user@invexis.com"
+                  disabled={!editing && formData.role === 'supplier' && supplierCreationStep === 2}
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">
-                  Password {!editing && <span className="text-red-400">*</span>}
-                  {editing && <span className="text-dark-500 text-xs ml-1">(leave blank to keep current)</span>}
-                </label>
-                <input
-                  type="password"
-                  required={!editing}
-                  minLength={6}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="input-field"
-                  placeholder={editing ? '••••••••' : 'Min 6 characters'}
-                />
-              </div>
+              {(editing || formData.role !== 'supplier' || supplierCreationStep === 2) && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1.5">
+                      Full Name <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="input-field"
+                      placeholder="e.g. John Doe"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Role</label>
-                <select
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="input-field"
-                >
-                  <option value="staff">Staff</option>
-                  <option value="supplier">Supplier</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1.5">
+                      Password {!editing && <span className="text-red-400">*</span>}
+                      {editing && <span className="text-dark-500 text-xs ml-1">(leave blank to keep current)</span>}
+                    </label>
+                    <input
+                      type="password"
+                      required={!editing}
+                      minLength={6}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="input-field"
+                      placeholder={editing ? '••••••••' : 'Min 6 characters'}
+                    />
+                  </div>
+                </>
+              )}
 
               {editing && (
                 <div className="flex items-center gap-3">
@@ -414,6 +454,8 @@ const Users = () => {
                     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
                   ) : editing ? (
                     'Update User'
+                  ) : !editing && formData.role === 'supplier' && supplierCreationStep === 1 ? (
+                    'Check & Continue'
                   ) : (
                     'Create User'
                   )}

@@ -6,6 +6,7 @@ const {
   createUser,
   updateUser,
   deleteUser,
+  checkSupplierEmail,
 } = require('../controllers/userController');
 const { protect, authorize, blockSuperAdmin } = require('../middleware/auth');
 
@@ -13,6 +14,8 @@ const { protect, authorize, blockSuperAdmin } = require('../middleware/auth');
 router.use(protect);
 router.use(blockSuperAdmin);
 router.use(authorize('admin'));
+
+router.post('/check-email', checkSupplierEmail);
 
 router.route('/').get(getUsers).post(createUser);
 router.route('/:id').get(getUser).put(updateUser).delete(deleteUser);

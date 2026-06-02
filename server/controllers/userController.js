@@ -378,4 +378,30 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-module.exports = { getUsers, getUser, createUser, updateUser, deleteUser };
+// @desc    Check if email exists and its role (for supplier link flow)
+const checkSupplierEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      res.status(400);
+      throw new Error('Email is required');
+    }
+
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.json({
+        success: true,
+        data: { exists: true, role: existing.role },
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: { exists: false },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getUsers, getUser, createUser, updateUser, deleteUser, checkSupplierEmail };
