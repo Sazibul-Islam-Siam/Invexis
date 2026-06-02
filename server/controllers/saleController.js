@@ -1,6 +1,7 @@
 const Sale = require('../models/Sale');
 const Product = require('../models/Product');
 const logAudit = require('../utils/logger');
+const { allocateFIFO, syncProductFromBatches, createBatch } = require('../utils/batchHelper');
 
 // @desc    Get all sales
 // @route   GET /api/sales
@@ -91,7 +92,7 @@ const getSale = async (req, res, next) => {
   }
 };
 
-// @desc    Record a new sale (multi-product)
+// @desc    Record a new sale (multi-product) — uses FIFO batch allocation
 // @route   POST /api/sales
 // @access  Private (Admin, Staff)
 const createSale = async (req, res, next) => {
@@ -105,6 +106,8 @@ const createSale = async (req, res, next) => {
     }
 
     const saleItems = [];
+    const affectedProducts = new Set();
+
     for (const item of items) {
       const product = await Product.findOne({ _id: item.product, company: req.user.company });
 
@@ -118,21 +121,26 @@ const createSale = async (req, res, next) => {
         throw new Error(`Cannot sell discontinued product: ${product.name}`);
       }
 
-      if (product.quantity < item.quantity) {
-        res.status(400);
-        throw new Error(
-          `Insufficient stock for "${product.name}". Available: ${product.quantity}, Requested: ${item.quantity}`
-        );
-      }
+      // FIFO: Allocate from oldest batches first
+      const allocations = await allocateFIFO(product._id, req.user.company, item.quantity);
+
+      // Calculate weighted average cost from batch allocations
+      const totalCostFromBatches = allocations.reduce(
+        (sum, a) => sum + a.quantity * a.unitCost, 0
+      );
+      const weightedUnitCost = totalCostFromBatches / item.quantity;
 
       saleItems.push({
         product: product._id,
         quantity: item.quantity,
         unitPrice: product.price,
         totalPrice: product.price * item.quantity,
-        unitCost: product.costPrice || 0,
-        totalCost: (product.costPrice || 0) * item.quantity,
+        unitCost: Math.round(weightedUnitCost * 100) / 100,
+        totalCost: Math.round(totalCostFromBatches * 100) / 100,
+        batchAllocations: allocations,
       });
+
+      affectedProducts.add(product._id.toString());
     }
 
     const totalAmount = saleItems.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -148,10 +156,9 @@ const createSale = async (req, res, next) => {
       company: req.user.company,
     });
 
-    for (const item of saleItems) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { quantity: -item.quantity },
-      });
+    // Sync cached product quantity & costPrice from batches
+    for (const productId of affectedProducts) {
+      await syncProductFromBatches(productId, req.user.company);
     }
 
     const populated = await Sale.findById(sale._id)
@@ -166,7 +173,7 @@ const createSale = async (req, res, next) => {
   }
 };
 
-// @desc    Delete a sale (reverses stock for all items)
+// @desc    Delete a sale (reverses stock — creates return batches per Option A)
 // @route   DELETE /api/sales/:id
 // @access  Private (Admin)
 const deleteSale = async (req, res, next) => {
@@ -178,16 +185,21 @@ const deleteSale = async (req, res, next) => {
       throw new Error('Sale not found');
     }
 
+    // Restore stock by creating return batches at the original cost
     for (const item of sale.items) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { quantity: item.quantity },
+      await createBatch({
+        product: item.product,
+        company: req.user.company,
+        unitCost: item.unitCost || 0,
+        initialQty: item.quantity,
+        notes: `Return batch from deleted sale ${sale.invoiceNo}`,
       });
     }
 
     const invoiceNo = sale.invoiceNo;
     await sale.deleteOne();
 
-    logAudit(req.user._id, 'DELETE', 'Sale', req.params.id, `Deleted sale ${invoiceNo} (stock restored)`, req.user.company);
+    logAudit(req.user._id, 'DELETE', 'Sale', req.params.id, `Deleted sale ${invoiceNo} (stock restored via return batches)`, req.user.company);
 
     res.json({ success: true, data: {} });
   } catch (error) {

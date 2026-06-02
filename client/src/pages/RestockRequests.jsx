@@ -45,12 +45,14 @@ const RestockRequests = () => {
     product: '',
     supplier: '',
     quantity: 1,
+    unitCost: '',
     notes: '',
   });
 
   const [approveData, setApproveData] = useState({
     supplier: '',
     quantity: 1,
+    unitCost: '',
   });
 
   useEffect(() => {
@@ -111,7 +113,7 @@ const RestockRequests = () => {
   };
 
   const openModal = () => {
-    setFormData({ product: '', supplier: '', quantity: 1, notes: '' });
+    setFormData({ product: '', supplier: '', quantity: 1, unitCost: '', notes: '' });
     setSearchQuery('');
     setShowModal(true);
   };
@@ -148,7 +150,7 @@ const RestockRequests = () => {
 
   const openApproveModal = (request) => {
     setApprovingRequest(request);
-    setApproveData({ supplier: '', quantity: 1 });
+    setApproveData({ supplier: '', quantity: 1, unitCost: request.product?.costPrice || '' });
     setShowApproveModal(true);
   };
 
@@ -250,6 +252,7 @@ const RestockRequests = () => {
                   <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Product</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Supplier</th>
                   <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Qty</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Unit Cost</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Requested By</th>
                   <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Status</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Date</th>
@@ -282,6 +285,13 @@ const RestockRequests = () => {
                           </span>
                         ) : (
                           <span className="text-dark-500 italic text-sm">—</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-right text-sm">
+                        {r.unitCost != null ? (
+                          <span className="text-dark-200 font-medium">৳{r.unitCost.toLocaleString()}</span>
+                        ) : (
+                          <span className="text-dark-500 italic">—</span>
                         )}
                       </td>
                       <td className="py-3.5 px-4 text-dark-400 text-sm">{r.requestedBy?.name}</td>
@@ -482,6 +492,19 @@ const RestockRequests = () => {
                     <label className="block text-sm font-medium text-dark-300 mb-1.5">Quantity <span className="text-red-400">*</span></label>
                     <input type="number" required min="1" value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: e.target.value })} className="input-field" />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1.5">Unit Cost (৳)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.unitCost}
+                      onChange={(e) => setFormData({ ...formData, unitCost: e.target.value })}
+                      className="input-field"
+                      placeholder={`Default: product's current cost price`}
+                    />
+                    <p className="text-xs text-dark-500 mt-1">Leave blank to use product's current cost price</p>
+                  </div>
                 </>
               )}
 
@@ -542,6 +565,19 @@ const RestockRequests = () => {
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-1.5">Quantity <span className="text-red-400">*</span></label>
                 <input type="number" required min="1" value={approveData.quantity} onChange={(e) => setApproveData({ ...approveData, quantity: e.target.value })} className="input-field" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-dark-300 mb-1.5">Unit Cost (৳)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={approveData.unitCost}
+                  onChange={(e) => setApproveData({ ...approveData, unitCost: e.target.value })}
+                  className="input-field"
+                  placeholder={`Default: ৳${approvingRequest.product?.costPrice || 0}`}
+                />
+                <p className="text-xs text-dark-500 mt-1">Purchase price per unit for this delivery</p>
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setShowApproveModal(false)} className="btn-secondary flex-1">Cancel</button>

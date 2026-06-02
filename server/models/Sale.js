@@ -27,6 +27,16 @@ const saleItemSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  batchAllocations: [
+    {
+      batch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'InventoryBatch',
+      },
+      quantity: Number,
+      unitCost: Number,
+    },
+  ],
 });
 
 const saleSchema = new mongoose.Schema(

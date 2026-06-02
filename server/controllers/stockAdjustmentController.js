@@ -1,6 +1,7 @@
 const StockAdjustment = require('../models/StockAdjustment');
 const Product = require('../models/Product');
 const logAudit = require('../utils/logger');
+const { allocateFIFO, syncProductFromBatches, createBatch } = require('../utils/batchHelper');
 
 const getStockAdjustments = async (req, res, next) => {
   try {
@@ -48,20 +49,25 @@ const createStockAdjustment = async (req, res, next) => {
     const adjustQty = Math.abs(quantity);
 
     if (['damaged', 'lost', 'expired'].includes(type)) {
-      if (product.quantity < adjustQty) {
-        res.status(400);
-        throw new Error(`Cannot remove ${adjustQty} units. Current stock: ${product.quantity}`);
-      }
-      product.quantity -= adjustQty;
+      // FIFO: Deduct from oldest batches first
+      await allocateFIFO(product._id, req.user.company, adjustQty);
+      await syncProductFromBatches(product._id, req.user.company);
     } else if (type === 'correction') {
-      product.quantity += quantity;
-      if (product.quantity < 0) {
-        res.status(400);
-        throw new Error('Correction would result in negative stock');
+      if (quantity > 0) {
+        // Positive correction: Create a new batch at current average costPrice
+        await createBatch({
+          product: product._id,
+          company: req.user.company,
+          unitCost: product.costPrice || 0,
+          initialQty: quantity,
+          notes: `Stock correction: +${quantity} (${reason || 'manual correction'})`,
+        });
+      } else if (quantity < 0) {
+        // Negative correction: Deduct from oldest batches (FIFO)
+        await allocateFIFO(product._id, req.user.company, adjustQty);
+        await syncProductFromBatches(product._id, req.user.company);
       }
     }
-
-    await product.save();
 
     const adjustment = await StockAdjustment.create({
       product: productId,

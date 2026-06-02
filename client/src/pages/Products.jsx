@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import productService from '../services/productService';
 import categoryService from '../services/categoryService';
+import { useAuth } from '../context/AuthContext';
 import {
   HiOutlineCube,
   HiOutlinePlus,
@@ -15,6 +16,7 @@ import {
 } from 'react-icons/hi';
 
 const Products = () => {
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -179,10 +181,12 @@ const Products = () => {
             Manage your inventory products ({pagination.total} total)
           </p>
         </div>
-        <button onClick={() => openModal()} className="btn-primary flex items-center gap-2">
-          <HiOutlinePlus className="text-lg" />
-          Add Product
-        </button>
+        {user?.role === 'admin' && (
+          <button onClick={() => openModal()} className="btn-primary flex items-center gap-2">
+            <HiOutlinePlus className="text-lg" />
+            Add Product
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -520,19 +524,35 @@ const Products = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-dark-300 mb-1.5">
-                    Cost Price (৳) <span className="text-red-400">*</span>
+                    Cost Price (৳) {!editingProduct && <span className="text-red-400">*</span>}
                   </label>
-                  <input
-                    type="number"
-                    name="costPrice"
-                    required
-                    min="0"
-                    step="0.01"
-                    value={formData.costPrice}
-                    onChange={handleChange}
-                    className="input-field"
-                    placeholder="0.00"
-                  />
+                  {editingProduct ? (
+                    <div>
+                      <input
+                        type="number"
+                        name="costPrice"
+                        value={formData.costPrice}
+                        readOnly
+                        className="input-field opacity-60 cursor-not-allowed"
+                      />
+                      <p className="text-xs text-amber-400/80 mt-1 flex items-center gap-1">
+                        <HiOutlineExclamation className="text-sm" />
+                        Auto-calculated from batch costs
+                      </p>
+                    </div>
+                  ) : (
+                    <input
+                      type="number"
+                      name="costPrice"
+                      required
+                      min="0"
+                      step="0.01"
+                      value={formData.costPrice}
+                      onChange={handleChange}
+                      className="input-field"
+                      placeholder="0.00"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -540,18 +560,34 @@ const Products = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-dark-300 mb-1.5">
-                    Quantity <span className="text-red-400">*</span>
+                    Quantity {!editingProduct && <span className="text-red-400">*</span>}
                   </label>
-                  <input
-                    type="number"
-                    name="quantity"
-                    required
-                    min="0"
-                    value={formData.quantity}
-                    onChange={handleChange}
-                    className="input-field"
-                    placeholder="0"
-                  />
+                  {editingProduct ? (
+                    <div>
+                      <input
+                        type="number"
+                        name="quantity"
+                        value={formData.quantity}
+                        readOnly
+                        className="input-field opacity-60 cursor-not-allowed"
+                      />
+                      <p className="text-xs text-amber-400/80 mt-1 flex items-center gap-1">
+                        <HiOutlineExclamation className="text-sm" />
+                        Managed through restocks & sales
+                      </p>
+                    </div>
+                  ) : (
+                    <input
+                      type="number"
+                      name="quantity"
+                      required
+                      min="0"
+                      value={formData.quantity}
+                      onChange={handleChange}
+                      className="input-field"
+                      placeholder="0"
+                    />
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-dark-300 mb-1.5">

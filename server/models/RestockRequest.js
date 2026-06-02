@@ -20,6 +20,10 @@ const restockRequestSchema = new mongoose.Schema(
       type: Number,
       min: [1, 'Quantity must be at least 1'],
     },
+    unitCost: {
+      type: Number,
+      min: [0, 'Unit cost cannot be negative'],
+    },
     status: {
       type: String,
       enum: ['pending_admin', 'pending', 'accepted', 'rejected', 'shipped', 'delivered'],

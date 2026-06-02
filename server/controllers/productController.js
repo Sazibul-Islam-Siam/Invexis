@@ -1,5 +1,7 @@
 const Product = require('../models/Product');
+const InventoryBatch = require('../models/InventoryBatch');
 const logAudit = require('../utils/logger');
+const { createBatch } = require('../utils/batchHelper');
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -97,12 +99,26 @@ const getProduct = async (req, res, next) => {
   }
 };
 
-// @desc    Create product
+// @desc    Create product (auto-creates initial batch if quantity > 0)
 // @route   POST /api/products
 // @access  Private (Admin)
 const createProduct = async (req, res, next) => {
   try {
+    const initialQty = Number(req.body.quantity) || 0;
+    const initialCostPrice = Number(req.body.costPrice) || 0;
+
     const product = await Product.create({ ...req.body, company: req.user.company });
+
+    // Create initial inventory batch if product starts with stock
+    if (initialQty > 0) {
+      await createBatch({
+        product: product._id,
+        company: req.user.company,
+        unitCost: initialCostPrice,
+        initialQty: initialQty,
+        notes: 'Initial stock batch',
+      });
+    }
 
     const populated = await product.populate([
       { path: 'category', select: 'name' },
@@ -117,14 +133,19 @@ const createProduct = async (req, res, next) => {
   }
 };
 
-// @desc    Update product
+// @desc    Update product (quantity and costPrice are read-only — managed via batches)
 // @route   PUT /api/products/:id
 // @access  Private (Admin)
 const updateProduct = async (req, res, next) => {
   try {
+    // Strip batch-managed fields — these should only change through restocks/sales
+    const updateData = { ...req.body };
+    delete updateData.quantity;
+    delete updateData.costPrice;
+
     const product = await Product.findOneAndUpdate(
       { _id: req.params.id, company: req.user.company },
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     )
       .populate('category', 'name')
@@ -143,7 +164,7 @@ const updateProduct = async (req, res, next) => {
   }
 };
 
-// @desc    Delete product
+// @desc    Delete product (also removes all associated batches)
 // @route   DELETE /api/products/:id
 // @access  Private (Admin)
 const deleteProduct = async (req, res, next) => {
@@ -154,6 +175,9 @@ const deleteProduct = async (req, res, next) => {
       res.status(404);
       throw new Error('Product not found');
     }
+
+    // Delete all associated inventory batches
+    await InventoryBatch.deleteMany({ product: product._id, company: req.user.company });
 
     const productName = product.name;
     await product.deleteOne();

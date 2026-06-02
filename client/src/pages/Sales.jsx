@@ -334,6 +334,7 @@ const Sales = () => {
                     <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Invoice</th>
                     <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Items</th>
                     <th className="text-right py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Total</th>
+                    <th className="text-right py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Profit</th>
                     <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Sold By</th>
                     <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Date</th>
                     <th className="text-right py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Actions</th>
@@ -360,6 +361,11 @@ const Sales = () => {
                       <td className="py-3.5 px-4 text-right">
                         <span className="font-semibold text-emerald-400">
                           ৳{sale.totalAmount?.toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <span className="font-semibold text-emerald-400">
+                          ৳{sale.totalProfit?.toLocaleString()}
                         </span>
                       </td>
                       <td className="py-3.5 px-4 text-dark-400 text-sm">{sale.soldBy?.name || '—'}</td>
@@ -470,18 +476,17 @@ const Sales = () => {
                               setSearchQuery(p.name);
                               setIsDropdownOpen(false);
                             }}
-                            className={`px-3 py-2 cursor-pointer transition-colors text-sm ${
-                              selectedProductId === p._id
-                                ? 'bg-primary-600/20 text-primary-400'
-                                : 'text-dark-100 hover:bg-dark-700'
-                            }`}
+                            className={`px-3 py-2 cursor-pointer transition-colors text-sm ${selectedProductId === p._id
+                              ? 'bg-primary-600/20 text-primary-400'
+                              : 'text-dark-100 hover:bg-dark-700'
+                              }`}
                           >
                             <p className="font-medium">{p.name}</p>
                             <p className="text-xs text-dark-400 mt-0.5">
                               {p.sku} • Stock: {p.quantity} • ৳{p.price.toLocaleString()}
                             </p>
                           </div>
-                      ))}
+                        ))}
                       {availableProducts.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.sku.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
                         <div className="px-3 py-4 text-dark-400 text-sm text-center">No products found</div>
                       )}
@@ -680,17 +685,42 @@ const Sales = () => {
               {showDetails.items?.map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between bg-dark-900/50 border border-dark-600 rounded-xl px-4 py-3"
+                  className="bg-dark-900/50 border border-dark-600 rounded-xl px-4 py-3"
                 >
-                  <div>
-                    <p className="text-sm font-medium text-white">{item.product?.name || 'Deleted Product'}</p>
-                    <p className="text-xs text-dark-500">
-                      ৳{item.unitPrice?.toLocaleString()} × {item.quantity}
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-white">{item.product?.name || 'Deleted Product'}</p>
+                      <p className="text-xs text-dark-500">
+                        ৳{item.unitPrice?.toLocaleString()} × {item.quantity}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-emerald-400">
+                        ৳{item.totalPrice?.toLocaleString()}
+                      </p>
+                      {user?.role === 'admin' && item.totalCost > 0 && (
+                        <p className="text-xs text-dark-500">Cost: ৳{item.totalCost?.toLocaleString()}</p>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-sm font-semibold text-emerald-400">
-                    ৳{item.totalPrice?.toLocaleString()}
-                  </p>
+                  {/* Batch allocation breakdown for admin */}
+                  {user?.role === 'admin' && item.batchAllocations?.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-dark-700">
+                      <p className="text-xs font-medium text-dark-400 mb-1">Batch Allocations (FIFO)</p>
+                      <div className="space-y-0.5">
+                        {item.batchAllocations.map((alloc, j) => (
+                          <div key={j} className="flex justify-between text-xs">
+                            <span className="text-dark-500">
+                              Batch #{String(alloc.batch).slice(-6)} — {alloc.quantity} unit{alloc.quantity !== 1 ? 's' : ''}
+                            </span>
+                            <span className="text-dark-400">
+                              @ ৳{alloc.unitCost?.toLocaleString()} = ৳{(alloc.quantity * alloc.unitCost).toLocaleString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -702,6 +732,20 @@ const Sales = () => {
                   ৳{showDetails.totalAmount?.toLocaleString()}
                 </span>
               </div>
+              {user?.role === 'admin' && (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-dark-500">Total Cost (FIFO)</span>
+                    <span className="text-dark-300">৳{showDetails.totalCost?.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-dark-500">Profit</span>
+                    <span className={`font-medium ${(showDetails.totalProfit || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      ৳{showDetails.totalProfit?.toLocaleString()}
+                    </span>
+                  </div>
+                </>
+              )}
               <div className="flex justify-between text-sm">
                 <span className="text-dark-500">Sold By</span>
                 <span className="text-dark-300">{showDetails.soldBy?.name}</span>

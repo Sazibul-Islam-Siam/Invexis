@@ -5,6 +5,7 @@ const CompanySupplier = require('../models/CompanySupplier');
 const logAudit = require('../utils/logger');
 const sendEmail = require('../utils/sendEmail');
 const { restockNotifySupplier, shipmentNotifyAdmin, deliveryNotifySupplier } = require('../utils/emailTemplates');
+const { createBatch } = require('../utils/batchHelper');
 
 // @desc    Get all restock requests
 // @route   GET /api/restock-requests
@@ -28,7 +29,7 @@ const getRestockRequests = async (req, res, next) => {
 
     const [requests, total] = await Promise.all([
       RestockRequest.find(query)
-        .populate('product', 'name sku quantity minStockThreshold')
+        .populate('product', 'name sku quantity minStockThreshold costPrice')
         .populate('supplier', 'name email')
         .populate('requestedBy', 'name')
         .sort({ createdAt: -1 })
@@ -55,7 +56,7 @@ const getRestockRequests = async (req, res, next) => {
 // @access  Private (Admin, Staff)
 const createRestockRequest = async (req, res, next) => {
   try {
-    const { product, supplier, quantity, notes } = req.body;
+    const { product, supplier, quantity, unitCost, notes } = req.body;
 
     const requestData = {
       product,
@@ -80,16 +81,24 @@ const createRestockRequest = async (req, res, next) => {
       requestData.supplier = supplier;
       requestData.quantity = quantity;
       requestData.status = 'pending';
+
+      // Set unitCost — default to product's current costPrice if not provided
+      if (unitCost !== undefined && unitCost !== null && unitCost !== '') {
+        requestData.unitCost = Number(unitCost);
+      } else {
+        const prod = await Product.findById(product);
+        requestData.unitCost = prod ? prod.costPrice : 0;
+      }
     }
 
     const request = await RestockRequest.create(requestData);
 
     const populated = await RestockRequest.findById(request._id)
-      .populate('product', 'name sku')
+      .populate('product', 'name sku costPrice')
       .populate('supplier', 'name email')
       .populate('requestedBy', 'name');
 
-    logAudit(req.user._id, 'CREATE', 'RestockRequest', request._id, `Created restock request for ${populated.product?.name}${quantity ? ` (qty: ${quantity})` : ' (awaiting admin approval)'}`, req.user.company);
+    logAudit(req.user._id, 'CREATE', 'RestockRequest', request._id, `Created restock request for ${populated.product?.name}${quantity ? ` (qty: ${quantity}, cost: ৳${requestData.unitCost})` : ' (awaiting admin approval)'}`, req.user.company);
 
     // Only email supplier if admin created (direct to supplier)
     if (req.user.role === 'admin' && populated.supplier?.email) {
@@ -106,12 +115,12 @@ const createRestockRequest = async (req, res, next) => {
   }
 };
 
-// @desc    Admin approves a staff restock request (assigns supplier + quantity)
+// @desc    Admin approves a staff restock request (assigns supplier + quantity + unitCost)
 // @route   PUT /api/restock-requests/:id/approve
 // @access  Private (Admin)
 const approveStaffRequest = async (req, res, next) => {
   try {
-    const { supplier, quantity } = req.body;
+    const { supplier, quantity, unitCost } = req.body;
 
     if (!supplier) {
       res.status(400);
@@ -136,14 +145,23 @@ const approveStaffRequest = async (req, res, next) => {
     request.supplier = supplier;
     request.quantity = quantity;
     request.status = 'pending';
+
+    // Set unitCost — default to product's current costPrice if not provided
+    if (unitCost !== undefined && unitCost !== null && unitCost !== '') {
+      request.unitCost = Number(unitCost);
+    } else {
+      const prod = await Product.findById(request.product);
+      request.unitCost = prod ? prod.costPrice : 0;
+    }
+
     await request.save();
 
     const populated = await RestockRequest.findById(request._id)
-      .populate('product', 'name sku quantity')
+      .populate('product', 'name sku quantity costPrice')
       .populate('supplier', 'name email')
       .populate('requestedBy', 'name');
 
-    logAudit(req.user._id, 'APPROVE', 'RestockRequest', request._id, `Approved staff restock request for ${populated.product?.name} (qty: ${quantity})`, req.user.company);
+    logAudit(req.user._id, 'APPROVE', 'RestockRequest', request._id, `Approved staff restock request for ${populated.product?.name} (qty: ${quantity}, cost: ৳${request.unitCost})`, req.user.company);
 
     // Notify supplier
     if (populated.supplier?.email) {
@@ -196,9 +214,15 @@ const updateRestockRequest = async (req, res, next) => {
       }
     }
 
+    // FIFO: Create a new inventory batch when delivery is confirmed
     if (status === 'delivered' && request.status !== 'delivered') {
-      await Product.findByIdAndUpdate(request.product, {
-        $inc: { quantity: request.quantity },
+      await createBatch({
+        product: request.product,
+        company: request.company,
+        unitCost: request.unitCost || 0,
+        initialQty: request.quantity,
+        supplier: request.supplier,
+        restockRequest: request._id,
       });
     }
 
