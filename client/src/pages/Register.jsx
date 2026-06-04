@@ -86,27 +86,27 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-dark-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-600/20 rounded-2xl mb-4 border border-primary-500/30">
-            <svg className="w-7 h-7 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-50 rounded-2xl mb-4 border border-primary-200">
+            <svg className="w-7 h-7 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-dark-50">Create Your Company</h1>
-          <p className="text-dark-400 mt-1">Start managing your inventory today</p>
+          <h1 className="text-2xl font-bold text-gray-900">Create Your Company</h1>
+          <p className="text-gray-500 mt-1">Start managing your inventory today</p>
         </div>
 
         {/* Form */}
-        <div className="bg-dark-900/50 backdrop-blur-xl rounded-2xl p-8 border border-dark-800/50 shadow-2xl">
+        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             {inputFields.map((field) => (
               <div key={field.name}>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">{field.label}</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">{field.label}</label>
                 <div className="relative">
-                  <field.icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-500" />
+                  <field.icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type={field.type}
                     name={field.name}
@@ -114,13 +114,13 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder={field.placeholder}
                     required
-                    className="w-full pl-10 pr-10 py-2.5 bg-dark-800/50 border border-dark-700/50 rounded-xl text-dark-50 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
+                    className="w-full pl-10 pr-10 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
                   />
                   {field.hasToggle && (
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-500 hover:text-dark-300"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
                       {showPassword ? <HiOutlineEyeOff className="w-5 h-5" /> : <HiOutlineEye className="w-5 h-5" />}
                     </button>
@@ -138,9 +138,9 @@ const Register = () => {
             </button>
           </form>
 
-          <p className="text-center text-dark-400 text-sm mt-6">
+          <p className="text-center text-gray-500 text-sm mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
+            <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
               Sign In
             </Link>
           </p>

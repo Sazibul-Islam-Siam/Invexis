@@ -25,7 +25,7 @@ const Layout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white-950">
+    <div className="min-h-screen bg-gray-50">
       {/* Mobile overlay */}
       {isMobile && mobileOpen && (
         <div

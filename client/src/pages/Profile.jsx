@@ -127,10 +127,10 @@ const Profile = () => {
   };
 
   const roleBadge = {
-    admin: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
-    staff: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-    supplier: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-    super_admin: 'bg-violet-500/15 text-violet-400 border-violet-500/30',
+    admin: 'bg-purple-50 text-purple-600 border-purple-200',
+    staff: 'bg-blue-50 text-blue-600 border-blue-200',
+    supplier: 'bg-amber-50 text-amber-600 border-amber-200',
+    super_admin: 'bg-violet-50 text-violet-600 border-violet-200',
   };
 
   const roleLabel = {
@@ -144,26 +144,26 @@ const Profile = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
-          <HiOutlineUserCircle className="text-primary-400" />
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <HiOutlineUserCircle className="text-primary-600" />
           My Profile
         </h1>
-        <p className="text-dark-400 mt-1">Manage your account settings</p>
+        <p className="text-gray-500 mt-1">Manage your account settings</p>
       </div>
 
       {/* Profile Card */}
       <div className="card mb-6">
-        <div className="flex items-center gap-4 mb-6 pb-6 border-b border-dark-700">
+        <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
           {/* Avatar with upload */}
           <div className="relative group">
             {avatarUrl ? (
               <img
                 src={avatarUrl}
                 alt={user?.name}
-                className="w-20 h-20 rounded-2xl object-cover border-2 border-dark-600"
+                className="w-20 h-20 rounded-2xl object-cover border-2 border-gray-300"
               />
             ) : (
-              <div className="w-20 h-20 bg-primary-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl">
+              <div className="w-20 h-20 bg-primary-600 rounded-2xl flex items-center justify-center text-gray-900 font-bold text-3xl">
                 {user?.name?.charAt(0)?.toUpperCase() || 'U'}
               </div>
             )}
@@ -175,7 +175,7 @@ const Profile = () => {
               {uploadingAvatar ? (
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
               ) : (
-                <HiOutlineCamera className="text-2xl text-dark-50" />
+                <HiOutlineCamera className="text-2xl text-gray-900" />
               )}
             </button>
             <input
@@ -187,21 +187,21 @@ const Profile = () => {
             />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-dark-50">{user?.name}</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{user?.name}</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-dark-400">{user?.email}</span>
+              <span className="text-sm text-gray-500">{user?.email}</span>
               <span className={`px-2 py-0.5 rounded-lg text-xs font-medium border ${roleBadge[user?.role] || ''}`}>
                 {roleLabel[user?.role] || user?.role}
               </span>
             </div>
-            <p className="text-xs text-dark-500 mt-1">Click on avatar to change photo</p>
+            <p className="text-xs text-gray-400 mt-1">Click on avatar to change photo</p>
           </div>
         </div>
 
         <form onSubmit={handleUpdateProfile} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-1.5 flex items-center gap-1.5">
-              <HiOutlineUserCircle className="text-dark-400" /> Full Name
+            <label className="block text-sm font-medium text-gray-600 mb-1.5 flex items-center gap-1.5">
+              <HiOutlineUserCircle className="text-gray-500" /> Full Name
             </label>
             <input
               type="text"
@@ -212,8 +212,8 @@ const Profile = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-1.5 flex items-center gap-1.5">
-              <HiOutlineMail className="text-dark-400" /> Email
+            <label className="block text-sm font-medium text-gray-600 mb-1.5 flex items-center gap-1.5">
+              <HiOutlineMail className="text-gray-500" /> Email
             </label>
             <input
               type="email"
@@ -224,8 +224,8 @@ const Profile = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-1.5 flex items-center gap-1.5">
-              <HiOutlineShieldCheck className="text-dark-400" /> Role
+            <label className="block text-sm font-medium text-gray-600 mb-1.5 flex items-center gap-1.5">
+              <HiOutlineShieldCheck className="text-gray-500" /> Role
             </label>
             <input
               type="text"
@@ -250,13 +250,13 @@ const Profile = () => {
 
       {/* Change Password */}
       <div className="card">
-        <h3 className="text-lg font-semibold text-dark-50 mb-4 flex items-center gap-2">
-          <HiOutlineLockClosed className="text-primary-400" />
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <HiOutlineLockClosed className="text-primary-600" />
           Change Password
         </h3>
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-1.5">Current Password</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Current Password</label>
             <input
               type="password"
               required
@@ -267,7 +267,7 @@ const Profile = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-1.5">New Password</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">New Password</label>
             <input
               type="password"
               required
@@ -279,7 +279,7 @@ const Profile = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-1.5">Confirm New Password</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">Confirm New Password</label>
             <input
               type="password"
               required

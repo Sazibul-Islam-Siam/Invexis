@@ -17,12 +17,12 @@ import {
 } from 'react-icons/hi';
 
 const statusConfig = {
-  pending_admin: { label: 'Awaiting Approval', className: 'bg-orange-500/15 text-orange-400 border-orange-500/30' },
-  pending: { label: 'Pending', className: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
-  accepted: { label: 'Accepted', className: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
-  rejected: { label: 'Rejected', className: 'bg-red-500/15 text-red-400 border-red-500/30' },
-  shipped: { label: 'Shipped', className: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
-  delivered: { label: 'Delivered', className: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+  pending_admin: { label: 'Awaiting Approval', className: 'bg-orange-50 text-orange-600 border-orange-500/30' },
+  pending: { label: 'Pending', className: 'bg-amber-50 text-amber-600 border-amber-200' },
+  accepted: { label: 'Accepted', className: 'bg-blue-50 text-blue-600 border-blue-200' },
+  rejected: { label: 'Rejected', className: 'bg-red-50 text-red-500 border-red-200' },
+  shipped: { label: 'Shipped', className: 'bg-purple-50 text-purple-600 border-purple-200' },
+  delivered: { label: 'Delivered', className: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
   rejected_shipment: { label: 'Shipment Rejected', className: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
 };
 
@@ -201,11 +201,11 @@ const RestockRequests = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
-            <HiOutlineTruck className="text-primary-400" />
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <HiOutlineTruck className="text-primary-600" />
             Restock Requests
           </h1>
-          <p className="text-dark-400 mt-1">Manage supplier restock orders</p>
+          <p className="text-gray-500 mt-1">Manage supplier restock orders</p>
         </div>
         {(user?.role === 'admin' || user?.role === 'staff') && (
           <button onClick={openModal} className="btn-primary flex items-center gap-2">
@@ -244,67 +244,67 @@ const RestockRequests = () => {
           </div>
         ) : requests.length === 0 ? (
           <div className="text-center py-16">
-            <HiOutlineTruck className="text-5xl text-dark-600 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-dark-300">No restock requests</h3>
-            <p className="text-dark-500 mt-1">Create a request to restock products</p>
+            <HiOutlineTruck className="text-5xl text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-gray-600">No restock requests</h3>
+            <p className="text-gray-400 mt-1">Create a request to restock products</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-dark-700">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Product</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Supplier</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Qty</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Unit Cost</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Requested By</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Status</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Date</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Actions</th>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Product</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Supplier</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Qty</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Unit Cost</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Requested By</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Date</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-700/50">
+              <tbody className="divide-y divide-gray-100">
                 {requests.map((r) => {
                   const badge = statusConfig[r.status] || statusConfig.pending;
                   return (
-                    <tr key={r._id} className="hover:bg-dark-800/50 transition-colors">
+                    <tr key={r._id} className="hover:bg-gray-50 transition-colors">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-primary-600/15 rounded-lg flex items-center justify-center shrink-0">
-                            <HiOutlineCube className="text-primary-400" />
+                          <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center shrink-0">
+                            <HiOutlineCube className="text-primary-600" />
                           </div>
                           <div>
-                            <p className="font-medium text-dark-50">{r.product?.name}</p>
-                            <code className="text-xs text-dark-500">{r.product?.sku}</code>
+                            <p className="font-medium text-gray-900">{r.product?.name}</p>
+                            <code className="text-xs text-gray-400">{r.product?.sku}</code>
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-dark-400 text-sm">
-                        {r.supplier?.name || <span className="text-dark-500 italic">Not assigned</span>}
+                      <td className="py-3.5 px-4 text-gray-500 text-sm">
+                        {r.supplier?.name || <span className="text-gray-400 italic">Not assigned</span>}
                       </td>
                       <td className="py-3.5 px-4 text-center">
                         {r.quantity ? (
-                          <span className="bg-dark-700 px-2.5 py-1 rounded-lg text-sm font-medium text-dark-50">
+                          <span className="bg-gray-100 px-2.5 py-1 rounded-lg text-sm font-medium text-gray-900">
                             {r.quantity}
                           </span>
                         ) : (
-                          <span className="text-dark-500 italic text-sm">—</span>
+                          <span className="text-gray-400 italic text-sm">—</span>
                         )}
                       </td>
                       <td className="py-3.5 px-4 text-right text-sm">
                         {r.unitCost != null ? (
-                          <span className="text-dark-200 font-medium">৳{r.unitCost.toLocaleString()}</span>
+                          <span className="text-gray-700 font-medium">৳{r.unitCost.toLocaleString()}</span>
                         ) : (
-                          <span className="text-dark-500 italic">—</span>
+                          <span className="text-gray-400 italic">—</span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 text-dark-400 text-sm">{r.requestedBy?.name}</td>
+                      <td className="py-3.5 px-4 text-gray-500 text-sm">{r.requestedBy?.name}</td>
                       <td className="py-3.5 px-4 text-center">
                         <span className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${badge.className}`}>
                           {badge.label}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-dark-400 text-sm">
+                      <td className="py-3.5 px-4 text-gray-500 text-sm">
                         {new Date(r.createdAt).toLocaleDateString('en-US', {
                           month: 'short', day: 'numeric', year: 'numeric',
                         })}
@@ -316,14 +316,14 @@ const RestockRequests = () => {
                             <>
                               <button
                                 onClick={() => openApproveModal(r)}
-                                className="px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25 transition-colors flex items-center gap-1.5"
+                                className="px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors flex items-center gap-1.5"
                                 title="Approve & Assign Supplier"
                               >
                                 <HiOutlineClipboardCheck className="text-sm" /> Approve
                               </button>
                               <button
                                 onClick={() => handleStatusUpdate(r._id, 'rejected')}
-                                className="p-2 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                                className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                                 title="Reject"
                               >
                                 <HiOutlineBan className="text-lg" />
@@ -335,14 +335,14 @@ const RestockRequests = () => {
                             <>
                               <button
                                 onClick={() => handleStatusUpdate(r._id, 'accepted')}
-                                className="p-2 text-dark-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all"
+                                className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-500/10 rounded-lg transition-all"
                                 title="Accept"
                               >
                                 <HiOutlineCheck className="text-lg" />
                               </button>
                               <button
                                 onClick={() => handleStatusUpdate(r._id, 'rejected')}
-                                className="p-2 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                                className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                                 title="Reject"
                               >
                                 <HiOutlineBan className="text-lg" />
@@ -352,7 +352,7 @@ const RestockRequests = () => {
                           {user?.role === 'supplier' && r.status === 'accepted' && (
                             <button
                               onClick={() => handleStatusUpdate(r._id, 'shipped')}
-                              className="px-3 py-1.5 text-xs font-medium bg-purple-500/15 text-purple-400 border border-purple-500/30 rounded-lg hover:bg-purple-500/25 transition-colors flex items-center gap-1.5"
+                              className="px-3 py-1.5 text-xs font-medium bg-purple-50 text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-500/25 transition-colors flex items-center gap-1.5"
                             >
                               <HiOutlineTruck className="text-sm" /> Mark Shipped
                             </button>
@@ -368,7 +368,7 @@ const RestockRequests = () => {
                                     handleStatusUpdate(r._id, 'delivered');
                                   }
                                 }}
-                                className="px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25 transition-colors flex items-center gap-1.5"
+                                className="px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors flex items-center gap-1.5"
                               >
                                 <HiOutlineInboxIn className="text-sm" /> Confirm Receipt
                               </button>
@@ -381,7 +381,7 @@ const RestockRequests = () => {
                                     handleStatusUpdate(r._id, 'rejected_shipment', reason);
                                   }
                                 }}
-                                className="px-3 py-1.5 text-xs font-medium bg-red-500/15 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/25 transition-colors flex items-center gap-1.5"
+                                className="px-3 py-1.5 text-xs font-medium bg-red-50 text-red-500 border border-red-200 rounded-lg hover:bg-red-500/25 transition-colors flex items-center gap-1.5"
                                 title="Reject Shipment"
                               >
                                 <HiOutlineBan className="text-sm" /> Reject
@@ -391,7 +391,7 @@ const RestockRequests = () => {
                           {user?.role === 'admin' && (
                             <button
                               onClick={() => handleDelete(r._id)}
-                              className="p-2 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                              className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                               title="Delete"
                             >
                               <HiOutlineTrash className="text-lg" />
@@ -409,8 +409,8 @@ const RestockRequests = () => {
 
         {/* Pagination */}
         {pagination.pages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-dark-700">
-            <p className="text-sm text-dark-400">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+            <p className="text-sm text-gray-500">
               Page {pagination.page} of {pagination.pages}
             </p>
             <div className="flex gap-2">
@@ -432,20 +432,20 @@ const RestockRequests = () => {
       {/* ==================== CREATE MODAL ==================== */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal}></div>
-          <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeModal}></div>
+          <div className="relative bg-white border border-gray-300 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-dark-50">
+              <h2 className="text-xl font-semibold text-gray-900">
                 {user?.role === 'staff' ? 'Request Restock' : 'New Restock Request'}
               </h2>
-              <button onClick={closeModal} className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all">
+              <button onClick={closeModal} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
                 <HiOutlineX className="text-xl" />
               </button>
             </div>
 
             {user?.role === 'staff' && (
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 mb-4">
-                <p className="text-xs text-blue-400">
+              <div className="bg-blue-500/10 border border-blue-200 rounded-xl p-3 mb-4">
+                <p className="text-xs text-blue-600">
                   Your request will be reviewed by an Admin who will assign a supplier and quantity before forwarding it.
                 </p>
               </div>
@@ -454,7 +454,7 @@ const RestockRequests = () => {
             <form onSubmit={handleCreate} className="space-y-4">
               {/* Product selector (searchable) */}
               <div className="relative" ref={dropdownRef}>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Product <span className="text-red-400">*</span></label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Product <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   required={!formData.product}
@@ -469,7 +469,7 @@ const RestockRequests = () => {
                   className="input-field w-full"
                 />
                 {isDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-1 bg-dark-800 border border-dark-600 rounded-lg shadow-2xl max-h-56 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-2xl max-h-56 overflow-y-auto">
                     {products
                       .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase())))
                       .map(p => (
@@ -482,15 +482,15 @@ const RestockRequests = () => {
                           }}
                           className={`px-3 py-2 cursor-pointer transition-colors text-sm ${
                             formData.product === p._id
-                              ? 'bg-primary-600/20 text-primary-400'
-                              : 'text-dark-100 hover:bg-dark-700'
+                              ? 'bg-primary-50 text-primary-600'
+                              : 'text-gray-800 hover:bg-gray-100'
                           }`}
                         >
-                          {p.name} <span className="text-dark-400">— Stock: {p.quantity}</span>
+                          {p.name} <span className="text-gray-500">— Stock: {p.quantity}</span>
                         </div>
                     ))}
                     {products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase()))).length === 0 && (
-                      <div className="px-3 py-4 text-dark-400 text-sm text-center">No products found</div>
+                      <div className="px-3 py-4 text-gray-500 text-sm text-center">No products found</div>
                     )}
                   </div>
                 )}
@@ -500,7 +500,7 @@ const RestockRequests = () => {
               {user?.role === 'admin' && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1.5">Supplier <span className="text-red-400">*</span></label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1.5">Supplier <span className="text-red-500">*</span></label>
                     <select required value={formData.supplier} onChange={(e) => setFormData({ ...formData, supplier: e.target.value })} className="input-field">
                       <option value="">Select supplier</option>
                       {suppliers.map((s) => (
@@ -509,11 +509,11 @@ const RestockRequests = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1.5">Quantity <span className="text-red-400">*</span></label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1.5">Quantity <span className="text-red-500">*</span></label>
                     <input type="number" required min="1" value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: e.target.value })} className="input-field" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1.5">Unit Cost (৳)</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1.5">Unit Cost (৳)</label>
                     <input
                       type="number"
                       min="0"
@@ -523,13 +523,13 @@ const RestockRequests = () => {
                       className="input-field"
                       placeholder={`Default: product's current cost price`}
                     />
-                    <p className="text-xs text-dark-500 mt-1">Leave blank to use product's current cost price</p>
+                    <p className="text-xs text-gray-400 mt-1">Leave blank to use product's current cost price</p>
                   </div>
                 </>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Notes</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Notes</label>
                 <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className="input-field" rows="2" placeholder="Optional notes..." />
               </div>
               <div className="flex gap-3 pt-2">
@@ -546,35 +546,35 @@ const RestockRequests = () => {
       {/* ==================== APPROVE MODAL (Admin assigns supplier + qty) ==================== */}
       {showApproveModal && approvingRequest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowApproveModal(false)}></div>
-          <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowApproveModal(false)}></div>
+          <div className="relative bg-white border border-gray-300 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-dark-50">Approve Restock Request</h2>
-              <button onClick={() => setShowApproveModal(false)} className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all">
+              <h2 className="text-xl font-semibold text-gray-900">Approve Restock Request</h2>
+              <button onClick={() => setShowApproveModal(false)} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
                 <HiOutlineX className="text-xl" />
               </button>
             </div>
 
             {/* Request Info */}
-            <div className="bg-dark-900/50 border border-dark-600 rounded-xl p-4 mb-4">
+            <div className="bg-white border border-gray-300 rounded-xl p-4 mb-4">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-9 h-9 bg-primary-600/15 rounded-lg flex items-center justify-center shrink-0">
-                  <HiOutlineCube className="text-primary-400" />
+                <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center shrink-0">
+                  <HiOutlineCube className="text-primary-600" />
                 </div>
                 <div>
-                  <p className="font-medium text-dark-50">{approvingRequest.product?.name}</p>
-                  <p className="text-xs text-dark-500">Current Stock: {approvingRequest.product?.quantity} | Min: {approvingRequest.product?.minStockThreshold}</p>
+                  <p className="font-medium text-gray-900">{approvingRequest.product?.name}</p>
+                  <p className="text-xs text-gray-400">Current Stock: {approvingRequest.product?.quantity} | Min: {approvingRequest.product?.minStockThreshold}</p>
                 </div>
               </div>
-              <p className="text-xs text-dark-400">
-                Requested by <span className="text-dark-200">{approvingRequest.requestedBy?.name}</span>
+              <p className="text-xs text-gray-500">
+                Requested by <span className="text-gray-700">{approvingRequest.requestedBy?.name}</span>
                 {approvingRequest.notes && <> — "{approvingRequest.notes}"</>}
               </p>
             </div>
 
             <form onSubmit={handleApprove} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Supplier <span className="text-red-400">*</span></label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Supplier <span className="text-red-500">*</span></label>
                 <select required value={approveData.supplier} onChange={(e) => setApproveData({ ...approveData, supplier: e.target.value })} className="input-field">
                   <option value="">Select supplier</option>
                   {suppliers.map((s) => (
@@ -583,11 +583,11 @@ const RestockRequests = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Quantity <span className="text-red-400">*</span></label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Quantity <span className="text-red-500">*</span></label>
                 <input type="number" required min="1" value={approveData.quantity} onChange={(e) => setApproveData({ ...approveData, quantity: e.target.value })} className="input-field" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Unit Cost (৳)</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Unit Cost (৳)</label>
                 <input
                   type="number"
                   min="0"
@@ -597,7 +597,7 @@ const RestockRequests = () => {
                   className="input-field"
                   placeholder={`Default: ৳${approvingRequest.product?.costPrice || 0}`}
                 />
-                <p className="text-xs text-dark-500 mt-1">Purchase price per unit for this delivery</p>
+                <p className="text-xs text-gray-400 mt-1">Purchase price per unit for this delivery</p>
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setShowApproveModal(false)} className="btn-secondary flex-1">Cancel</button>

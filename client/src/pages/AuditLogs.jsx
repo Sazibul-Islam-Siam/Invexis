@@ -15,11 +15,11 @@ import {
 } from 'react-icons/hi';
 
 const actionConfig = {
-  CREATE: { label: 'Created', className: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-  UPDATE: { label: 'Updated', className: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
-  DELETE: { label: 'Deleted', className: 'bg-red-500/15 text-red-400 border-red-500/30' },
-  STATUS_CHANGE: { label: 'Status Change', className: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
-  LOGIN: { label: 'Login', className: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
+  CREATE: { label: 'Created', className: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
+  UPDATE: { label: 'Updated', className: 'bg-blue-50 text-blue-600 border-blue-200' },
+  DELETE: { label: 'Deleted', className: 'bg-red-50 text-red-500 border-red-200' },
+  STATUS_CHANGE: { label: 'Status Change', className: 'bg-purple-50 text-purple-600 border-purple-200' },
+  LOGIN: { label: 'Login', className: 'bg-amber-50 text-amber-600 border-amber-200' },
 };
 
 const entityIcons = {
@@ -33,13 +33,13 @@ const entityIcons = {
 };
 
 const entityColors = {
-  Product: 'text-indigo-400 bg-indigo-500/15',
-  Sale: 'text-emerald-400 bg-emerald-500/15',
-  RestockRequest: 'text-blue-400 bg-blue-500/15',
-  StockAdjustment: 'text-amber-400 bg-amber-500/15',
-  User: 'text-purple-400 bg-purple-500/15',
-  Category: 'text-pink-400 bg-pink-500/15',
-  Auth: 'text-amber-400 bg-amber-500/15',
+  Product: 'text-indigo-600 bg-indigo-50',
+  Sale: 'text-emerald-600 bg-emerald-50',
+  RestockRequest: 'text-blue-600 bg-blue-50',
+  StockAdjustment: 'text-amber-600 bg-amber-50',
+  User: 'text-purple-600 bg-purple-50',
+  Category: 'text-pink-600 bg-pink-50',
+  Auth: 'text-amber-600 bg-amber-50',
 };
 
 const AuditLogs = () => {
@@ -105,23 +105,23 @@ const AuditLogs = () => {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
-          <HiOutlineClipboardList className="text-primary-400" />
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <HiOutlineClipboardList className="text-primary-600" />
           Audit Logs
         </h1>
-        <p className="text-dark-400 mt-1">Track all system activity and changes</p>
+        <p className="text-gray-500 mt-1">Track all system activity and changes</p>
       </div>
 
       {/* Filters */}
       <div className="card mb-6">
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex items-center gap-2">
-            <HiOutlineFilter className="text-dark-400 text-lg shrink-0" />
+            <HiOutlineFilter className="text-gray-500 text-lg shrink-0" />
           </div>
 
           {/* Search */}
           <form onSubmit={handleSearch} className="relative flex-1 min-w-[200px]">
-            <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400" />
+            <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="text"
               placeholder="Search details..."
@@ -168,7 +168,7 @@ const AuditLogs = () => {
 
           {/* Date range */}
           <div className="flex items-center gap-2">
-            <HiOutlineCalendar className="text-dark-400 shrink-0" />
+            <HiOutlineCalendar className="text-gray-500 shrink-0" />
             <input
               type="date"
               value={filters.startDate}
@@ -179,7 +179,7 @@ const AuditLogs = () => {
               }}
               className="input-field w-auto text-sm"
             />
-            <span className="text-dark-500 text-sm">to</span>
+            <span className="text-gray-400 text-sm">to</span>
             <input
               type="date"
               value={filters.endDate}
@@ -195,7 +195,7 @@ const AuditLogs = () => {
           {hasFilters && (
             <button
               onClick={clearFilters}
-              className="text-sm text-primary-400 hover:text-primary-300 whitespace-nowrap"
+              className="text-sm text-primary-600 hover:text-primary-700 whitespace-nowrap"
             >
               Clear All
             </button>
@@ -205,7 +205,7 @@ const AuditLogs = () => {
 
       {/* Results count */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-dark-400">
+        <p className="text-sm text-gray-500">
           {pagination.total} log{pagination.total !== 1 ? 's' : ''} found
         </p>
       </div>
@@ -218,39 +218,39 @@ const AuditLogs = () => {
           </div>
         ) : logs.length === 0 ? (
           <div className="text-center py-16">
-            <HiOutlineClipboardList className="text-5xl text-dark-600 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-dark-300">No audit logs</h3>
-            <p className="text-dark-500 mt-1">System activity will appear here</p>
+            <HiOutlineClipboardList className="text-5xl text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-gray-600">No audit logs</h3>
+            <p className="text-gray-400 mt-1">System activity will appear here</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-dark-700">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">User</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Action</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Entity</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Details</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Date</th>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">User</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Action</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Entity</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Details</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-700/50">
+              <tbody className="divide-y divide-gray-100">
                 {logs.map((log) => {
                   const actionStyle = actionConfig[log.action] || actionConfig.CREATE;
                   const EntityIcon = entityIcons[log.entity] || HiOutlineCube;
-                  const entityColor = entityColors[log.entity] || 'text-dark-400 bg-dark-700';
+                  const entityColor = entityColors[log.entity] || 'text-gray-500 bg-gray-100';
 
                   return (
-                    <tr key={log._id} className="hover:bg-dark-800/50 transition-colors">
+                    <tr key={log._id} className="hover:bg-gray-50 transition-colors">
                       {/* User */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0">
+                          <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-gray-900 text-xs font-semibold shrink-0">
                             {log.user?.name?.charAt(0)?.toUpperCase() || '?'}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-dark-50">{log.user?.name || 'Unknown'}</p>
-                            <p className="text-xs text-dark-500 capitalize">{log.user?.role}</p>
+                            <p className="text-sm font-medium text-gray-900">{log.user?.name || 'Unknown'}</p>
+                            <p className="text-xs text-gray-400 capitalize">{log.user?.role}</p>
                           </div>
                         </div>
                       </td>
@@ -268,19 +268,19 @@ const AuditLogs = () => {
                           <div className={`w-6 h-6 rounded-md flex items-center justify-center ${entityColor}`}>
                             <EntityIcon className="text-xs" />
                           </div>
-                          <span className="text-sm text-dark-300">{log.entity}</span>
+                          <span className="text-sm text-gray-600">{log.entity}</span>
                         </div>
                       </td>
 
                       {/* Details */}
                       <td className="py-3.5 px-4">
-                        <p className="text-sm text-dark-300 max-w-xs truncate" title={log.details}>
+                        <p className="text-sm text-gray-600 max-w-xs truncate" title={log.details}>
                           {log.details}
                         </p>
                       </td>
 
                       {/* Date */}
-                      <td className="py-3.5 px-4 text-sm text-dark-400 whitespace-nowrap">
+                      <td className="py-3.5 px-4 text-sm text-gray-500 whitespace-nowrap">
                         {formatDate(log.createdAt)}
                       </td>
                     </tr>
@@ -293,8 +293,8 @@ const AuditLogs = () => {
 
         {/* Pagination */}
         {pagination.pages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-dark-700">
-            <p className="text-sm text-dark-400">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+            <p className="text-sm text-gray-500">
               Page {pagination.page} of {pagination.pages}
             </p>
             <div className="flex gap-2">

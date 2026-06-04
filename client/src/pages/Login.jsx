@@ -59,19 +59,19 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       {/* Background gradient effects */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-600/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary-800/20 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100/50 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary-200/40 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600/20 rounded-2xl mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-50 rounded-2xl mb-4 border border-primary-200">
             <svg
-              className="w-8 h-8 text-primary-400"
+              className="w-8 h-8 text-primary-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -84,17 +84,17 @@ const Login = () => {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-dark-50 tracking-tight">
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
             Invexis
           </h1>
-          <p className="text-dark-400 mt-2">
+          <p className="text-gray-500 mt-2">
             Smart Inventory Management System
           </p>
         </div>
 
         {/* Login Card */}
         <div className="card">
-          <h2 className="text-xl font-semibold text-dark-50 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">
             Sign in to your account
           </h2>
 
@@ -103,12 +103,12 @@ const Login = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-dark-300 mb-1.5"
+                className="block text-sm font-medium text-gray-600 mb-1.5"
               >
                 Email Address
               </label>
               <div className="relative">
-                <HiOutlineMail className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400 text-lg" />
+                <HiOutlineMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
                 <input
                   id="email"
                   name="email"
@@ -126,12 +126,12 @@ const Login = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-dark-300 mb-1.5"
+                className="block text-sm font-medium text-gray-600 mb-1.5"
               >
                 Password
               </label>
               <div className="relative">
-                <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400 text-lg" />
+                <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
                 <input
                   id="password"
                   name="password"
@@ -145,7 +145,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 hover:text-dark-200 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPassword ? (
                     <HiOutlineEyeOff className="text-lg" />
@@ -175,14 +175,14 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-dark-400 text-sm mt-6">
+        <p className="text-center text-gray-500 text-sm mt-6">
           Don't have an account?{' '}
-          <Link to="/register" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
+          <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
             Register Your Company
           </Link>
         </p>
         <p className="text-center mt-3">
-          <Link to="/" className="text-dark-500 hover:text-dark-300 text-xs transition-colors">
+          <Link to="/" className="text-gray-400 hover:text-gray-600 text-xs transition-colors">
             ← Back to Home
           </Link>
         </p>

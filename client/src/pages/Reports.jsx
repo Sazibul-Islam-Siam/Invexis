@@ -220,11 +220,11 @@ const Reports = () => {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
-          <HiOutlineDocumentReport className="text-primary-400" />
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <HiOutlineDocumentReport className="text-primary-600" />
           Reports
         </h1>
-        <p className="text-dark-400 mt-1">Analytics and business intelligence</p>
+        <p className="text-gray-500 mt-1">Analytics and business intelligence</p>
       </div>
 
       {/* Tabs + Export */}
@@ -236,8 +236,8 @@ const Reports = () => {
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === tab.key
-                ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/25'
-                : 'bg-dark-800 text-dark-400 border border-dark-700 hover:text-dark-50 hover:border-dark-600'
+                ? 'bg-primary-600 text-gray-900 shadow-lg shadow-primary-600/25'
+                : 'bg-white text-gray-500 border border-gray-200 hover:text-gray-900 hover:border-gray-300'
             }`}
           >
             <tab.icon className="text-lg" />
@@ -279,9 +279,9 @@ const Reports = () => {
           {/* Date filters */}
           <div className="card mb-6">
             <div className="flex flex-wrap items-center gap-4">
-              <HiOutlineCalendar className="text-dark-400 text-lg" />
+              <HiOutlineCalendar className="text-gray-500 text-lg" />
               <div className="flex items-center gap-2">
-                <label className="text-sm text-dark-400">From:</label>
+                <label className="text-sm text-gray-500">From:</label>
                 <input
                   type="date"
                   value={dateRange.startDate}
@@ -291,7 +291,7 @@ const Reports = () => {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <label className="text-sm text-dark-400">To:</label>
+                <label className="text-sm text-gray-500">To:</label>
                 <input
                   type="date"
                   value={dateRange.endDate}
@@ -312,7 +312,7 @@ const Reports = () => {
               {(dateRange.startDate || dateRange.endDate) && (
                 <button
                   onClick={() => setDateRange({ startDate: '', endDate: '' })}
-                  className="text-sm text-primary-400 hover:text-primary-300"
+                  className="text-sm text-primary-600 hover:text-primary-700"
                 >Clear</button>
               )}
             </div>
@@ -321,25 +321,25 @@ const Reports = () => {
           {/* Summary Cards */}
           {salesData?.summary && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-6">
-              <div className="card border border-emerald-500/20">
-                <p className="text-sm text-dark-400">Total Revenue</p>
-                <p className="text-2xl font-bold text-dark-50 mt-1">৳{salesData.summary.totalRevenue.toLocaleString()}</p>
+              <div className="card border border-emerald-200">
+                <p className="text-sm text-gray-500">Total Revenue</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">৳{salesData.summary.totalRevenue.toLocaleString()}</p>
               </div>
-              <div className="card border border-emerald-500/20">
-                <p className="text-sm text-dark-400">Total Profit</p>
-                <p className="text-2xl font-bold text-dark-50 mt-1">৳{salesData.summary.totalProfit.toLocaleString()}</p>
+              <div className="card border border-emerald-200">
+                <p className="text-sm text-gray-500">Total Profit</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">৳{salesData.summary.totalProfit.toLocaleString()}</p>
               </div>
-              <div className="card border border-purple-500/20">
-                <p className="text-sm text-dark-400">Transactions</p>
-                <p className="text-2xl font-bold text-dark-50 mt-1">{salesData.summary.totalTransactions}</p>
+              <div className="card border border-purple-200">
+                <p className="text-sm text-gray-500">Transactions</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{salesData.summary.totalTransactions}</p>
               </div>
-              <div className="card border border-blue-500/20">
-                <p className="text-sm text-dark-400">Items Sold</p>
-                <p className="text-2xl font-bold text-dark-50 mt-1">{salesData.summary.totalItemsSold}</p>
+              <div className="card border border-blue-200">
+                <p className="text-sm text-gray-500">Items Sold</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{salesData.summary.totalItemsSold}</p>
               </div>
-              <div className="card border border-amber-500/20">
-                <p className="text-sm text-dark-400">Avg Order Value</p>
-                <p className="text-2xl font-bold text-dark-50 mt-1">৳{Math.round(salesData.summary.avgOrderValue).toLocaleString()}</p>
+              <div className="card border border-amber-200">
+                <p className="text-sm text-gray-500">Avg Order Value</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">৳{Math.round(salesData.summary.avgOrderValue).toLocaleString()}</p>
               </div>
             </div>
           )}
@@ -348,7 +348,7 @@ const Reports = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Revenue Timeline */}
             <div className="card">
-              <h3 className="text-base font-semibold text-dark-50 mb-4">Revenue Over Time</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Revenue Over Time</h3>
               {revenueChart ? (
                 <div className="h-64">
                   <Line data={revenueChart} options={{
@@ -365,7 +365,7 @@ const Reports = () => {
                   }} />
                 </div>
               ) : (
-                <div className="h-64 flex items-center justify-center text-dark-500 border border-dashed border-dark-700 rounded-xl">
+                <div className="h-64 flex items-center justify-center text-gray-400 border border-dashed border-gray-200 rounded-xl">
                   <p className="text-sm">No revenue data for this period</p>
                 </div>
               )}
@@ -373,7 +373,7 @@ const Reports = () => {
 
             {/* Top Products */}
             <div className="card">
-              <h3 className="text-base font-semibold text-dark-50 mb-4">Top Products by Revenue</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Top Products by Revenue</h3>
               {topProductsChart ? (
                 <div className="h-64">
                   <Bar data={topProductsChart} options={{
@@ -388,7 +388,7 @@ const Reports = () => {
                   }} />
                 </div>
               ) : (
-                <div className="h-64 flex items-center justify-center text-dark-500 border border-dashed border-dark-700 rounded-xl">
+                <div className="h-64 flex items-center justify-center text-gray-400 border border-dashed border-gray-200 rounded-xl">
                   <p className="text-sm">No product data available</p>
                 </div>
               )}
@@ -399,55 +399,55 @@ const Reports = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Staff Performance */}
             <div className="card">
-              <h3 className="text-base font-semibold text-dark-50 mb-4">Sales by Staff</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Sales by Staff</h3>
               {salesData?.salesByStaff?.length ? (
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-dark-700">
-                      <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Staff</th>
-                      <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Orders</th>
-                      <th className="text-right py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Revenue</th>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Staff</th>
+                      <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Orders</th>
+                      <th className="text-right py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Revenue</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-dark-700/50">
+                  <tbody className="divide-y divide-gray-100">
                     {salesData.salesByStaff.map((s, i) => (
-                      <tr key={i} className="hover:bg-dark-800/50">
-                        <td className="py-2.5 px-3 text-sm text-dark-50">{s.name}</td>
-                        <td className="py-2.5 px-3 text-center text-sm text-dark-400">{s.transactions}</td>
-                        <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-400">৳{s.revenue.toLocaleString()}</td>
+                      <tr key={i} className="hover:bg-gray-50">
+                        <td className="py-2.5 px-3 text-sm text-gray-900">{s.name}</td>
+                        <td className="py-2.5 px-3 text-center text-sm text-gray-500">{s.transactions}</td>
+                        <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-600">৳{s.revenue.toLocaleString()}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               ) : (
-                <p className="text-sm text-dark-500 text-center py-8">No staff data</p>
+                <p className="text-sm text-gray-400 text-center py-8">No staff data</p>
               )}
             </div>
 
             {/* Top Products Table */}
             <div className="card">
-              <h3 className="text-base font-semibold text-dark-50 mb-4">Top Products</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Top Products</h3>
               {salesData?.topProducts?.length ? (
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-dark-700">
-                      <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Product</th>
-                      <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Sold</th>
-                      <th className="text-right py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Revenue</th>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Product</th>
+                      <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Sold</th>
+                      <th className="text-right py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Revenue</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-dark-700/50">
+                  <tbody className="divide-y divide-gray-100">
                     {salesData.topProducts.map((p, i) => (
-                      <tr key={i} className="hover:bg-dark-800/50">
-                        <td className="py-2.5 px-3 text-sm text-dark-50">{p.name}</td>
-                        <td className="py-2.5 px-3 text-center text-sm text-dark-400">{p.totalQty}</td>
-                        <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-400">৳{p.totalRevenue.toLocaleString()}</td>
+                      <tr key={i} className="hover:bg-gray-50">
+                        <td className="py-2.5 px-3 text-sm text-gray-900">{p.name}</td>
+                        <td className="py-2.5 px-3 text-center text-sm text-gray-500">{p.totalQty}</td>
+                        <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-600">৳{p.totalRevenue.toLocaleString()}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               ) : (
-                <p className="text-sm text-dark-500 text-center py-8">No product data</p>
+                <p className="text-sm text-gray-400 text-center py-8">No product data</p>
               )}
             </div>
           </div>
@@ -458,23 +458,23 @@ const Reports = () => {
           {/* Summary Cards */}
           {inventoryData?.summary && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-              <div className="card border border-blue-500/20">
-                <p className="text-sm text-dark-400">Total Products</p>
-                <p className="text-2xl font-bold text-dark-50 mt-1">{inventoryData.summary.totalProducts}</p>
-                <p className="text-xs text-dark-500 mt-0.5">{inventoryData.summary.inStock} in stock</p>
+              <div className="card border border-blue-200">
+                <p className="text-sm text-gray-500">Total Products</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{inventoryData.summary.totalProducts}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{inventoryData.summary.inStock} in stock</p>
               </div>
-              <div className="card border border-amber-500/20">
-                <p className="text-sm text-dark-400">Low Stock</p>
-                <p className="text-2xl font-bold text-amber-400 mt-1">{inventoryData.summary.lowStock}</p>
+              <div className="card border border-amber-200">
+                <p className="text-sm text-gray-500">Low Stock</p>
+                <p className="text-2xl font-bold text-amber-600 mt-1">{inventoryData.summary.lowStock}</p>
               </div>
-              <div className="card border border-red-500/20">
-                <p className="text-sm text-dark-400">Out of Stock</p>
-                <p className="text-2xl font-bold text-red-400 mt-1">{inventoryData.summary.outOfStock}</p>
+              <div className="card border border-red-200">
+                <p className="text-sm text-gray-500">Out of Stock</p>
+                <p className="text-2xl font-bold text-red-500 mt-1">{inventoryData.summary.outOfStock}</p>
               </div>
-              <div className="card border border-emerald-500/20">
-                <p className="text-sm text-dark-400">Inventory Value</p>
-                <p className="text-2xl font-bold text-dark-50 mt-1">৳{inventoryData.summary.totalValue.toLocaleString()}</p>
-                <p className="text-xs text-dark-500 mt-0.5">Retail: ৳{inventoryData.summary.totalRetailValue.toLocaleString()}</p>
+              <div className="card border border-emerald-200">
+                <p className="text-sm text-gray-500">Inventory Value</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">৳{inventoryData.summary.totalValue.toLocaleString()}</p>
+                <p className="text-xs text-gray-400 mt-0.5">Retail: ৳{inventoryData.summary.totalRetailValue.toLocaleString()}</p>
               </div>
             </div>
           )}
@@ -483,7 +483,7 @@ const Reports = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Category Distribution */}
             <div className="card">
-              <h3 className="text-base font-semibold text-dark-50 mb-4">Products by Category</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Products by Category</h3>
               {categoryChart ? (
                 <div className="h-64 flex items-center justify-center">
                   <Doughnut
@@ -502,7 +502,7 @@ const Reports = () => {
                   />
                 </div>
               ) : (
-                <div className="h-64 flex items-center justify-center text-dark-500">
+                <div className="h-64 flex items-center justify-center text-gray-400">
                   <p className="text-sm">No category data</p>
                 </div>
               )}
@@ -510,62 +510,62 @@ const Reports = () => {
 
             {/* Category Value Table */}
             <div className="card">
-              <h3 className="text-base font-semibold text-dark-50 mb-4">Category Breakdown</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-4">Category Breakdown</h3>
               {inventoryData?.categoryDistribution?.length ? (
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-dark-700">
-                      <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Category</th>
-                      <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Products</th>
-                      <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Total Qty</th>
-                      <th className="text-right py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Value</th>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Category</th>
+                      <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Products</th>
+                      <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Total Qty</th>
+                      <th className="text-right py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Value</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-dark-700/50">
+                  <tbody className="divide-y divide-gray-100">
                     {inventoryData.categoryDistribution.map((c, i) => (
-                      <tr key={i} className="hover:bg-dark-800/50">
-                        <td className="py-2.5 px-3 text-sm text-dark-50 font-medium">{c.name}</td>
-                        <td className="py-2.5 px-3 text-center text-sm text-dark-400">{c.count}</td>
-                        <td className="py-2.5 px-3 text-center text-sm text-dark-400">{c.qty}</td>
-                        <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-400">৳{c.value.toLocaleString()}</td>
+                      <tr key={i} className="hover:bg-gray-50">
+                        <td className="py-2.5 px-3 text-sm text-gray-900 font-medium">{c.name}</td>
+                        <td className="py-2.5 px-3 text-center text-sm text-gray-500">{c.count}</td>
+                        <td className="py-2.5 px-3 text-center text-sm text-gray-500">{c.qty}</td>
+                        <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-600">৳{c.value.toLocaleString()}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               ) : (
-                <p className="text-sm text-dark-500 text-center py-8">No data</p>
+                <p className="text-sm text-gray-400 text-center py-8">No data</p>
               )}
             </div>
           </div>
 
           {/* Low Stock Alert */}
           {inventoryData?.lowStockItems?.length > 0 && (
-            <div className="card border border-red-500/20">
-              <h3 className="text-base font-semibold text-dark-50 mb-4 flex items-center gap-2">
-                <HiOutlineExclamation className="text-red-400" />
+            <div className="card border border-red-200">
+              <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <HiOutlineExclamation className="text-red-500" />
                 Low Stock Items ({inventoryData.lowStockItems.length})
               </h3>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-dark-700">
-                      <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Product</th>
-                      <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">SKU</th>
-                      <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Category</th>
-                      <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Stock</th>
-                      <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Threshold</th>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Product</th>
+                      <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">SKU</th>
+                      <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Category</th>
+                      <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Stock</th>
+                      <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Threshold</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-dark-700/50">
+                  <tbody className="divide-y divide-gray-100">
                     {inventoryData.lowStockItems.map((p, i) => (
-                      <tr key={i} className="hover:bg-dark-800/50">
-                        <td className="py-2.5 px-3 text-sm text-dark-50 font-medium">{p.name}</td>
-                        <td className="py-2.5 px-3"><code className="text-xs text-dark-400">{p.sku}</code></td>
-                        <td className="py-2.5 px-3 text-sm text-dark-400">{p.category}</td>
+                      <tr key={i} className="hover:bg-gray-50">
+                        <td className="py-2.5 px-3 text-sm text-gray-900 font-medium">{p.name}</td>
+                        <td className="py-2.5 px-3"><code className="text-xs text-gray-500">{p.sku}</code></td>
+                        <td className="py-2.5 px-3 text-sm text-gray-500">{p.category}</td>
                         <td className="py-2.5 px-3 text-center">
-                          <span className={`font-bold text-sm ${p.quantity === 0 ? 'text-red-400' : 'text-amber-400'}`}>{p.quantity}</span>
+                          <span className={`font-bold text-sm ${p.quantity === 0 ? 'text-red-500' : 'text-amber-600'}`}>{p.quantity}</span>
                         </td>
-                        <td className="py-2.5 px-3 text-center text-sm text-dark-500">{p.minStockThreshold}</td>
+                        <td className="py-2.5 px-3 text-center text-sm text-gray-400">{p.minStockThreshold}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -581,9 +581,9 @@ const Reports = () => {
           {/* Date filters */}
           <div className="card mb-6">
             <div className="flex flex-wrap items-center gap-4">
-              <HiOutlineCalendar className="text-dark-400 text-lg" />
+              <HiOutlineCalendar className="text-gray-500 text-lg" />
               <div className="flex items-center gap-2">
-                <label className="text-sm text-dark-400">From:</label>
+                <label className="text-sm text-gray-500">From:</label>
                 <input
                   type="date"
                   value={dateRange.startDate}
@@ -593,7 +593,7 @@ const Reports = () => {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <label className="text-sm text-dark-400">To:</label>
+                <label className="text-sm text-gray-500">To:</label>
                 <input
                   type="date"
                   value={dateRange.endDate}
@@ -605,7 +605,7 @@ const Reports = () => {
               {(dateRange.startDate || dateRange.endDate) && (
                 <button
                   onClick={() => setDateRange({ startDate: '', endDate: '' })}
-                  className="text-sm text-primary-400 hover:text-primary-300"
+                  className="text-sm text-primary-600 hover:text-primary-700"
                 >Clear</button>
               )}
             </div>
@@ -613,23 +613,23 @@ const Reports = () => {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-            <div className="card border border-blue-500/20">
-              <p className="text-sm text-dark-400">Total Requests</p>
-              <p className="text-2xl font-bold text-dark-50 mt-1">{supplierData.summary.totalRequests}</p>
+            <div className="card border border-blue-200">
+              <p className="text-sm text-gray-500">Total Requests</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{supplierData.summary.totalRequests}</p>
             </div>
-            <div className="card border border-emerald-500/20">
-              <p className="text-sm text-dark-400">Delivered</p>
-              <p className="text-2xl font-bold text-emerald-400 mt-1">{supplierData.summary.totalDelivered}</p>
-              <p className="text-xs text-dark-500 mt-0.5">{supplierData.summary.totalUnitsDelivered} units total</p>
+            <div className="card border border-emerald-200">
+              <p className="text-sm text-gray-500">Delivered</p>
+              <p className="text-2xl font-bold text-emerald-600 mt-1">{supplierData.summary.totalDelivered}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{supplierData.summary.totalUnitsDelivered} units total</p>
             </div>
-            <div className="card border border-purple-500/20">
-              <p className="text-sm text-dark-400">Total Delivery Value</p>
-              <p className="text-2xl font-bold text-dark-50 mt-1">৳{supplierData.summary.totalDeliveryValue.toLocaleString()}</p>
+            <div className="card border border-purple-200">
+              <p className="text-sm text-gray-500">Total Delivery Value</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">৳{supplierData.summary.totalDeliveryValue.toLocaleString()}</p>
             </div>
-            <div className="card border border-amber-500/20">
-              <p className="text-sm text-dark-400">Pending</p>
-              <p className="text-2xl font-bold text-amber-400 mt-1">{supplierData.summary.pending + supplierData.summary.accepted + supplierData.summary.shipped}</p>
-              <p className="text-xs text-dark-500 mt-0.5">{supplierData.summary.rejected} rejected</p>
+            <div className="card border border-amber-200">
+              <p className="text-sm text-gray-500">Pending</p>
+              <p className="text-2xl font-bold text-amber-600 mt-1">{supplierData.summary.pending + supplierData.summary.accepted + supplierData.summary.shipped}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{supplierData.summary.rejected} rejected</p>
             </div>
           </div>
 
@@ -638,7 +638,7 @@ const Reports = () => {
               {/* Delivery Timeline Chart */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div className="card">
-                  <h3 className="text-base font-semibold text-dark-50 mb-4">Deliveries Over Time</h3>
+                  <h3 className="text-base font-semibold text-gray-900 mb-4">Deliveries Over Time</h3>
                   {supplierData.deliveryTimeline?.length ? (
                     <div className="h-64">
                       <Bar
@@ -657,7 +657,7 @@ const Reports = () => {
                       />
                     </div>
                   ) : (
-                    <div className="h-64 flex items-center justify-center text-dark-500 border border-dashed border-dark-700 rounded-xl">
+                    <div className="h-64 flex items-center justify-center text-gray-400 border border-dashed border-gray-200 rounded-xl">
                       <p className="text-sm">No delivery data for this period</p>
                     </div>
                   )}
@@ -665,7 +665,7 @@ const Reports = () => {
 
                 {/* Delivery Value Chart */}
                 <div className="card">
-                  <h3 className="text-base font-semibold text-dark-50 mb-4">Delivery Value Over Time</h3>
+                  <h3 className="text-base font-semibold text-gray-900 mb-4">Delivery Value Over Time</h3>
                   {supplierData.deliveryTimeline?.length ? (
                     <div className="h-64">
                       <Bar
@@ -693,7 +693,7 @@ const Reports = () => {
                       />
                     </div>
                   ) : (
-                    <div className="h-64 flex items-center justify-center text-dark-500 border border-dashed border-dark-700 rounded-xl">
+                    <div className="h-64 flex items-center justify-center text-gray-400 border border-dashed border-gray-200 rounded-xl">
                       <p className="text-sm">No delivery data for this period</p>
                     </div>
                   )}
@@ -702,34 +702,34 @@ const Reports = () => {
 
               {/* Top Products Supplied */}
               <div className="card">
-                <h3 className="text-base font-semibold text-dark-50 mb-4">Top Products Supplied</h3>
+                <h3 className="text-base font-semibold text-gray-900 mb-4">Top Products Supplied</h3>
                 {supplierData.topProducts?.length ? (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-dark-700">
-                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Product</th>
-                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">SKU</th>
-                          <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Deliveries</th>
-                          <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Units</th>
-                          <th className="text-right py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Value</th>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Product</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">SKU</th>
+                          <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Deliveries</th>
+                          <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Units</th>
+                          <th className="text-right py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Value</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-dark-700/50">
+                      <tbody className="divide-y divide-gray-100">
                         {supplierData.topProducts.map((p, i) => (
-                          <tr key={i} className="hover:bg-dark-800/50">
-                            <td className="py-2.5 px-3 text-sm text-dark-50 font-medium">{p.name}</td>
-                            <td className="py-2.5 px-3"><code className="text-xs text-dark-400">{p.sku}</code></td>
-                            <td className="py-2.5 px-3 text-center text-sm text-dark-400">{p.deliveries}</td>
-                            <td className="py-2.5 px-3 text-center text-sm text-dark-400">{p.units}</td>
-                            <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-400">৳{p.value.toLocaleString()}</td>
+                          <tr key={i} className="hover:bg-gray-50">
+                            <td className="py-2.5 px-3 text-sm text-gray-900 font-medium">{p.name}</td>
+                            <td className="py-2.5 px-3"><code className="text-xs text-gray-500">{p.sku}</code></td>
+                            <td className="py-2.5 px-3 text-center text-sm text-gray-500">{p.deliveries}</td>
+                            <td className="py-2.5 px-3 text-center text-sm text-gray-500">{p.units}</td>
+                            <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-600">৳{p.value.toLocaleString()}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                  <p className="text-sm text-dark-500 text-center py-8">No delivery data</p>
+                  <p className="text-sm text-gray-400 text-center py-8">No delivery data</p>
                 )}
               </div>
             </>
@@ -738,23 +738,23 @@ const Reports = () => {
               {/* Status Breakdown */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div className="card">
-                  <h3 className="text-base font-semibold text-dark-50 mb-4">Request Status Breakdown</h3>
+                  <h3 className="text-base font-semibold text-gray-900 mb-4">Request Status Breakdown</h3>
                   <div className="space-y-3">
                     {[
-                      { label: 'Pending', count: supplierData.summary.pending, color: 'bg-amber-400', textColor: 'text-amber-400' },
-                      { label: 'Accepted', count: supplierData.summary.accepted, color: 'bg-blue-400', textColor: 'text-blue-400' },
-                      { label: 'Shipped', count: supplierData.summary.shipped, color: 'bg-purple-400', textColor: 'text-purple-400' },
-                      { label: 'Delivered', count: supplierData.summary.delivered, color: 'bg-emerald-400', textColor: 'text-emerald-400' },
-                      { label: 'Rejected', count: supplierData.summary.rejected, color: 'bg-red-400', textColor: 'text-red-400' },
+                      { label: 'Pending', count: supplierData.summary.pending, color: 'bg-amber-400', textColor: 'text-amber-600' },
+                      { label: 'Accepted', count: supplierData.summary.accepted, color: 'bg-blue-400', textColor: 'text-blue-600' },
+                      { label: 'Shipped', count: supplierData.summary.shipped, color: 'bg-purple-400', textColor: 'text-purple-600' },
+                      { label: 'Delivered', count: supplierData.summary.delivered, color: 'bg-emerald-400', textColor: 'text-emerald-600' },
+                      { label: 'Rejected', count: supplierData.summary.rejected, color: 'bg-red-400', textColor: 'text-red-500' },
                     ].map((s) => {
                       const pct = supplierData.summary.totalRequests > 0 ? (s.count / supplierData.summary.totalRequests) * 100 : 0;
                       return (
                         <div key={s.label}>
                           <div className="flex justify-between text-sm mb-1">
-                            <span className="text-dark-300">{s.label}</span>
+                            <span className="text-gray-600">{s.label}</span>
                             <span className={`font-medium ${s.textColor}`}>{s.count}</span>
                           </div>
-                          <div className="w-full bg-dark-700 rounded-full h-2">
+                          <div className="w-full bg-gray-100 rounded-full h-2">
                             <div className={`${s.color} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }}></div>
                           </div>
                         </div>
@@ -765,7 +765,7 @@ const Reports = () => {
 
                 {/* Status Doughnut */}
                 <div className="card">
-                  <h3 className="text-base font-semibold text-dark-50 mb-4">Status Distribution</h3>
+                  <h3 className="text-base font-semibold text-gray-900 mb-4">Status Distribution</h3>
                   <div className="h-64 flex items-center justify-center">
                     <Doughnut
                       data={{
@@ -807,43 +807,43 @@ const Reports = () => {
 
               {/* Recent Requests */}
               <div className="card">
-                <h3 className="text-base font-semibold text-dark-50 mb-4">Recent Requests</h3>
+                <h3 className="text-base font-semibold text-gray-900 mb-4">Recent Requests</h3>
                 {supplierData.recentRequests?.length ? (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-dark-700">
-                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Product</th>
-                          <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Qty</th>
-                          <th className="text-right py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Unit Cost</th>
-                          <th className="text-center py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Status</th>
-                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Requested By</th>
-                          <th className="text-left py-2 px-3 text-xs font-semibold text-dark-400 uppercase">Date</th>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Product</th>
+                          <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Qty</th>
+                          <th className="text-right py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Unit Cost</th>
+                          <th className="text-center py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Requested By</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-gray-500 uppercase">Date</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-dark-700/50">
+                      <tbody className="divide-y divide-gray-100">
                         {supplierData.recentRequests.map((r) => {
                           const statusColors = {
-                            pending: 'bg-amber-400/10 text-amber-400 border-amber-400/30',
-                            accepted: 'bg-blue-400/10 text-blue-400 border-blue-400/30',
-                            shipped: 'bg-purple-400/10 text-purple-400 border-purple-400/30',
-                            delivered: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/30',
-                            rejected: 'bg-red-400/10 text-red-400 border-red-400/30',
+                            pending: 'bg-amber-50 text-amber-600 border-amber-400/30',
+                            accepted: 'bg-blue-50 text-blue-600 border-blue-400/30',
+                            shipped: 'bg-purple-50 text-purple-600 border-purple-400/30',
+                            delivered: 'bg-emerald-50 text-emerald-600 border-emerald-400/30',
+                            rejected: 'bg-red-50 text-red-500 border-red-400/30',
                           };
                           return (
-                            <tr key={r._id} className="hover:bg-dark-800/50">
-                              <td className="py-2.5 px-3 text-sm text-dark-50 font-medium">{r.product?.name || 'Unknown'}</td>
-                              <td className="py-2.5 px-3 text-center text-sm text-dark-400">{r.quantity}</td>
-                              <td className="py-2.5 px-3 text-right text-sm text-dark-300">
+                            <tr key={r._id} className="hover:bg-gray-50">
+                              <td className="py-2.5 px-3 text-sm text-gray-900 font-medium">{r.product?.name || 'Unknown'}</td>
+                              <td className="py-2.5 px-3 text-center text-sm text-gray-500">{r.quantity}</td>
+                              <td className="py-2.5 px-3 text-right text-sm text-gray-600">
                                 {r.unitCost != null ? `৳${r.unitCost.toLocaleString()}` : '—'}
                               </td>
                               <td className="py-2.5 px-3 text-center">
-                                <span className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${statusColors[r.status] || 'text-dark-400'}`}>
+                                <span className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${statusColors[r.status] || 'text-gray-500'}`}>
                                   {r.status}
                                 </span>
                               </td>
-                              <td className="py-2.5 px-3 text-sm text-dark-400">{r.requestedBy?.name || '—'}</td>
-                              <td className="py-2.5 px-3 text-sm text-dark-400">
+                              <td className="py-2.5 px-3 text-sm text-gray-500">{r.requestedBy?.name || '—'}</td>
+                              <td className="py-2.5 px-3 text-sm text-gray-500">
                                 {new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </td>
                             </tr>
@@ -853,7 +853,7 @@ const Reports = () => {
                     </table>
                   </div>
                 ) : (
-                  <p className="text-sm text-dark-500 text-center py-8">No requests found</p>
+                  <p className="text-sm text-gray-400 text-center py-8">No requests found</p>
                 )}
               </div>
             </>

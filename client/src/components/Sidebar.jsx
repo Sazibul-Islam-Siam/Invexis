@@ -150,15 +150,15 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen bg-white-900 border-r border-dark-700 z-40 flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'w-[72px]' : 'w-64'
+      className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 z-40 flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'w-[72px]' : 'w-64'
         }`}
     >
       {/* Logo */}
-      <div className="h-16 flex items-center px-4 border-b border-dark-700 shrink-0">
+      <div className="h-16 flex items-center px-4 border-b border-gray-200 shrink-0">
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-9 h-9 bg-primary-600/20 rounded-lg flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center shrink-0 border border-primary-200">
             <svg
-              className="w-5 h-5 text-primary-400"
+              className="w-5 h-5 text-primary-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -173,9 +173,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           </div>
           {!isCollapsed && (
             <div className="whitespace-nowrap overflow-hidden">
-              <span className="text-lg font-bold text-white block leading-tight">Invexis</span>
+              <span className="text-lg font-bold text-gray-900 block leading-tight">Invexis</span>
               {(user?.company?.name || getActiveCompanyInfo()?.name) && (
-                <span className="text-[11px] text-dark-400 block truncate">{user?.company?.name || getActiveCompanyInfo()?.name}</span>
+                <span className="text-[11px] text-gray-500 block truncate">{user?.company?.name || getActiveCompanyInfo()?.name}</span>
               )}
             </div>
           )}
@@ -191,8 +191,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                 to={item.path}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${isActive
-                    ? 'bg-primary-600/15 text-primary-400 border border-primary-500/20'
-                    : 'text-dark-400 hover:bg-dark-800 hover:text-dark-100 border border-transparent'
+                    ? 'bg-primary-50 text-primary-600 border border-primary-200'
+                    : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 border border-transparent'
                   }`
                 }
                 title={isCollapsed ? item.label : ''}
@@ -208,11 +208,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       </nav>
 
       {/* Bottom section — User info + Collapse button */}
-      <div className="border-t border-dark-700 p-3 shrink-0">
+      <div className="border-t border-gray-200 p-3 shrink-0">
         {/* User info */}
         <NavLink
           to="/profile"
-          className={`flex items-center gap-3 px-2 py-2 mb-2 rounded-lg hover:bg-dark-800 transition-colors cursor-pointer ${isCollapsed ? 'justify-center' : ''
+          className={`flex items-center gap-3 px-2 py-2 mb-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer ${isCollapsed ? 'justify-center' : ''
             }`}
           title="My Profile"
         >
@@ -220,7 +220,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
             <img
               src={user.profilePicture.startsWith('http') ? user.profilePicture : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${user.profilePicture}`}
               alt={user?.name}
-              className="w-9 h-9 rounded-full object-cover border-2 border-dark-600 shrink-0"
+              className="w-9 h-9 rounded-full object-cover border-2 border-gray-200 shrink-0"
             />
           ) : (
             <div className="w-9 h-9 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shrink-0">
@@ -229,10 +229,10 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           )}
           {!isCollapsed && (
             <div className="overflow-hidden">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-gray-900 truncate">
                 {user?.name || 'User'}
               </p>
-              <p className="text-xs text-dark-400">{{ admin: 'Admin', supplier: 'Supplier', staff: 'Staff', super_admin: 'Super Admin' }[user?.role] || user?.role}</p>
+              <p className="text-xs text-gray-500">{{ admin: 'Admin', supplier: 'Supplier', staff: 'Staff', super_admin: 'Super Admin' }[user?.role] || user?.role}</p>
             </div>
           )}
         </NavLink>
@@ -240,7 +240,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         {/* Logout button */}
         <button
           onClick={handleLogout}
-          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-dark-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 ${isCollapsed ? 'justify-center' : ''
+          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 ${isCollapsed ? 'justify-center' : ''
             }`}
           title="Logout"
         >
@@ -251,7 +251,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         {/* Collapse toggle */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-dark-400 hover:bg-dark-800 hover:text-dark-100 transition-all duration-200 mt-1 ${isCollapsed ? 'justify-center' : ''
+          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200 mt-1 ${isCollapsed ? 'justify-center' : ''
             }`}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >

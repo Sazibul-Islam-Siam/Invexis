@@ -14,9 +14,9 @@ import {
 } from 'react-icons/hi';
 
 const roleBadge = {
-  admin: { label: 'Admin', className: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
-  staff: { label: 'Staff', className: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
-  supplier: { label: 'Supplier', className: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
+  admin: { label: 'Admin', className: 'bg-purple-50 text-purple-600 border-purple-200' },
+  staff: { label: 'Staff', className: 'bg-blue-50 text-blue-600 border-blue-200' },
+  supplier: { label: 'Supplier', className: 'bg-amber-50 text-amber-600 border-amber-200' },
 };
 
 const roleIcon = {
@@ -175,11 +175,11 @@ const Users = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
-            <HiOutlineUsers className="text-primary-400" />
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <HiOutlineUsers className="text-primary-600" />
             Users
           </h1>
-          <p className="text-dark-400 mt-1">Manage staff, supplier, and admin accounts</p>
+          <p className="text-gray-500 mt-1">Manage staff, supplier, and admin accounts</p>
         </div>
         <button onClick={openCreate} className="btn-primary flex items-center gap-2">
           <HiOutlinePlus className="text-lg" />
@@ -191,7 +191,7 @@ const Users = () => {
       <div className="card mb-6">
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 min-w-[200px]">
-            <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400" />
+            <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="text"
               placeholder="Search by name or email..."
@@ -227,39 +227,39 @@ const Users = () => {
           </div>
         ) : users.length === 0 ? (
           <div className="text-center py-16">
-            <HiOutlineUsers className="text-5xl text-dark-600 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-dark-300">No users found</h3>
-            <p className="text-dark-500 mt-1">Create your first user to get started</p>
+            <HiOutlineUsers className="text-5xl text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-gray-600">No users found</h3>
+            <p className="text-gray-400 mt-1">Create your first user to get started</p>
           </div>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-dark-700">
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">User</th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Email</th>
-                    <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Role</th>
-                    <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Status</th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Joined</th>
-                    <th className="text-right py-3 px-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Actions</th>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+                    <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                    <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
+                    <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-700/50">
+                <tbody className="divide-y divide-gray-100">
                   {users.map((u) => {
                     const RoleIcon = roleIcon[u.role] || HiOutlineUserCircle;
                     const badge = roleBadge[u.role] || roleBadge.staff;
                     return (
-                      <tr key={u._id} className="hover:bg-dark-800/50 transition-colors">
+                      <tr key={u._id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-3.5 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 bg-primary-600/15 rounded-full flex items-center justify-center shrink-0 text-sm font-bold text-primary-400 uppercase">
+                            <div className="w-9 h-9 bg-primary-50 rounded-full flex items-center justify-center shrink-0 text-sm font-bold text-primary-600 uppercase">
                               {u.name?.charAt(0)}
                             </div>
-                            <span className="font-medium text-dark-50">{u.name}</span>
+                            <span className="font-medium text-gray-900">{u.name}</span>
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 text-dark-400 text-sm">{u.email}</td>
+                        <td className="py-3.5 px-4 text-gray-500 text-sm">{u.email}</td>
                         <td className="py-3.5 px-4 text-center">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${badge.className}`}>
                             <RoleIcon className="text-sm" />
@@ -271,14 +271,14 @@ const Users = () => {
                             onClick={() => handleToggleActive(u)}
                             className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
                               u.isActive
-                                ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25'
-                                : 'bg-red-500/15 text-red-400 border-red-500/30 hover:bg-red-500/25'
+                                ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'
+                                : 'bg-red-50 text-red-500 border-red-200 hover:bg-red-500/25'
                             }`}
                           >
                             {u.isActive ? 'Active' : 'Inactive'}
                           </button>
                         </td>
-                        <td className="py-3.5 px-4 text-dark-400 text-sm">
+                        <td className="py-3.5 px-4 text-gray-500 text-sm">
                           {new Date(u.createdAt).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
@@ -289,14 +289,14 @@ const Users = () => {
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => openEdit(u)}
-                              className="p-2 text-dark-400 hover:text-primary-400 hover:bg-primary-600/10 rounded-lg transition-all"
+                              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
                               title="Edit user"
                             >
                               <HiOutlinePencil className="text-lg" />
                             </button>
                             <button
                               onClick={() => handleDelete(u._id)}
-                              className="p-2 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                              className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                               title="Delete user"
                             >
                               <HiOutlineTrash className="text-lg" />
@@ -312,8 +312,8 @@ const Users = () => {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-dark-700">
-                <p className="text-sm text-dark-400">
+              <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+                <p className="text-sm text-gray-500">
                   Page {pagination.page} of {pagination.pages} ({pagination.total} users)
                 </p>
                 <div className="flex gap-2">
@@ -341,15 +341,15 @@ const Users = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal}></div>
-          <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeModal}></div>
+          <div className="relative bg-white border border-gray-300 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-dark-50">
+              <h2 className="text-xl font-semibold text-gray-900">
                 {editing ? 'Edit User' : 'Create New User'}
               </h2>
               <button
                 onClick={closeModal}
-                className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all"
+                className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
               >
                 <HiOutlineX className="text-xl" />
               </button>
@@ -358,15 +358,15 @@ const Users = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Supplier link hint */}
               {!editing && formData.role === 'supplier' && supplierCreationStep === 1 && (
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
-                  <p className="text-xs text-amber-400">
+                <div className="bg-amber-500/10 border border-amber-200 rounded-xl p-3">
+                  <p className="text-xs text-amber-600">
                     Enter the supplier's email first. If they exist on the platform, we'll link their account. Otherwise, we'll ask for their name and password to create a new one.
                   </p>
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Role</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Role</label>
                 <select
                   value={formData.role}
                   onChange={(e) => {
@@ -383,8 +383,8 @@ const Users = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">
-                  Email <span className="text-red-400">*</span>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                  Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -400,8 +400,8 @@ const Users = () => {
               {(editing || formData.role !== 'supplier' || supplierCreationStep === 2) && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1.5">
-                      Full Name <span className="text-red-400">*</span>
+                    <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                      Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -414,9 +414,9 @@ const Users = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1.5">
-                      Password {!editing && <span className="text-red-400">*</span>}
-                      {editing && <span className="text-dark-500 text-xs ml-1">(leave blank to keep current)</span>}
+                    <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                      Password {!editing && <span className="text-red-500">*</span>}
+                      {editing && <span className="text-gray-400 text-xs ml-1">(leave blank to keep current)</span>}
                     </label>
                     <input
                       type="password"
@@ -440,8 +440,8 @@ const Users = () => {
                       onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-10 h-5 bg-dark-600 peer-focus:ring-2 peer-focus:ring-primary-500/30 rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-dark-300 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600 peer-checked:after:bg-white"></div>
-                    <span className="ml-3 text-sm text-dark-300">
+                    <div className="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-primary-500/30 rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600 peer-checked:after:bg-white"></div>
+                    <span className="ml-3 text-sm text-gray-600">
                       Account {formData.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </label>

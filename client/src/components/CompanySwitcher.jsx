@@ -60,11 +60,11 @@ const CompanySwitcher = () => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-1.5 bg-dark-800 border border-dark-600 rounded-lg text-sm text-dark-200 hover:bg-dark-700 hover:border-dark-500 transition-all"
+        className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all"
       >
-        <HiOutlineOfficeBuilding className="text-primary-400" />
+        <HiOutlineOfficeBuilding className="text-primary-600" />
         <span className="max-w-[140px] truncate">{activeInfo?.name || 'Select Company'}</span>
-        <HiOutlineSwitchHorizontal className="text-dark-400 text-xs" />
+        <HiOutlineSwitchHorizontal className="text-gray-400 text-xs" />
         {totalOtherAlerts > 0 && (
           <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
             {totalOtherAlerts}
@@ -73,9 +73,9 @@ const CompanySwitcher = () => {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-72 bg-dark-800 border border-dark-600 rounded-xl shadow-2xl z-50 overflow-hidden">
-          <div className="px-3 py-2 border-b border-dark-700">
-            <p className="text-xs text-dark-400 font-medium uppercase">Switch Company</p>
+        <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+          <div className="px-3 py-2 border-b border-gray-200">
+            <p className="text-xs text-gray-500 font-medium uppercase">Switch Company</p>
           </div>
           <div className="max-h-60 overflow-y-auto">
             {user.companies.map((company) => {
@@ -86,20 +86,20 @@ const CompanySwitcher = () => {
                   onClick={() => handleSwitch(company._id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors ${
                     activeCompany === company._id
-                      ? 'bg-primary-600/15 text-primary-400'
-                      : 'text-dark-200 hover:bg-dark-700'
+                      ? 'bg-primary-50 text-primary-600'
+                      : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   <div
                     className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                       activeCompany === company._id
-                        ? 'bg-primary-600/25'
-                        : 'bg-dark-700'
+                        ? 'bg-primary-100'
+                        : 'bg-gray-100'
                     }`}
                   >
                     <HiOutlineOfficeBuilding
                       className={
-                        activeCompany === company._id ? 'text-primary-400' : 'text-dark-400'
+                        activeCompany === company._id ? 'text-primary-600' : 'text-gray-400'
                       }
                     />
                   </div>
@@ -111,7 +111,7 @@ const CompanySwitcher = () => {
                   </div>
                   {/* Alert badge for other companies */}
                   {alertCount > 0 && activeCompany !== company._id && (
-                    <span className="min-w-[20px] h-5 bg-red-500/20 text-red-400 text-[11px] font-semibold rounded-full flex items-center justify-center px-1.5 border border-red-500/30">
+                    <span className="min-w-[20px] h-5 bg-red-50 text-red-600 text-[11px] font-semibold rounded-full flex items-center justify-center px-1.5 border border-red-200">
                       {alertCount}
                     </span>
                   )}

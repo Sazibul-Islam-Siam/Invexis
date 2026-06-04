@@ -12,10 +12,10 @@ import {
 } from 'react-icons/hi';
 
 const typeConfig = {
-  damaged: { label: 'Damaged', className: 'bg-red-500/15 text-red-400 border-red-500/30' },
-  lost: { label: 'Lost', className: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
-  expired: { label: 'Expired', className: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
-  correction: { label: 'Correction', className: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
+  damaged: { label: 'Damaged', className: 'bg-red-50 text-red-500 border-red-200' },
+  lost: { label: 'Lost', className: 'bg-amber-50 text-amber-600 border-amber-200' },
+  expired: { label: 'Expired', className: 'bg-purple-50 text-purple-600 border-purple-200' },
+  correction: { label: 'Correction', className: 'bg-blue-50 text-blue-600 border-blue-200' },
 };
 
 const StockAdjustments = () => {
@@ -91,11 +91,11 @@ const StockAdjustments = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
-            <HiOutlineAdjustments className="text-primary-400" />
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <HiOutlineAdjustments className="text-primary-600" />
             Stock Adjustments
           </h1>
-          <p className="text-dark-400 mt-1">Track damaged, lost, expired, and corrected stock</p>
+          <p className="text-gray-500 mt-1">Track damaged, lost, expired, and corrected stock</p>
         </div>
         {(user?.role === 'admin' || user?.role === 'staff') && (
           <button onClick={openModal} className="btn-primary flex items-center gap-2">
@@ -131,36 +131,36 @@ const StockAdjustments = () => {
           </div>
         ) : adjustments.length === 0 ? (
           <div className="text-center py-16">
-            <HiOutlineAdjustments className="text-5xl text-dark-600 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-dark-300">No stock adjustments</h3>
-            <p className="text-dark-500 mt-1">Record adjustments for damaged, lost, or expired stock</p>
+            <HiOutlineAdjustments className="text-5xl text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-gray-600">No stock adjustments</h3>
+            <p className="text-gray-400 mt-1">Record adjustments for damaged, lost, or expired stock</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-dark-700">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Product</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Type</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Qty Change</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Reason</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Adjusted By</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-dark-400 uppercase">Date</th>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Product</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Type</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Qty Change</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Reason</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Adjusted By</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-700/50">
+              <tbody className="divide-y divide-gray-100">
                 {adjustments.map((a) => {
                   const badge = typeConfig[a.type] || typeConfig.damaged;
                   return (
-                    <tr key={a._id} className="hover:bg-dark-800/50 transition-colors">
+                    <tr key={a._id} className="hover:bg-gray-50 transition-colors">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-primary-600/15 rounded-lg flex items-center justify-center shrink-0">
-                            <HiOutlineCube className="text-primary-400" />
+                          <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center shrink-0">
+                            <HiOutlineCube className="text-primary-600" />
                           </div>
                           <div>
-                            <p className="font-medium text-dark-50">{a.product?.name}</p>
-                            <code className="text-xs text-dark-500">{a.product?.sku}</code>
+                            <p className="font-medium text-gray-900">{a.product?.name}</p>
+                            <code className="text-xs text-gray-400">{a.product?.sku}</code>
                           </div>
                         </div>
                       </td>
@@ -170,15 +170,15 @@ const StockAdjustments = () => {
                         </span>
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        <span className={`font-bold text-sm ${a.quantity < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                        <span className={`font-bold text-sm ${a.quantity < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
                           {a.quantity > 0 ? '+' : ''}{a.quantity}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-dark-400 text-sm max-w-[200px] truncate">
+                      <td className="py-3.5 px-4 text-gray-500 text-sm max-w-[200px] truncate">
                         {a.reason}
                       </td>
-                      <td className="py-3.5 px-4 text-dark-400 text-sm">{a.adjustedBy?.name}</td>
-                      <td className="py-3.5 px-4 text-dark-400 text-sm">
+                      <td className="py-3.5 px-4 text-gray-500 text-sm">{a.adjustedBy?.name}</td>
+                      <td className="py-3.5 px-4 text-gray-500 text-sm">
                         {new Date(a.createdAt).toLocaleDateString('en-US', {
                           month: 'short', day: 'numeric', year: 'numeric',
                         })}
@@ -192,8 +192,8 @@ const StockAdjustments = () => {
         )}
 
         {pagination.pages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-dark-700">
-            <p className="text-sm text-dark-400">Page {pagination.page} of {pagination.pages}</p>
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+            <p className="text-sm text-gray-500">Page {pagination.page} of {pagination.pages}</p>
             <div className="flex gap-2">
               <button onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))} disabled={pagination.page <= 1} className="btn-secondary text-sm py-1.5 px-3 disabled:opacity-30">Previous</button>
               <button onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))} disabled={pagination.page >= pagination.pages} className="btn-secondary text-sm py-1.5 px-3 disabled:opacity-30">Next</button>
@@ -205,17 +205,17 @@ const StockAdjustments = () => {
       {/* Create Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)}></div>
-          <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowModal(false)}></div>
+          <div className="relative bg-white border border-gray-300 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-dark-50">New Stock Adjustment</h2>
-              <button onClick={() => setShowModal(false)} className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all">
+              <h2 className="text-xl font-semibold text-gray-900">New Stock Adjustment</h2>
+              <button onClick={() => setShowModal(false)} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
                 <HiOutlineX className="text-xl" />
               </button>
             </div>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Product <span className="text-red-400">*</span></label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Product <span className="text-red-500">*</span></label>
                 <select required value={formData.product} onChange={(e) => setFormData({ ...formData, product: e.target.value })} className="input-field">
                   <option value="">Select product</option>
                   {products.map((p) => (
@@ -223,11 +223,11 @@ const StockAdjustments = () => {
                   ))}
                 </select>
                 {selectedProduct && (
-                  <p className="text-xs text-dark-500 mt-1">Current stock: {selectedProduct.quantity}</p>
+                  <p className="text-xs text-gray-400 mt-1">Current stock: {selectedProduct.quantity}</p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Type <span className="text-red-400">*</span></label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Type <span className="text-red-500">*</span></label>
                 <select required value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="input-field">
                   <option value="damaged">Damaged</option>
                   <option value="lost">Lost</option>
@@ -236,10 +236,10 @@ const StockAdjustments = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">
-                  Quantity <span className="text-red-400">*</span>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                  Quantity <span className="text-red-500">*</span>
                   {formData.type === 'correction' && (
-                    <span className="text-dark-500 text-xs ml-1">(use negative to reduce)</span>
+                    <span className="text-gray-400 text-xs ml-1">(use negative to reduce)</span>
                   )}
                 </label>
                 <input
@@ -252,15 +252,15 @@ const StockAdjustments = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1.5">Reason <span className="text-red-400">*</span></label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Reason <span className="text-red-500">*</span></label>
                 <textarea required value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} className="input-field" rows="2" placeholder="Why is this adjustment needed?" />
               </div>
 
               {selectedProduct && formData.type !== 'correction' && (
-                <div className="bg-dark-900/50 border border-dark-600 rounded-xl p-3 flex items-center gap-3">
-                  <HiOutlineExclamation className="text-amber-400 text-lg shrink-0" />
-                  <p className="text-xs text-dark-400">
-                    This will reduce <strong className="text-dark-50">{selectedProduct.name}</strong> stock from <strong className="text-dark-50">{selectedProduct.quantity}</strong> to <strong className="text-amber-400">{Math.max(0, selectedProduct.quantity - Math.abs(Number(formData.quantity) || 0))}</strong>
+                <div className="bg-white border border-gray-300 rounded-xl p-3 flex items-center gap-3">
+                  <HiOutlineExclamation className="text-amber-600 text-lg shrink-0" />
+                  <p className="text-xs text-gray-500">
+                    This will reduce <strong className="text-gray-900">{selectedProduct.name}</strong> stock from <strong className="text-gray-900">{selectedProduct.quantity}</strong> to <strong className="text-amber-600">{Math.max(0, selectedProduct.quantity - Math.abs(Number(formData.quantity) || 0))}</strong>
                   </p>
                 </div>
               )}
