@@ -95,7 +95,7 @@ const Register = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white">Create Your Company</h1>
+          <h1 className="text-2xl font-bold text-dark-50">Create Your Company</h1>
           <p className="text-dark-400 mt-1">Start managing your inventory today</p>
         </div>
 
@@ -114,7 +114,7 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder={field.placeholder}
                     required
-                    className="w-full pl-10 pr-10 py-2.5 bg-dark-800/50 border border-dark-700/50 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
+                    className="w-full pl-10 pr-10 py-2.5 bg-dark-800/50 border border-dark-700/50 rounded-xl text-dark-50 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all"
                   />
                   {field.hasToggle && (
                     <button

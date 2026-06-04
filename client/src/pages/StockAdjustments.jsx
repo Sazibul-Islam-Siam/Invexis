@@ -91,7 +91,7 @@ const StockAdjustments = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
             <HiOutlineAdjustments className="text-primary-400" />
             Stock Adjustments
           </h1>
@@ -159,7 +159,7 @@ const StockAdjustments = () => {
                             <HiOutlineCube className="text-primary-400" />
                           </div>
                           <div>
-                            <p className="font-medium text-white">{a.product?.name}</p>
+                            <p className="font-medium text-dark-50">{a.product?.name}</p>
                             <code className="text-xs text-dark-500">{a.product?.sku}</code>
                           </div>
                         </div>
@@ -208,8 +208,8 @@ const StockAdjustments = () => {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)}></div>
           <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">New Stock Adjustment</h2>
-              <button onClick={() => setShowModal(false)} className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all">
+              <h2 className="text-xl font-semibold text-dark-50">New Stock Adjustment</h2>
+              <button onClick={() => setShowModal(false)} className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all">
                 <HiOutlineX className="text-xl" />
               </button>
             </div>
@@ -260,7 +260,7 @@ const StockAdjustments = () => {
                 <div className="bg-dark-900/50 border border-dark-600 rounded-xl p-3 flex items-center gap-3">
                   <HiOutlineExclamation className="text-amber-400 text-lg shrink-0" />
                   <p className="text-xs text-dark-400">
-                    This will reduce <strong className="text-white">{selectedProduct.name}</strong> stock from <strong className="text-white">{selectedProduct.quantity}</strong> to <strong className="text-amber-400">{Math.max(0, selectedProduct.quantity - Math.abs(Number(formData.quantity) || 0))}</strong>
+                    This will reduce <strong className="text-dark-50">{selectedProduct.name}</strong> stock from <strong className="text-dark-50">{selectedProduct.quantity}</strong> to <strong className="text-amber-400">{Math.max(0, selectedProduct.quantity - Math.abs(Number(formData.quantity) || 0))}</strong>
                   </p>
                 </div>
               )}

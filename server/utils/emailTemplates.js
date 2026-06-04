@@ -90,9 +90,33 @@ const deliveryNotifySupplier = (supplierName, productName, quantity) => `
 </body>
 </html>`;
 
+const shipmentRejectNotifySupplier = (supplierName, productName, quantity, reason) => `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#0f172a;font-family:Arial,sans-serif;">
+  <div style="max-width:500px;margin:40px auto;background:#1e293b;border-radius:16px;overflow:hidden;border:1px solid #334155;">
+    <div style="padding:24px;text-align:center;background:linear-gradient(135deg,#ef4444,#dc2626);">
+      <h1 style="color:#fff;margin:0;font-size:20px;">❌ Shipment Rejected</h1>
+    </div>
+    <div style="padding:24px;">
+      <p style="color:#e2e8f0;font-size:15px;">Hi <strong>${supplierName}</strong>,</p>
+      <p style="color:#94a3b8;font-size:14px;line-height:1.6;">Your shipment has been rejected by the admin:</p>
+      <div style="background:#0f172a;border-radius:8px;padding:16px;margin:16px 0;">
+        <p style="color:#e2e8f0;margin:4px 0;font-size:14px;"><strong>Product:</strong> ${productName}</p>
+        <p style="color:#e2e8f0;margin:4px 0;font-size:14px;"><strong>Quantity:</strong> ${quantity}</p>
+        <p style="color:#e2e8f0;margin:4px 0;font-size:14px;"><strong>Status:</strong> <span style="color:#ef4444;">Rejected ✕</span></p>
+        ${reason ? `<p style="color:#e2e8f0;margin:8px 0 4px;font-size:14px;"><strong>Reason:</strong></p><p style="color:#94a3b8;font-size:13px;margin:0;">${reason}</p>` : ''}
+      </div>
+      <p style="color:#64748b;font-size:12px;">Please contact the admin via your Invexis dashboard for further details.</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
 module.exports = {
   verificationEmail,
   restockNotifySupplier,
   shipmentNotifyAdmin,
   deliveryNotifySupplier,
+  shipmentRejectNotifySupplier,
 };

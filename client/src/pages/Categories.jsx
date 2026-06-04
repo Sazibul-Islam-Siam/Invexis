@@ -89,7 +89,7 @@ const Categories = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
             <HiOutlineTag className="text-primary-400" />
             Categories
           </h1>
@@ -151,7 +151,7 @@ const Categories = () => {
                       <div className="w-9 h-9 bg-primary-600/15 rounded-lg flex items-center justify-center">
                         <HiOutlineTag className="text-primary-400" />
                       </div>
-                      <span className="font-medium text-white">
+                      <span className="font-medium text-dark-50">
                         {category.name}
                       </span>
                     </div>
@@ -196,12 +196,12 @@ const Categories = () => {
           ></div>
           <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-xl font-semibold text-dark-50">
                 {editingCategory ? 'Edit Category' : 'New Category'}
               </h2>
               <button
                 onClick={closeModal}
-                className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all"
+                className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all"
               >
                 <HiOutlineX className="text-xl" />
               </button>

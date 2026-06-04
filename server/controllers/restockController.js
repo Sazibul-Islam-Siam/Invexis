@@ -4,7 +4,7 @@ const User = require('../models/User');
 const CompanySupplier = require('../models/CompanySupplier');
 const logAudit = require('../utils/logger');
 const sendEmail = require('../utils/sendEmail');
-const { restockNotifySupplier, shipmentNotifyAdmin, deliveryNotifySupplier } = require('../utils/emailTemplates');
+const { restockNotifySupplier, shipmentNotifyAdmin, deliveryNotifySupplier, shipmentRejectNotifySupplier } = require('../utils/emailTemplates');
 const { createBatch } = require('../utils/batchHelper');
 
 // @desc    Get all restock requests
@@ -255,6 +255,15 @@ const updateRestockRequest = async (req, res, next) => {
         to: populated.supplier.email,
         subject: `Delivery Confirmed — ${populated.product?.name}`,
         html: deliveryNotifySupplier(populated.supplier.name, populated.product?.name, request.quantity),
+      });
+    }
+
+    // Notify supplier when admin rejects a shipped order
+    if (status === 'rejected_shipment' && populated.supplier?.email) {
+      sendEmail({
+        to: populated.supplier.email,
+        subject: `Shipment Rejected — ${populated.product?.name}`,
+        html: shipmentRejectNotifySupplier(populated.supplier.name, populated.product?.name, request.quantity, notes || ''),
       });
     }
 

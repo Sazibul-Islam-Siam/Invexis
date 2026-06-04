@@ -72,28 +72,28 @@ const AdminDashboard = ({ user }) => {
 
   const chartConfig = chartData
     ? {
-        labels: chartData.map((d) => d.label),
-        datasets: [{
-          label: 'Revenue (৳)',
-          data: chartData.map((d) => d.revenue),
-          borderColor: '#818cf8',
-          backgroundColor: 'rgba(129, 140, 248, 0.1)',
-          tension: 0.4, fill: true,
-          pointBackgroundColor: '#818cf8',
-          pointBorderColor: '#1e1b4b',
-          pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7,
-        },
-        {
-          label: 'Profit (৳)',
-          data: chartData.map((d) => d.profit),
-          borderColor: '#34d399',
-          backgroundColor: 'transparent',
-          tension: 0.4, fill: false,
-          pointBackgroundColor: '#34d399',
-          pointBorderColor: '#064e3b',
-          pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
-        }],
-      }
+      labels: chartData.map((d) => d.label),
+      datasets: [{
+        label: 'Revenue (৳)',
+        data: chartData.map((d) => d.revenue),
+        borderColor: '#818cf8',
+        backgroundColor: 'rgba(129, 140, 248, 0.1)',
+        tension: 0.4, fill: true,
+        pointBackgroundColor: '#818cf8',
+        pointBorderColor: '#1e1b4b',
+        pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7,
+      },
+      {
+        label: 'Profit (৳)',
+        data: chartData.map((d) => d.profit),
+        borderColor: '#34d399',
+        backgroundColor: 'transparent',
+        tension: 0.4, fill: false,
+        pointBackgroundColor: '#34d399',
+        pointBorderColor: '#064e3b',
+        pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
+      }],
+    }
     : null;
 
   const chartOptions = {
@@ -104,8 +104,8 @@ const AdminDashboard = ({ user }) => {
         backgroundColor: '#1e293b', borderColor: '#334155', borderWidth: 1,
         titleColor: '#f8fafc', bodyColor: '#cbd5e1', padding: 12, cornerRadius: 8,
         displayColors: false,
-        callbacks: { 
-          label: (ctx) => `${ctx.dataset.label}: ৳${ctx.parsed.y.toLocaleString()}` 
+        callbacks: {
+          label: (ctx) => `${ctx.dataset.label}: ৳${ctx.parsed.y.toLocaleString()}`
         },
       },
     },

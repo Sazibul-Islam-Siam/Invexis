@@ -163,7 +163,7 @@ const SuperAdminDashboard = () => {
             <HiOutlineShieldCheck className="text-xl text-violet-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-dark-50">
               Platform Management
             </h1>
             <p className="text-dark-400 text-sm">
@@ -185,7 +185,7 @@ const SuperAdminDashboard = () => {
                 <p className="text-sm text-dark-400 font-medium">
                   {stat.title}
                 </p>
-                <p className="text-3xl font-bold text-white mt-2">
+                <p className="text-3xl font-bold text-dark-50 mt-2">
                   {stat.value}
                 </p>
                 {stat.sub && (
@@ -205,7 +205,7 @@ const SuperAdminDashboard = () => {
       {/* Companies Table */}
       <div className="card">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-dark-50 flex items-center gap-2">
             <HiOutlineGlobe className="text-primary-400" />
             All Companies
             <span className="text-sm font-normal text-dark-500 ml-2">
@@ -243,7 +243,7 @@ const SuperAdminDashboard = () => {
                 fetchStats();
                 fetchCompanies();
               }}
-              className="p-2 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
+              className="p-2 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-colors"
               title="Refresh"
             >
               <HiOutlineRefresh className="text-lg" />
@@ -306,7 +306,7 @@ const SuperAdminDashboard = () => {
                             <HiOutlineOfficeBuilding className="text-primary-400 text-lg" />
                           </div>
                           <div>
-                            <p className="font-medium text-white">
+                            <p className="font-medium text-dark-50">
                               {company.name}
                             </p>
                             <code className="text-xs text-dark-500">
@@ -332,7 +332,7 @@ const SuperAdminDashboard = () => {
                         )}
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        <span className="bg-dark-700 px-3 py-1 rounded-lg text-sm font-medium text-white">
+                        <span className="bg-dark-700 px-3 py-1 rounded-lg text-sm font-medium text-dark-50">
                           {company.userCount}
                         </span>
                       </td>
@@ -461,7 +461,7 @@ const SuperAdminDashboard = () => {
                 <HiOutlineExclamation className="text-2xl text-red-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-dark-50">
                   Delete Company
                 </h3>
                 <p className="text-sm text-dark-400">
@@ -473,7 +473,7 @@ const SuperAdminDashboard = () => {
             <div className="bg-dark-900/50 border border-dark-700 rounded-xl p-4 mb-6">
               <p className="text-sm text-dark-300">
                 You are about to permanently delete{' '}
-                <span className="text-white font-semibold">
+                <span className="text-dark-50 font-semibold">
                   "{deleteModal.name}"
                 </span>{' '}
                 and all its associated data:
@@ -500,7 +500,7 @@ const SuperAdminDashboard = () => {
               <button
                 onClick={handleDelete}
                 disabled={actionLoading === deleteModal._id}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-50 bg-red-600 rounded-xl hover:bg-red-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {actionLoading === deleteModal._id ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>

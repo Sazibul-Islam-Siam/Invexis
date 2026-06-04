@@ -35,7 +35,7 @@ const VerifyEmail = () => {
           {status === 'loading' && (
             <>
               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-500 mx-auto mb-6"></div>
-              <h2 className="text-xl font-semibold text-white mb-2">Verifying your email...</h2>
+              <h2 className="text-xl font-semibold text-dark-50 mb-2">Verifying your email...</h2>
               <p className="text-dark-400">Please wait a moment.</p>
             </>
           )}
@@ -45,7 +45,7 @@ const VerifyEmail = () => {
               <div className="w-20 h-20 bg-emerald-500/15 rounded-full flex items-center justify-center mx-auto mb-6">
                 <HiOutlineCheckCircle className="text-5xl text-emerald-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white mb-2">Email Verified!</h2>
+              <h2 className="text-xl font-semibold text-dark-50 mb-2">Email Verified!</h2>
               <p className="text-dark-400 mb-6">{message}</p>
               <button
                 onClick={() => navigate('/login')}
@@ -61,7 +61,7 @@ const VerifyEmail = () => {
               <div className="w-20 h-20 bg-red-500/15 rounded-full flex items-center justify-center mx-auto mb-6">
                 <HiOutlineXCircle className="text-5xl text-red-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white mb-2">Verification Failed</h2>
+              <h2 className="text-xl font-semibold text-dark-50 mb-2">Verification Failed</h2>
               <p className="text-dark-400 mb-6">{message}</p>
               <button
                 onClick={() => navigate('/login')}

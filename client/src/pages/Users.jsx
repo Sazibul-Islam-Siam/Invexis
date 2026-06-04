@@ -175,7 +175,7 @@ const Users = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
             <HiOutlineUsers className="text-primary-400" />
             Users
           </h1>
@@ -256,7 +256,7 @@ const Users = () => {
                             <div className="w-9 h-9 bg-primary-600/15 rounded-full flex items-center justify-center shrink-0 text-sm font-bold text-primary-400 uppercase">
                               {u.name?.charAt(0)}
                             </div>
-                            <span className="font-medium text-white">{u.name}</span>
+                            <span className="font-medium text-dark-50">{u.name}</span>
                           </div>
                         </td>
                         <td className="py-3.5 px-4 text-dark-400 text-sm">{u.email}</td>
@@ -344,12 +344,12 @@ const Users = () => {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal}></div>
           <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-xl font-semibold text-dark-50">
                 {editing ? 'Edit User' : 'Create New User'}
               </h2>
               <button
                 onClick={closeModal}
-                className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all"
+                className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all"
               >
                 <HiOutlineX className="text-xl" />
               </button>

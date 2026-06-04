@@ -218,7 +218,7 @@ const Sales = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
             <HiOutlineShoppingCart className="text-primary-400" />
             Sales
           </h1>
@@ -239,7 +239,7 @@ const Sales = () => {
             </div>
             <div>
               <p className="text-sm text-dark-400">Total Revenue</p>
-              <p className="text-2xl font-bold text-white">৳{summary.totalRevenue.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-dark-50">৳{summary.totalRevenue.toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -250,7 +250,7 @@ const Sales = () => {
             </div>
             <div>
               <p className="text-sm text-dark-400">Items Sold</p>
-              <p className="text-2xl font-bold text-white">{summary.totalItems.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-dark-50">{summary.totalItems.toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -261,7 +261,7 @@ const Sales = () => {
             </div>
             <div>
               <p className="text-sm text-dark-400">Transactions</p>
-              <p className="text-2xl font-bold text-white">{summary.totalTransactions}</p>
+              <p className="text-2xl font-bold text-dark-50">{summary.totalTransactions}</p>
             </div>
           </div>
         </div>
@@ -354,7 +354,7 @@ const Sales = () => {
                         <div className="space-y-1">
                           {sale.items?.map((item, i) => (
                             <div key={i} className="flex items-center gap-2 text-sm">
-                              <span className="text-white">{item.product?.name || 'Deleted Product'}</span>
+                              <span className="text-dark-50">{item.product?.name || 'Deleted Product'}</span>
                               <span className="text-dark-500">×{item.quantity}</span>
                             </div>
                           ))}
@@ -440,10 +440,10 @@ const Sales = () => {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal}></div>
           <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Record New Sale</h2>
+              <h2 className="text-xl font-semibold text-dark-50">Record New Sale</h2>
               <button
                 onClick={closeModal}
-                className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all"
+                className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all"
               >
                 <HiOutlineX className="text-xl" />
               </button>
@@ -532,7 +532,7 @@ const Sales = () => {
                       <HiOutlineCube className="text-primary-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{item.product.name}</p>
+                      <p className="text-sm font-medium text-dark-50 truncate">{item.product.name}</p>
                       <p className="text-xs text-dark-500">
                         ৳{item.unitPrice.toLocaleString()} × {item.quantity}
                       </p>
@@ -541,7 +541,7 @@ const Sales = () => {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => updateCartQty(index, item.quantity - 1)}
-                        className="p-1 text-dark-400 hover:text-white hover:bg-dark-700 rounded transition-all"
+                        className="p-1 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded transition-all"
                       >
                         <HiOutlineMinus className="text-sm" />
                       </button>
@@ -551,11 +551,11 @@ const Sales = () => {
                         max={item.product.quantity}
                         value={item.quantity}
                         onChange={(e) => updateCartQty(index, Number(e.target.value))}
-                        className="w-14 bg-dark-700 border border-dark-600 rounded text-center text-sm text-white py-1 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        className="w-14 bg-dark-700 border border-dark-600 rounded text-center text-sm text-dark-50 py-1 focus:outline-none focus:ring-1 focus:ring-primary-500"
                       />
                       <button
                         onClick={() => updateCartQty(index, item.quantity + 1)}
-                        className="p-1 text-dark-400 hover:text-white hover:bg-dark-700 rounded transition-all"
+                        className="p-1 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded transition-all"
                       >
                         <HiOutlinePlus className="text-sm" />
                       </button>
@@ -584,7 +584,7 @@ const Sales = () => {
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-dark-700 pt-2 mt-2">
-                  <span className="font-semibold text-white">Grand Total</span>
+                  <span className="font-semibold text-dark-50">Grand Total</span>
                   <span className="font-bold text-xl text-emerald-400">
                     ৳{cartTotal.toLocaleString()}
                   </span>
@@ -624,7 +624,7 @@ const Sales = () => {
               <div className="w-14 h-14 bg-emerald-500/15 rounded-full flex items-center justify-center mx-auto mb-3">
                 <HiOutlineReceiptTax className="text-3xl text-emerald-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white">Sale Receipt</h2>
+              <h2 className="text-xl font-semibold text-dark-50">Sale Receipt</h2>
               <code className="text-primary-400 text-sm">{showReceipt.invoiceNo}</code>
             </div>
 
@@ -638,7 +638,7 @@ const Sales = () => {
                 </div>
               ))}
               <div className="border-t border-dark-700 pt-2 flex justify-between">
-                <span className="font-semibold text-white">Total</span>
+                <span className="font-semibold text-dark-50">Total</span>
                 <span className="font-bold text-lg text-emerald-400">
                   ৳{showReceipt.totalAmount?.toLocaleString()}
                 </span>
@@ -672,12 +672,12 @@ const Sales = () => {
           <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-semibold text-white">Sale Details</h2>
+                <h2 className="text-xl font-semibold text-dark-50">Sale Details</h2>
                 <code className="text-primary-400 text-sm">{showDetails.invoiceNo}</code>
               </div>
               <button
                 onClick={() => setShowDetails(null)}
-                className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all"
+                className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all"
               >
                 <HiOutlineX className="text-xl" />
               </button>
@@ -691,7 +691,7 @@ const Sales = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-white">{item.product?.name || 'Deleted Product'}</p>
+                      <p className="text-sm font-medium text-dark-50">{item.product?.name || 'Deleted Product'}</p>
                       <p className="text-xs text-dark-500">
                         ৳{item.unitPrice?.toLocaleString()} × {item.quantity}
                       </p>
@@ -729,7 +729,7 @@ const Sales = () => {
 
             <div className="bg-dark-900/50 border border-dark-600 rounded-xl p-4 space-y-2">
               <div className="flex justify-between border-b border-dark-700 pb-2">
-                <span className="font-semibold text-white">Grand Total</span>
+                <span className="font-semibold text-dark-50">Grand Total</span>
                 <span className="font-bold text-lg text-emerald-400">
                   ৳{showDetails.totalAmount?.toLocaleString()}
                 </span>

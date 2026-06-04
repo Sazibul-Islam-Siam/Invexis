@@ -113,6 +113,12 @@ const Products = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (Number(formData.price) <= Number(formData.costPrice)) {
+      toast.error('Selling price must be greater than cost price');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -173,7 +179,7 @@ const Products = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
             <HiOutlineCube className="text-primary-400" />
             Products
           </h1>
@@ -321,7 +327,7 @@ const Products = () => {
                             <HiOutlineCube className="text-dark-400" />
                           </div>
                           <div>
-                            <p className="font-medium text-white">{product.name}</p>
+                            <p className="font-medium text-dark-50">{product.name}</p>
                             {product.isLowStock && (
                               <span className="text-xs text-amber-400 flex items-center gap-1">
                                 <HiOutlineExclamation className="text-sm" />
@@ -340,7 +346,7 @@ const Products = () => {
                         {product.category?.name || '—'}
                       </td>
                       <td className="py-3.5 px-4 text-right">
-                        <p className="text-white font-medium">
+                        <p className="text-dark-50 font-medium">
                           ৳{product.price?.toLocaleString()}
                         </p>
                         <p className="text-xs text-dark-500">
@@ -439,12 +445,12 @@ const Products = () => {
           ></div>
           <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-xl font-semibold text-dark-50">
                 {editingProduct ? 'Edit Product' : 'New Product'}
               </h2>
               <button
                 onClick={closeModal}
-                className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all"
+                className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all"
               >
                 <HiOutlineX className="text-xl" />
               </button>

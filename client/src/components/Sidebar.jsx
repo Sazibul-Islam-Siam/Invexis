@@ -150,9 +150,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen bg-dark-900 border-r border-dark-700 z-40 flex flex-col transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'w-[72px]' : 'w-64'
-      }`}
+      className={`fixed left-0 top-0 h-screen bg-white-900 border-r border-dark-700 z-40 flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'w-[72px]' : 'w-64'
+        }`}
     >
       {/* Logo */}
       <div className="h-16 flex items-center px-4 border-b border-dark-700 shrink-0">
@@ -191,10 +190,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
               <NavLink
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
-                    isActive
-                      ? 'bg-primary-600/15 text-primary-400 border border-primary-500/20'
-                      : 'text-dark-400 hover:bg-dark-800 hover:text-dark-100 border border-transparent'
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${isActive
+                    ? 'bg-primary-600/15 text-primary-400 border border-primary-500/20'
+                    : 'text-dark-400 hover:bg-dark-800 hover:text-dark-100 border border-transparent'
                   }`
                 }
                 title={isCollapsed ? item.label : ''}
@@ -214,9 +212,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         {/* User info */}
         <NavLink
           to="/profile"
-          className={`flex items-center gap-3 px-2 py-2 mb-2 rounded-lg hover:bg-dark-800 transition-colors cursor-pointer ${
-            isCollapsed ? 'justify-center' : ''
-          }`}
+          className={`flex items-center gap-3 px-2 py-2 mb-2 rounded-lg hover:bg-dark-800 transition-colors cursor-pointer ${isCollapsed ? 'justify-center' : ''
+            }`}
           title="My Profile"
         >
           {user?.profilePicture ? (
@@ -243,9 +240,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         {/* Logout button */}
         <button
           onClick={handleLogout}
-          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-dark-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 ${
-            isCollapsed ? 'justify-center' : ''
-          }`}
+          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-dark-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 ${isCollapsed ? 'justify-center' : ''
+            }`}
           title="Logout"
         >
           <HiOutlineLogout className="text-xl shrink-0" />
@@ -255,9 +251,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         {/* Collapse toggle */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-dark-400 hover:bg-dark-800 hover:text-dark-100 transition-all duration-200 mt-1 ${
-            isCollapsed ? 'justify-center' : ''
-          }`}
+          className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-dark-400 hover:bg-dark-800 hover:text-dark-100 transition-all duration-200 mt-1 ${isCollapsed ? 'justify-center' : ''
+            }`}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? (

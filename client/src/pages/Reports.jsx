@@ -220,7 +220,7 @@ const Reports = () => {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
           <HiOutlineDocumentReport className="text-primary-400" />
           Reports
         </h1>
@@ -237,7 +237,7 @@ const Reports = () => {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === tab.key
                 ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/25'
-                : 'bg-dark-800 text-dark-400 border border-dark-700 hover:text-white hover:border-dark-600'
+                : 'bg-dark-800 text-dark-400 border border-dark-700 hover:text-dark-50 hover:border-dark-600'
             }`}
           >
             <tab.icon className="text-lg" />
@@ -323,23 +323,23 @@ const Reports = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-6">
               <div className="card border border-emerald-500/20">
                 <p className="text-sm text-dark-400">Total Revenue</p>
-                <p className="text-2xl font-bold text-white mt-1">৳{salesData.summary.totalRevenue.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-dark-50 mt-1">৳{salesData.summary.totalRevenue.toLocaleString()}</p>
               </div>
               <div className="card border border-emerald-500/20">
                 <p className="text-sm text-dark-400">Total Profit</p>
-                <p className="text-2xl font-bold text-white mt-1">৳{salesData.summary.totalProfit.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-dark-50 mt-1">৳{salesData.summary.totalProfit.toLocaleString()}</p>
               </div>
               <div className="card border border-purple-500/20">
                 <p className="text-sm text-dark-400">Transactions</p>
-                <p className="text-2xl font-bold text-white mt-1">{salesData.summary.totalTransactions}</p>
+                <p className="text-2xl font-bold text-dark-50 mt-1">{salesData.summary.totalTransactions}</p>
               </div>
               <div className="card border border-blue-500/20">
                 <p className="text-sm text-dark-400">Items Sold</p>
-                <p className="text-2xl font-bold text-white mt-1">{salesData.summary.totalItemsSold}</p>
+                <p className="text-2xl font-bold text-dark-50 mt-1">{salesData.summary.totalItemsSold}</p>
               </div>
               <div className="card border border-amber-500/20">
                 <p className="text-sm text-dark-400">Avg Order Value</p>
-                <p className="text-2xl font-bold text-white mt-1">৳{Math.round(salesData.summary.avgOrderValue).toLocaleString()}</p>
+                <p className="text-2xl font-bold text-dark-50 mt-1">৳{Math.round(salesData.summary.avgOrderValue).toLocaleString()}</p>
               </div>
             </div>
           )}
@@ -348,7 +348,7 @@ const Reports = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Revenue Timeline */}
             <div className="card">
-              <h3 className="text-base font-semibold text-white mb-4">Revenue Over Time</h3>
+              <h3 className="text-base font-semibold text-dark-50 mb-4">Revenue Over Time</h3>
               {revenueChart ? (
                 <div className="h-64">
                   <Line data={revenueChart} options={{
@@ -373,7 +373,7 @@ const Reports = () => {
 
             {/* Top Products */}
             <div className="card">
-              <h3 className="text-base font-semibold text-white mb-4">Top Products by Revenue</h3>
+              <h3 className="text-base font-semibold text-dark-50 mb-4">Top Products by Revenue</h3>
               {topProductsChart ? (
                 <div className="h-64">
                   <Bar data={topProductsChart} options={{
@@ -399,7 +399,7 @@ const Reports = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Staff Performance */}
             <div className="card">
-              <h3 className="text-base font-semibold text-white mb-4">Sales by Staff</h3>
+              <h3 className="text-base font-semibold text-dark-50 mb-4">Sales by Staff</h3>
               {salesData?.salesByStaff?.length ? (
                 <table className="w-full">
                   <thead>
@@ -412,7 +412,7 @@ const Reports = () => {
                   <tbody className="divide-y divide-dark-700/50">
                     {salesData.salesByStaff.map((s, i) => (
                       <tr key={i} className="hover:bg-dark-800/50">
-                        <td className="py-2.5 px-3 text-sm text-white">{s.name}</td>
+                        <td className="py-2.5 px-3 text-sm text-dark-50">{s.name}</td>
                         <td className="py-2.5 px-3 text-center text-sm text-dark-400">{s.transactions}</td>
                         <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-400">৳{s.revenue.toLocaleString()}</td>
                       </tr>
@@ -426,7 +426,7 @@ const Reports = () => {
 
             {/* Top Products Table */}
             <div className="card">
-              <h3 className="text-base font-semibold text-white mb-4">Top Products</h3>
+              <h3 className="text-base font-semibold text-dark-50 mb-4">Top Products</h3>
               {salesData?.topProducts?.length ? (
                 <table className="w-full">
                   <thead>
@@ -439,7 +439,7 @@ const Reports = () => {
                   <tbody className="divide-y divide-dark-700/50">
                     {salesData.topProducts.map((p, i) => (
                       <tr key={i} className="hover:bg-dark-800/50">
-                        <td className="py-2.5 px-3 text-sm text-white">{p.name}</td>
+                        <td className="py-2.5 px-3 text-sm text-dark-50">{p.name}</td>
                         <td className="py-2.5 px-3 text-center text-sm text-dark-400">{p.totalQty}</td>
                         <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-400">৳{p.totalRevenue.toLocaleString()}</td>
                       </tr>
@@ -460,7 +460,7 @@ const Reports = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
               <div className="card border border-blue-500/20">
                 <p className="text-sm text-dark-400">Total Products</p>
-                <p className="text-2xl font-bold text-white mt-1">{inventoryData.summary.totalProducts}</p>
+                <p className="text-2xl font-bold text-dark-50 mt-1">{inventoryData.summary.totalProducts}</p>
                 <p className="text-xs text-dark-500 mt-0.5">{inventoryData.summary.inStock} in stock</p>
               </div>
               <div className="card border border-amber-500/20">
@@ -473,7 +473,7 @@ const Reports = () => {
               </div>
               <div className="card border border-emerald-500/20">
                 <p className="text-sm text-dark-400">Inventory Value</p>
-                <p className="text-2xl font-bold text-white mt-1">৳{inventoryData.summary.totalValue.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-dark-50 mt-1">৳{inventoryData.summary.totalValue.toLocaleString()}</p>
                 <p className="text-xs text-dark-500 mt-0.5">Retail: ৳{inventoryData.summary.totalRetailValue.toLocaleString()}</p>
               </div>
             </div>
@@ -483,7 +483,7 @@ const Reports = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Category Distribution */}
             <div className="card">
-              <h3 className="text-base font-semibold text-white mb-4">Products by Category</h3>
+              <h3 className="text-base font-semibold text-dark-50 mb-4">Products by Category</h3>
               {categoryChart ? (
                 <div className="h-64 flex items-center justify-center">
                   <Doughnut
@@ -510,7 +510,7 @@ const Reports = () => {
 
             {/* Category Value Table */}
             <div className="card">
-              <h3 className="text-base font-semibold text-white mb-4">Category Breakdown</h3>
+              <h3 className="text-base font-semibold text-dark-50 mb-4">Category Breakdown</h3>
               {inventoryData?.categoryDistribution?.length ? (
                 <table className="w-full">
                   <thead>
@@ -524,7 +524,7 @@ const Reports = () => {
                   <tbody className="divide-y divide-dark-700/50">
                     {inventoryData.categoryDistribution.map((c, i) => (
                       <tr key={i} className="hover:bg-dark-800/50">
-                        <td className="py-2.5 px-3 text-sm text-white font-medium">{c.name}</td>
+                        <td className="py-2.5 px-3 text-sm text-dark-50 font-medium">{c.name}</td>
                         <td className="py-2.5 px-3 text-center text-sm text-dark-400">{c.count}</td>
                         <td className="py-2.5 px-3 text-center text-sm text-dark-400">{c.qty}</td>
                         <td className="py-2.5 px-3 text-right text-sm font-medium text-emerald-400">৳{c.value.toLocaleString()}</td>
@@ -541,7 +541,7 @@ const Reports = () => {
           {/* Low Stock Alert */}
           {inventoryData?.lowStockItems?.length > 0 && (
             <div className="card border border-red-500/20">
-              <h3 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
+              <h3 className="text-base font-semibold text-dark-50 mb-4 flex items-center gap-2">
                 <HiOutlineExclamation className="text-red-400" />
                 Low Stock Items ({inventoryData.lowStockItems.length})
               </h3>
@@ -559,7 +559,7 @@ const Reports = () => {
                   <tbody className="divide-y divide-dark-700/50">
                     {inventoryData.lowStockItems.map((p, i) => (
                       <tr key={i} className="hover:bg-dark-800/50">
-                        <td className="py-2.5 px-3 text-sm text-white font-medium">{p.name}</td>
+                        <td className="py-2.5 px-3 text-sm text-dark-50 font-medium">{p.name}</td>
                         <td className="py-2.5 px-3"><code className="text-xs text-dark-400">{p.sku}</code></td>
                         <td className="py-2.5 px-3 text-sm text-dark-400">{p.category}</td>
                         <td className="py-2.5 px-3 text-center">
@@ -615,7 +615,7 @@ const Reports = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
             <div className="card border border-blue-500/20">
               <p className="text-sm text-dark-400">Total Requests</p>
-              <p className="text-2xl font-bold text-white mt-1">{supplierData.summary.totalRequests}</p>
+              <p className="text-2xl font-bold text-dark-50 mt-1">{supplierData.summary.totalRequests}</p>
             </div>
             <div className="card border border-emerald-500/20">
               <p className="text-sm text-dark-400">Delivered</p>
@@ -624,7 +624,7 @@ const Reports = () => {
             </div>
             <div className="card border border-purple-500/20">
               <p className="text-sm text-dark-400">Total Delivery Value</p>
-              <p className="text-2xl font-bold text-white mt-1">৳{supplierData.summary.totalDeliveryValue.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-dark-50 mt-1">৳{supplierData.summary.totalDeliveryValue.toLocaleString()}</p>
             </div>
             <div className="card border border-amber-500/20">
               <p className="text-sm text-dark-400">Pending</p>
@@ -638,7 +638,7 @@ const Reports = () => {
               {/* Delivery Timeline Chart */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div className="card">
-                  <h3 className="text-base font-semibold text-white mb-4">Deliveries Over Time</h3>
+                  <h3 className="text-base font-semibold text-dark-50 mb-4">Deliveries Over Time</h3>
                   {supplierData.deliveryTimeline?.length ? (
                     <div className="h-64">
                       <Bar
@@ -665,7 +665,7 @@ const Reports = () => {
 
                 {/* Delivery Value Chart */}
                 <div className="card">
-                  <h3 className="text-base font-semibold text-white mb-4">Delivery Value Over Time</h3>
+                  <h3 className="text-base font-semibold text-dark-50 mb-4">Delivery Value Over Time</h3>
                   {supplierData.deliveryTimeline?.length ? (
                     <div className="h-64">
                       <Bar
@@ -702,7 +702,7 @@ const Reports = () => {
 
               {/* Top Products Supplied */}
               <div className="card">
-                <h3 className="text-base font-semibold text-white mb-4">Top Products Supplied</h3>
+                <h3 className="text-base font-semibold text-dark-50 mb-4">Top Products Supplied</h3>
                 {supplierData.topProducts?.length ? (
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -718,7 +718,7 @@ const Reports = () => {
                       <tbody className="divide-y divide-dark-700/50">
                         {supplierData.topProducts.map((p, i) => (
                           <tr key={i} className="hover:bg-dark-800/50">
-                            <td className="py-2.5 px-3 text-sm text-white font-medium">{p.name}</td>
+                            <td className="py-2.5 px-3 text-sm text-dark-50 font-medium">{p.name}</td>
                             <td className="py-2.5 px-3"><code className="text-xs text-dark-400">{p.sku}</code></td>
                             <td className="py-2.5 px-3 text-center text-sm text-dark-400">{p.deliveries}</td>
                             <td className="py-2.5 px-3 text-center text-sm text-dark-400">{p.units}</td>
@@ -738,7 +738,7 @@ const Reports = () => {
               {/* Status Breakdown */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div className="card">
-                  <h3 className="text-base font-semibold text-white mb-4">Request Status Breakdown</h3>
+                  <h3 className="text-base font-semibold text-dark-50 mb-4">Request Status Breakdown</h3>
                   <div className="space-y-3">
                     {[
                       { label: 'Pending', count: supplierData.summary.pending, color: 'bg-amber-400', textColor: 'text-amber-400' },
@@ -765,7 +765,7 @@ const Reports = () => {
 
                 {/* Status Doughnut */}
                 <div className="card">
-                  <h3 className="text-base font-semibold text-white mb-4">Status Distribution</h3>
+                  <h3 className="text-base font-semibold text-dark-50 mb-4">Status Distribution</h3>
                   <div className="h-64 flex items-center justify-center">
                     <Doughnut
                       data={{
@@ -807,7 +807,7 @@ const Reports = () => {
 
               {/* Recent Requests */}
               <div className="card">
-                <h3 className="text-base font-semibold text-white mb-4">Recent Requests</h3>
+                <h3 className="text-base font-semibold text-dark-50 mb-4">Recent Requests</h3>
                 {supplierData.recentRequests?.length ? (
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -832,7 +832,7 @@ const Reports = () => {
                           };
                           return (
                             <tr key={r._id} className="hover:bg-dark-800/50">
-                              <td className="py-2.5 px-3 text-sm text-white font-medium">{r.product?.name || 'Unknown'}</td>
+                              <td className="py-2.5 px-3 text-sm text-dark-50 font-medium">{r.product?.name || 'Unknown'}</td>
                               <td className="py-2.5 px-3 text-center text-sm text-dark-400">{r.quantity}</td>
                               <td className="py-2.5 px-3 text-right text-sm text-dark-300">
                                 {r.unitCost != null ? `৳${r.unitCost.toLocaleString()}` : '—'}

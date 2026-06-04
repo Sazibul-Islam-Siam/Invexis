@@ -25,7 +25,7 @@ const Layout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-dark-950">
+    <div className="min-h-screen bg-white-950">
       {/* Mobile overlay */}
       {isMobile && mobileOpen && (
         <div
@@ -44,13 +44,12 @@ const Layout = () => {
 
       {/* Main content area */}
       <div
-        className={`transition-all duration-300 ${
-          isMobile ? 'ml-0' : isCollapsed ? 'ml-[72px]' : 'ml-64'
-        }`}
+        className={`transition-all duration-300 ${isMobile ? 'ml-0' : isCollapsed ? 'ml-[72px]' : 'ml-64'
+          }`}
       >
         {/* Top navigation bar */}
-        <TopBar 
-          isCollapsed={isCollapsed} 
+        <TopBar
+          isCollapsed={isCollapsed}
           isMobile={isMobile}
           mobileOpen={mobileOpen}
           setMobileOpen={setMobileOpen}

@@ -106,6 +106,12 @@ const createProduct = async (req, res, next) => {
   try {
     const initialQty = Number(req.body.quantity) || 0;
     const initialCostPrice = Number(req.body.costPrice) || 0;
+    const sellingPrice = Number(req.body.price) || 0;
+
+    if (sellingPrice <= initialCostPrice) {
+      res.status(400);
+      throw new Error('Selling price must be greater than cost price');
+    }
 
     const product = await Product.create({ ...req.body, company: req.user.company });
 
@@ -142,6 +148,14 @@ const updateProduct = async (req, res, next) => {
     const updateData = { ...req.body };
     delete updateData.quantity;
     delete updateData.costPrice;
+
+    if (updateData.price !== undefined) {
+      const existingProduct = await Product.findOne({ _id: req.params.id, company: req.user.company });
+      if (existingProduct && Number(updateData.price) <= existingProduct.costPrice) {
+        res.status(400);
+        throw new Error('Selling price must be greater than cost price');
+      }
+    }
 
     const product = await Product.findOneAndUpdate(
       { _id: req.params.id, company: req.user.company },

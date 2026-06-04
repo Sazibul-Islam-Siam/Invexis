@@ -181,7 +181,7 @@ const TopBar = ({ isCollapsed, isMobile, mobileOpen, setMobileOpen }) => {
   }[role] || '');
 
   return (
-    <header className="h-16 bg-dark-900/80 backdrop-blur-md border-b border-dark-700 sticky top-0 z-30 flex items-center px-4 md:px-6">
+    <header className="h-16 bg-white-900/80 backdrop-blur-md border-b border-dark-700 sticky top-0 z-30 flex items-center px-4 md:px-6">
       {/* Mobile Hamburger */}
       {isMobile && (
         <button

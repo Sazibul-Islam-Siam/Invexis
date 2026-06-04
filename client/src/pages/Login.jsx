@@ -84,7 +84,7 @@ const Login = () => {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl font-bold text-dark-50 tracking-tight">
             Invexis
           </h1>
           <p className="text-dark-400 mt-2">
@@ -94,7 +94,7 @@ const Login = () => {
 
         {/* Login Card */}
         <div className="card">
-          <h2 className="text-xl font-semibold text-white mb-6">
+          <h2 className="text-xl font-semibold text-dark-50 mb-6">
             Sign in to your account
           </h2>
 

@@ -144,7 +144,7 @@ const Profile = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
           <HiOutlineUserCircle className="text-primary-400" />
           My Profile
         </h1>
@@ -175,7 +175,7 @@ const Profile = () => {
               {uploadingAvatar ? (
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
               ) : (
-                <HiOutlineCamera className="text-2xl text-white" />
+                <HiOutlineCamera className="text-2xl text-dark-50" />
               )}
             </button>
             <input
@@ -187,7 +187,7 @@ const Profile = () => {
             />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-white">{user?.name}</h2>
+            <h2 className="text-xl font-semibold text-dark-50">{user?.name}</h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-sm text-dark-400">{user?.email}</span>
               <span className={`px-2 py-0.5 rounded-lg text-xs font-medium border ${roleBadge[user?.role] || ''}`}>
@@ -250,7 +250,7 @@ const Profile = () => {
 
       {/* Change Password */}
       <div className="card">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <h3 className="text-lg font-semibold text-dark-50 mb-4 flex items-center gap-2">
           <HiOutlineLockClosed className="text-primary-400" />
           Change Password
         </h3>

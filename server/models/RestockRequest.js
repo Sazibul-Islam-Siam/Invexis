@@ -26,7 +26,7 @@ const restockRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending_admin', 'pending', 'accepted', 'rejected', 'shipped', 'delivered'],
+      enum: ['pending_admin', 'pending', 'accepted', 'rejected', 'shipped', 'delivered', 'rejected_shipment'],
       default: 'pending',
     },
     estimatedDelivery: {

@@ -105,7 +105,7 @@ const AuditLogs = () => {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
           <HiOutlineClipboardList className="text-primary-400" />
           Audit Logs
         </h1>
@@ -249,7 +249,7 @@ const AuditLogs = () => {
                             {log.user?.name?.charAt(0)?.toUpperCase() || '?'}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-white">{log.user?.name || 'Unknown'}</p>
+                            <p className="text-sm font-medium text-dark-50">{log.user?.name || 'Unknown'}</p>
                             <p className="text-xs text-dark-500 capitalize">{log.user?.role}</p>
                           </div>
                         </div>

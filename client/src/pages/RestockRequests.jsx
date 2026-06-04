@@ -23,6 +23,7 @@ const statusConfig = {
   rejected: { label: 'Rejected', className: 'bg-red-500/15 text-red-400 border-red-500/30' },
   shipped: { label: 'Shipped', className: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
   delivered: { label: 'Delivered', className: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+  rejected_shipment: { label: 'Shipment Rejected', className: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
 };
 
 const RestockRequests = () => {
@@ -171,10 +172,12 @@ const RestockRequests = () => {
     }
   };
 
-  const handleStatusUpdate = async (id, status) => {
+  const handleStatusUpdate = async (id, status, notes) => {
     try {
-      await restockService.updateRestockRequest(id, { status });
-      toast.success(`Request ${status}`);
+      const payload = { status };
+      if (notes) payload.notes = notes;
+      await restockService.updateRestockRequest(id, payload);
+      toast.success(`Request ${status === 'rejected_shipment' ? 'shipment rejected' : status}`);
       fetchRequests();
       window.dispatchEvent(new Event('refresh-notifications'));
     } catch (error) {
@@ -198,7 +201,7 @@ const RestockRequests = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-dark-50 flex items-center gap-2">
             <HiOutlineTruck className="text-primary-400" />
             Restock Requests
           </h1>
@@ -229,6 +232,7 @@ const RestockRequests = () => {
           <option value="shipped">Shipped</option>
           <option value="delivered">Delivered</option>
           <option value="rejected">Rejected</option>
+          <option value="rejected_shipment">Shipment Rejected</option>
         </select>
       </div>
 
@@ -270,7 +274,7 @@ const RestockRequests = () => {
                             <HiOutlineCube className="text-primary-400" />
                           </div>
                           <div>
-                            <p className="font-medium text-white">{r.product?.name}</p>
+                            <p className="font-medium text-dark-50">{r.product?.name}</p>
                             <code className="text-xs text-dark-500">{r.product?.sku}</code>
                           </div>
                         </div>
@@ -280,7 +284,7 @@ const RestockRequests = () => {
                       </td>
                       <td className="py-3.5 px-4 text-center">
                         {r.quantity ? (
-                          <span className="bg-dark-700 px-2.5 py-1 rounded-lg text-sm font-medium text-white">
+                          <span className="bg-dark-700 px-2.5 py-1 rounded-lg text-sm font-medium text-dark-50">
                             {r.quantity}
                           </span>
                         ) : (
@@ -355,18 +359,34 @@ const RestockRequests = () => {
                           )}
                           {/* Admin: Confirm Receipt when supplier has shipped */}
                           {user?.role === 'admin' && r.status === 'shipped' && (
-                            <button
-                              onClick={() => {
-                                if (window.confirm(
-                                  `Confirm receipt of ${r.quantity} × ${r.product?.name}?\n\nThis will mark the shipment as Delivered and add ${r.quantity} units to inventory.`
-                                )) {
-                                  handleStatusUpdate(r._id, 'delivered');
-                                }
-                              }}
-                              className="px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25 transition-colors flex items-center gap-1.5"
-                            >
-                              <HiOutlineInboxIn className="text-sm" /> Confirm Receipt
-                            </button>
+                            <>
+                              <button
+                                onClick={() => {
+                                  if (window.confirm(
+                                    `Confirm receipt of ${r.quantity} × ${r.product?.name}?\n\nThis will mark the shipment as Delivered and add ${r.quantity} units to inventory.`
+                                  )) {
+                                    handleStatusUpdate(r._id, 'delivered');
+                                  }
+                                }}
+                                className="px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/25 transition-colors flex items-center gap-1.5"
+                              >
+                                <HiOutlineInboxIn className="text-sm" /> Confirm Receipt
+                              </button>
+                              <button
+                                onClick={() => {
+                                  const reason = window.prompt(
+                                    `Reject shipment of ${r.quantity} × ${r.product?.name}?\n\nOptionally provide a reason for the supplier:`
+                                  );
+                                  if (reason !== null) {
+                                    handleStatusUpdate(r._id, 'rejected_shipment', reason);
+                                  }
+                                }}
+                                className="px-3 py-1.5 text-xs font-medium bg-red-500/15 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/25 transition-colors flex items-center gap-1.5"
+                                title="Reject Shipment"
+                              >
+                                <HiOutlineBan className="text-sm" /> Reject
+                              </button>
+                            </>
                           )}
                           {user?.role === 'admin' && (
                             <button
@@ -415,10 +435,10 @@ const RestockRequests = () => {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal}></div>
           <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-xl font-semibold text-dark-50">
                 {user?.role === 'staff' ? 'Request Restock' : 'New Restock Request'}
               </h2>
-              <button onClick={closeModal} className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all">
+              <button onClick={closeModal} className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all">
                 <HiOutlineX className="text-xl" />
               </button>
             </div>
@@ -529,8 +549,8 @@ const RestockRequests = () => {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowApproveModal(false)}></div>
           <div className="relative bg-dark-800 border border-dark-600 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Approve Restock Request</h2>
-              <button onClick={() => setShowApproveModal(false)} className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all">
+              <h2 className="text-xl font-semibold text-dark-50">Approve Restock Request</h2>
+              <button onClick={() => setShowApproveModal(false)} className="p-1.5 text-dark-400 hover:text-dark-50 hover:bg-dark-700 rounded-lg transition-all">
                 <HiOutlineX className="text-xl" />
               </button>
             </div>
@@ -542,7 +562,7 @@ const RestockRequests = () => {
                   <HiOutlineCube className="text-primary-400" />
                 </div>
                 <div>
-                  <p className="font-medium text-white">{approvingRequest.product?.name}</p>
+                  <p className="font-medium text-dark-50">{approvingRequest.product?.name}</p>
                   <p className="text-xs text-dark-500">Current Stock: {approvingRequest.product?.quantity} | Min: {approvingRequest.product?.minStockThreshold}</p>
                 </div>
               </div>

@@ -60,7 +60,7 @@ function App() {
             position="top-right"
             autoClose={3000}
             hideProgressBar={false}
-            theme="dark"
+            theme="light"
           />
         </div>
       </Router>
